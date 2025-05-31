@@ -35,6 +35,10 @@ public:
         return  m_Layers[LayerName][ID];
     };
 
+    CComponent* Get_Object_Component(string LayerName, _uint ID, string ComponentTag) {
+        return m_Layers[LayerName][ID]->Get_Object_Component(ComponentTag);
+	}
+
 private:
     unordered_map<string, Layer> m_Layers;
     unordered_map<string, CGameObject*> m_Prototypes;

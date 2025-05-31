@@ -26,9 +26,11 @@ protected:
 	CTransform* m_TransformCom = {};
 	class CGameInstance* m_GameInstance;
 
+public:
+	CComponent* Get_Object_Component(string ComName) { return m_Components[ComName]; };
+
 protected:
-	//unordered_map<string, class CComponent*> m_Components;
-	//CComponent* Get_Object_Component(string ComName) { return m_Components[ComName]; };
+	unordered_map<string, class CComponent*> m_Components;
 
 public:
 	void Free() override;

@@ -33,7 +33,7 @@ HRESULT CTank::Initialize(void* pArg)
     MaterialData mat{};
     mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds"));
     mat.NormalMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds"));
-    m_VIBuffer->Set_MatOffsets(mat.DiffuseMapIndex - 1); // Camera를 먼저 추가한다고 가정.
+    m_VIBuffer->Set_MatOffsets(mat.DiffuseMapIndex); // Camera를 먼저 추가한다고 가정.
     m_GameInstance->Add_Material("Tank_Glacis", mat);
 
     mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glass_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds"));
@@ -79,70 +79,6 @@ HRESULT CTank::Initialize(void* pArg)
 
 void CTank::Tick(float fTimeDelta)
 {
-    //if (_myPlayer) {
-
-    //    if (m_GameInstance->Key_Pressing(VK_UP)) {
-    //        m_TransformCom->Go_Straight(fTimeDelta * 30.f);
-    //        //_float4 tempPosition;
-    //        //XMStoreFloat4(&tempPosition, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-    //        //SendBufferRef sendBuffer = ClientPacketHandler::Make_C_MOVE(tempPosition.x, tempPosition.y, tempPosition.z);
-    //        //ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-    //    }
-
-    //    if (m_GameInstance->Key_Pressing(VK_LEFT)) {
-    //        m_TransformCom->Go_Left(fTimeDelta * 30.f);
-    //        //_float4 tempPosition;
-    //        //XMStoreFloat4(&tempPosition, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-    //        //SendBufferRef sendBuffer = ClientPacketHandler::Make_C_MOVE(tempPosition.x, tempPosition.y, tempPosition.z);
-    //        //ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-
-    //    }
-
-    //    if (m_GameInstance->Key_Pressing(VK_DOWN)) {
-    //        m_TransformCom->Go_Backward(fTimeDelta * 30.f);
-    //        //_float4 tempPosition;
-    //        //XMStoreFloat4(&tempPosition, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-    //        //SendBufferRef sendBuffer = ClientPacketHandler::Make_C_MOVE(tempPosition.x, tempPosition.y, tempPosition.z);
-    //        //ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-
-    //    }
-
-    //    if (m_GameInstance->Key_Pressing(VK_RIGHT)) {
-    //        m_TransformCom->Go_Right(fTimeDelta * 30.f);
-    //        //_float4 tempPosition;
-    //        //XMStoreFloat4(&tempPosition, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-    //        //SendBufferRef sendBuffer = ClientPacketHandler::Make_C_MOVE(tempPosition.x, tempPosition.y, tempPosition.z);
-    //        //ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-
-    //    }
-
-    //    _float4 Position;
-
-    //    XMStoreFloat4(&Position, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-
-    //    float TerrainY = ((CVIBuffer_Terrain*)(m_GameInstance->GetPrototype("TerrainCom")))->Get_Terrain_Heights(Position.x, Position.z);
-
-    //    m_TransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Position.x,TerrainY - 8.f,Position.z,1.f });
-
-    //}
-
-    /*if (m_GameInstance->Key_Pressing(VK_RIGHT))
-        m_TransformCom->Turn({ 0.f,1.f,0.f,0.f }, fTimeDelta);
-
-    if (m_GameInstance->Key_Pressing(VK_LEFT))
-        m_TransformCom->Turn({ 0.f,1.f,0.f,0.f }, -fTimeDelta);
-
-    if (m_GameInstance->Key_Pressing(VK_UP))
-        m_TransformCom->Turn(m_TransformCom->Get_State(CTransform::STATE_RIGHT), -fTimeDelta);
-
-    if (m_GameInstance->Key_Pressing(VK_DOWN))
-        m_TransformCom->Turn(m_TransformCom->Get_State(CTransform::STATE_RIGHT), fTimeDelta);
-
-    if (m_GameInstance->Key_Pressing(VK_SPACE))
-        m_TransformCom->Go_Straight(fTimeDelta);
-
-    if (m_GameInstance->Key_Pressing(VK_CONTROL))
-        m_TransformCom->Go_Backward(fTimeDelta);*/
 
     if (m_GameInstance->Key_Down('U'))
         m_TankConsrolState.leftThrust = true;
@@ -170,44 +106,31 @@ void CTank::Tick(float fTimeDelta)
 
     m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 
-    if (m_GameInstance->Key_Pressing(VK_RIGHT))
-        m_fPotapRotation += 1.f * fTimeDelta;
+    //if (m_GameInstance->Key_Pressing(VK_RIGHT))
+    //    m_TestX += 10.f * fTimeDelta;
 
-    if (m_GameInstance->Key_Pressing(VK_LEFT))
-        m_fPotapRotation -= 1.f * fTimeDelta;
+    //if (m_GameInstance->Key_Pressing(VK_LEFT))
+    //    m_TestX -= 10.f * fTimeDelta;
 
-    if (m_GameInstance->Key_Pressing(VK_UP))
-        m_fPosinRotation+= 1.f * fTimeDelta;
+    //if (m_GameInstance->Key_Pressing(VK_UP))
+    //    m_TestZ += 10.f * fTimeDelta;
 
-    if (m_GameInstance->Key_Pressing(VK_DOWN))
-        m_fPosinRotation -= 1.f * fTimeDelta;
+    //if (m_GameInstance->Key_Pressing(VK_DOWN))
+    //    m_TestZ -= 10.f * fTimeDelta;
+    //    //m_fPosinRotation += 1.f * fTimeDelta;
 
+    //_float4x4 matworld;
+    //XMStoreFloat4x4(&matworld, XMMatrixIdentity());
 
-    /*if (m_GameInstance->Key_Down(VK_SPACE))
-    {
-        if (m_CBIndex < 9)
-            ++m_CBIndex;
-        else
-            m_CBIndex = 0;
-    }
+    //m_TransformCom->Set_WorldMatrix(matworld);
 
-    _uint Matindex = m_MatIndicies[m_CBIndex];
-
-    if (m_GameInstance->Key_Down(VK_RIGHT))
-        if (Matindex < 8)
-            m_MatIndicies[m_CBIndex] += 1;
-
-    if (m_GameInstance->Key_Down(VK_LEFT))
-        if (Matindex > 0)
-            m_MatIndicies[m_CBIndex] -= 1;*/
+    //m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_TestX, 100.f, m_TestZ, 1.f));
 
 }
 
 void CTank::LateTick(float fTimeDelta)
 {
     __super::LateTick(fTimeDelta);
-
- 
 
 
     PxMat44 pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_CHASSIS);
@@ -219,104 +142,176 @@ void CTank::LateTick(float fTimeDelta)
         XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
         XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
     );
-    XMMATRIX mat2 = XMMATRIX(
+
+    _float4x4 matworld;
+    XMStoreFloat4x4(&matworld, mat);
+
+    m_TransformCom->Set_WorldMatrix(matworld);
+
+#pragma region Wheel
+
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIRST_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L1Mat = XMMATRIX(
         XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
         XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
         XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
-        XMVectorSet(0,0,0, pxMat.column3.w)
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
     );
-
-
-    PxMat44 pxMatL1 = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIFTH_WHEEL);
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SECOND_WHEEL);
 
     // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
-    XMMATRIX matL1 = XMMATRIX(
-        XMVectorSet(pxMatL1.column0.x, pxMatL1.column0.y, pxMatL1.column0.z, pxMatL1.column0.w),
-        XMVectorSet(pxMatL1.column1.x, pxMatL1.column1.y, pxMatL1.column1.z, pxMatL1.column1.w),
-        XMVectorSet(pxMatL1.column2.x, pxMatL1.column2.y, pxMatL1.column2.z, pxMatL1.column2.w),
-        XMVectorSet(pxMatL1.column3.x, pxMatL1.column3.y, pxMatL1.column3.z, pxMatL1.column3.w)
+    XMMATRIX R1Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_THIRD_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L2Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FOURTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R2Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIFTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L3Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SIXTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R3Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SEVENTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L4Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FIRST_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R4Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SECOND_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L5Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_THIRD_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R5Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FOURTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L6Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FIFTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R6Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SIXTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX L7Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
     );
 
-    //m_VIBuffer->Make_Root_Combined_Matrix(mat);
-    //m_VIBuffer->Make_Root_Combined_Matrix(XMMatrixIdentity());
+    pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SEVENTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX R7Mat = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
+    );
+#pragma endregion
 
 
-    XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation) * mat;
 
-    XMMATRIX matPosin = XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_RIGHT), m_fPosinRotation) * matPotap;
+    XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+
+    XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
+
+
+	m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
+	m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
+    
+
+    m_VIBuffer->Set_Transform_Matrix(24 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L1Mat); // Left First Wheel
+    m_VIBuffer->Set_Transform_Matrix(26 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L2Mat); // Left Second Wheel
+    m_VIBuffer->Set_Transform_Matrix(28 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L3Mat); // Left Third Wheel
+    m_VIBuffer->Set_Transform_Matrix(30 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L4Mat); // Left Fourth Wheel
+    m_VIBuffer->Set_Transform_Matrix(32 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L5Mat); // Left Fifth Wheel
+    m_VIBuffer->Set_Transform_Matrix(34 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L6Mat); // Left Sixth Wheel
+    m_VIBuffer->Set_Transform_Matrix(36 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L7Mat); // Left Seventh Wheel
+    m_VIBuffer->Set_Transform_Matrix(46 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R1Mat); // Right First Wheel
+    m_VIBuffer->Set_Transform_Matrix(37 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R2Mat); // Right Second Wheel
+    m_VIBuffer->Set_Transform_Matrix(35 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R3Mat); // Right Third Wheel
+    m_VIBuffer->Set_Transform_Matrix(33 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R4Mat); // Right Fourth Wheel
+    m_VIBuffer->Set_Transform_Matrix(44 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R5Mat); // Right Fifth Wheel
+    m_VIBuffer->Set_Transform_Matrix(48 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R6Mat); // Right Sixth Wheel
+    m_VIBuffer->Set_Transform_Matrix(42 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R7Mat); // Right Seventh Wheel
+
 
     m_VIBuffer->Invalidate_Bones();
 
-
-#pragma region Chassis
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(0, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(1, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(2, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(3, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(4, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(6, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(7, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(8, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(9, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(10, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(11, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(12, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(13, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(14, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(15, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(16, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(17, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(18, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(19, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(20, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(21, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(22, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(23, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(38, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(39, mat);
-#pragma endregion Chassis
-
-#pragma region Potap
-
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(5, matPotap );
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(25, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(27, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(31, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(40, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(41, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(43, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(45, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(47, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(49, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(52, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(53, matPotap);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(54, matPotap);
-
-#pragma endregion Potap
-
-#pragma region Posin
     m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
-#pragma endregion Posin
-
-#pragma region Wheels
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(24, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(26, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(28, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(30, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(32, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(34, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(36, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(46, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(37, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(35, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(33, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(44, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(48, mat);
-    m_VIBuffer->Multiply_Mesh_Combined_Matrix(42, mat);
-#pragma endregion Wheels
-
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
+ 
     m_VIBuffer->Update();
 }
 
@@ -324,6 +319,16 @@ void CTank::Render()
 {
     for(int i = 0; i < 55; ++i)
         m_VIBuffer->Render(i);
+}
+
+void CTank::Set_PotapRotation(float fDegree)
+{
+    m_fPotapRotation = fDegree;
+}
+
+void CTank::Set_PoSinpRotation(float fDegree)
+{
+    m_fPosinRotation = fDegree;
 }
 
 void CTank::Free()

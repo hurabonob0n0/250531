@@ -44,6 +44,7 @@ public:		//For_InputDev
 	//bool Mouse_Down(MOUSEKEYSTATE button);
 	//bool Mouse_Up(MOUSEKEYSTATE button);
 	//bool Mouse_Pressing(MOUSEKEYSTATE button);
+	bool Mouse_Down(UINT button) { return m_Input_Dev->Mouse_Down(button); }
 
 	SHORT Get_Mouse_XDelta() { return m_Input_Dev->Get_Mouse_XDelta(); }
 	SHORT Get_Mouse_YDelta() { return m_Input_Dev->Get_Mouse_YDelta(); }
@@ -63,6 +64,8 @@ public: //For ComponentMgr
 public: //For ObjectMgr
 	HRESULT AddObject(string PrototypeTag, string layerTag, void* pArg) { return m_ObjectMgr->AddObject(PrototypeTag, layerTag, pArg); }
 	HRESULT Add_PrototypeObject(string Prototypename, CGameObject* pGameObject) { return m_ObjectMgr->Add_PrototypeObject(Prototypename, pGameObject); }
+	CComponent* Get_Object_Component(string LayerName, _uint ID, string ComponentTag){ return m_ObjectMgr->Get_Object_Component(LayerName, ID, ComponentTag); }
+
 public:
 	void Set_Pos_For_Server(string LayerName, _uint ID, float* pos) {
 		m_ObjectMgr->Set_Pos_For_Server(LayerName, ID, pos);

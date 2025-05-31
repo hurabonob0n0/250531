@@ -59,8 +59,9 @@ HRESULT CModel::Initialize_Prototype(TYPE eModelType, const string& strModelFile
 	/* 내뼈의 정보만 필요한게아니라 이 뼈의 부모가 대체 누구였는가?! */
 	/* 부모자식간의 뼈의 관계 + 뼈의 상태를 로드하는 작업이 Ready_Bones함수의 역활이다. */
 	/* aiNode */
-	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
-		return E_FAIL;
+	/*if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+		return E_FAIL;*/
+	Load_Tank_Bones();
 	//Todo : 뼈행렬 어떻게 할 지 처리
 
 	/* 모델 = 메시 + 메시 + ...*/
@@ -102,6 +103,11 @@ void CModel::Update()
 	for (auto& mesh : m_Meshes) {
 		mesh->Update();
 	}
+
+	/*for (int i = 0; i < m_Meshes.size() - 1; ++i)
+	{
+		m_Meshes[i]->Update();
+	}*/
 }
 
 /* 사전에 뼈의 상태들을 셰이더로 던진다. */
@@ -132,56 +138,123 @@ void CModel::Multiply_Mesh_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
 	m_Meshes[iMeshIndex]->m_Bone->Mul_CombinedTransformationMatrix(WorldMat);
 }
 
-//void CModel::Save_For_Tank_Bones()
-//{
-//	struct BoneData {
-//		char        m_szName[MAX_PATH];
-//		_float4x4   m_TransformationMatrix;
-//		int         m_iParentBoneIndex;
-//	};
-//
-//	BoneData bones[3];
-//
-//	strcpy_s(bones[0].m_szName, "RootNode");
-//	XMStoreFloat4x4(&bones[0].m_TransformationMatrix, XMMatrixIdentity());
-//	bones[0].m_iParentBoneIndex = -1;
-//
-//	strcpy_s(bones[1].m_szName, "PotabNode");
-//	XMStoreFloat4x4(&bones[1].m_TransformationMatrix, XMMatrixIdentity());
-//	bones[1].m_iParentBoneIndex = 0;
-//
-//	strcpy_s(bones[2].m_szName, "PosinNode");
-//	XMStoreFloat4x4(&bones[2].m_TransformationMatrix, XMMatrixIdentity());
-//	bones[2].m_iParentBoneIndex = 1;
-//
-//	std::ofstream fout("../bin/Models/Tank/TankBones", std::ios::binary);
-//	if (fout.is_open())
-//	{
-//		uint32_t iNumBones = 57;
-//		fout.write(reinterpret_cast<const char*>(&iNumBones), sizeof(uint32_t));
-//
-//		for (int i = 0; i < 3; ++i)
-//		{
-//			fout.write(reinterpret_cast<const char*>(bones[i].m_szName), MAX_PATH);
-//			fout.write(reinterpret_cast<const char*>(&bones[i].m_TransformationMatrix), sizeof(_float4x4));
-//			fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), sizeof(int));
-//		}
-//
-//		for (int i = 0; i < 55; ++i) {
-//			if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14 || i == 15 || i == 16 || i == 17 || i == 18 ||
-//				i == 19 || i == 20 || i == 21 || i == 22 || i == 23 || i == 38 || i == 39)
-//			{
-//				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_szName), MAX_PATH);
-//				fout.write(reinterpret_cast<const char*>(&bones[i].m_TransformationMatrix), sizeof(_float4x4));
-//				fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), 0);
-//			}
-//		}
-//
-//		fout.close();
-//	}
-//
-//	
-//}
+void CModel::Set_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
+{
+	m_Bones[iMeshIndex]->Set_TransformationMatrix(WorldMat);
+}
+
+void CModel::Save_For_Tank_Bones()
+{
+	struct BoneData {
+		char        m_szName[MAX_PATH];
+		_float4x4   m_TransformationMatrix;
+		int         m_iParentBoneIndex;
+	};
+
+	BoneData bones[3];
+
+	strcpy_s(bones[0].m_szName, "RootNode");
+	XMStoreFloat4x4(&bones[0].m_TransformationMatrix, XMMatrixIdentity());
+	bones[0].m_iParentBoneIndex = -1;
+
+	strcpy_s(bones[1].m_szName, "PotabNode");
+	XMStoreFloat4x4(&bones[1].m_TransformationMatrix, XMMatrixIdentity());
+	bones[1].m_iParentBoneIndex = 0;
+
+	strcpy_s(bones[2].m_szName, "PosinNode");
+	XMStoreFloat4x4(&bones[2].m_TransformationMatrix, XMMatrixIdentity());
+	bones[2].m_iParentBoneIndex = 1;
+
+	std::ofstream fout("../bin/Models/Tank/TankBones", std::ios::binary);
+	if (fout.is_open())
+	{
+		uint32_t iNumBones = 58;
+		fout.write(reinterpret_cast<const char*>(&iNumBones), sizeof(uint32_t));
+
+		for (int i = 0; i < 3; ++i)
+		{
+			fout.write(reinterpret_cast<const char*>(bones[i].m_szName), MAX_PATH);
+			fout.write(reinterpret_cast<const char*>(&bones[i].m_TransformationMatrix), sizeof(_float4x4));
+			fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), sizeof(int));
+		}
+
+		for (int i = 0; i < 55; ++i) {
+			if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14 || i == 15 || i == 16 || i == 17 || i == 18 ||
+				i == 19 || i == 20 || i == 21 || i == 22 || i == 23 || i == 38 || i == 39)
+			{
+				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 0;
+				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
+			}
+			else if (i == 5 || i == 25 || i == 27  || i == 31 || i == 40 || i == 41 || i == 43 || i == 45 || i == 47 || i == 49 || i == 52 || i == 53 || i == 54)
+			{
+				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 1;
+				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
+			}
+			else if (i == 29 || i == 51 || i == 50 )
+			{
+				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 2;
+				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
+			}
+			else if (i == 24 || i == 26 || i == 28 || i == 30 || i == 32 || i == 34 || i == 36 || i == 46 || i == 37 || i == 35 || i == 33 || i == 44 || i == 48 || i == 42)
+			{
+				m_Meshes[i]->m_Bone->m_iParentBoneIndex = -1;
+				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
+				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
+			}
+
+				
+		}
+
+		fout.close();
+	}
+
+	
+}
+
+void CModel::Load_Tank_Bones()
+{
+	std::ifstream fin("../bin/Models/Tank/TankBones", std::ios::binary);
+	if (!fin.is_open())
+	{
+		MessageBoxA(nullptr, "Failed to open TankBones file for reading.", "Error", MB_OK);
+		return;
+	}
+
+	uint32_t iNumBones = 0;
+	fin.read(reinterpret_cast<char*>(&iNumBones), sizeof(uint32_t));
+
+	m_Bones.clear();
+	m_Bones.reserve(iNumBones);
+
+	for (uint32_t i = 0; i < iNumBones; ++i)
+	{
+		char szName[MAX_PATH] = "";
+		_float4x4 transformation = {};
+		int iParentIndex = -1;
+
+		fin.read(reinterpret_cast<char*>(szName), MAX_PATH);
+		fin.read(reinterpret_cast<char*>(&transformation), sizeof(_float4x4));
+		fin.read(reinterpret_cast<char*>(&iParentIndex), sizeof(int));
+
+
+		CBone* pBone = CBone::Create(szName, transformation,iParentIndex);  // CBone 생성자 직접 사용
+		/*strcpy_s(pBone->m_szName, szName);
+		memcpy(&pBone->m_TransformationMatrix, &transformation, sizeof(_float4x4));
+		XMStoreFloat4x4(&pBone->m_CombindTransformationMatrix, XMMatrixIdentity());
+		pBone->m_iParentBoneIndex = iParentIndex;*/
+
+		m_Bones.push_back(pBone);
+	}
+
+	fin.close();
+}
 
 
 

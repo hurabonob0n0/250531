@@ -36,9 +36,11 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 	void Make_Root_Combined_Matrix(_fmatrix WorldMat = XMMatrixIdentity());
 	void Multiply_Mesh_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
+	void Set_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
 
 public:
-	//void Save_For_Tank_Bones();
+	void Save_For_Tank_Bones();
+	void Load_Tank_Bones();
 
 
 private:

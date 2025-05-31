@@ -69,7 +69,7 @@ void MyPhysicsEngine::CMyPhysicsEngine::Add_Terrain_From_File(const char* fileNa
 VehicleDesc MyPhysicsEngine::CMyPhysicsEngine::initTankDesc()
 {
 	const PxF32 chassisMass = 6200.0f;
-	const PxVec3 chassisDims(3.8f, 1.5f, 9.6f);
+	const PxVec3 chassisDims(3.8f, 1.f, 9.6f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) * chassisMass / 12.0f,
 		(chassisDims.x * chassisDims.x + chassisDims.z * chassisDims.z) * 0.8f * chassisMass / 12.0f,
@@ -79,8 +79,12 @@ VehicleDesc MyPhysicsEngine::CMyPhysicsEngine::initTankDesc()
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	const PxF32 wheelMass = 60.0f;
-	const PxF32 wheelRadius = 0.5f;
+	/*const PxF32 wheelRadius = 0.5f;
 	const PxF32 wheelWidth = 0.6f;
+	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
+	const PxU32 nbWheels = 14;*/
+	const PxF32 wheelRadius = 0.25f;  // 약 92cm 정도로 보임
+	const PxF32 wheelWidth = 0.4f;    // 약 40cm 정도로 가정
 	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 14;
 
@@ -117,6 +121,15 @@ void MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(float x, float y, float z)
 	gTank->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	gTank->mDriveDynData.setUseAutoGears(true);
 	gTank->setDriveModel(PxVehicleDriveTankControlModel::eSTANDARD);
+
+	m_VehicleQueryResult.wheelQueryResults = m_WheelQueryResults;
+}
+
+void MyPhysicsEngine::CMyPhysicsEngine::Set_Pos(float x, float y, float z)
+{
+	PxTransform startTransform(PxVec3(x, y, z), PxQuat(PxIdentity));
+	gTank->getRigidDynamicActor()->setGlobalPose(startTransform);
+	gTank->setToRestState();
 }
 
 void MyPhysicsEngine::CMyPhysicsEngine::Set_Tank_ControlState(TankControlState TCS)
@@ -141,9 +154,11 @@ void MyPhysicsEngine::CMyPhysicsEngine::Update_PhysX(float deltaTime)
 	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastQueryResultsSize, raycastQueryResults);
 
 	//Vehicle update.
+	//m_VehicleQueryResult.wheelQueryResults = m_WheelQueryResults;
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, gTank->mWheelsSimData.getNbWheels()} };
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {m_WheelQueryResults, gTank->mWheelsSimData.getNbWheels()} };
+	m_VehicleQueryResult = vehicleQueryResults[0];
 	PxVehicleUpdates(deltaTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults);
 
 	//Scene update.
@@ -169,29 +184,33 @@ PxMat44 MyPhysicsEngine::CMyPhysicsEngine::Get_Tank_Transform(TankComponent TC)
 			// 휠 요청
 			else if (TC > TC_CHASSIS && TC < TC_COUNT)
 			{
-				// 휠 인덱스 확인
-				const PxU32 wheelIndex = static_cast<PxU32>(TC) - 1;
+				PxU32 wheelIndex = static_cast<PxU32>(TC) - 1;
 
-				// 휠이 존재하는지 확인
 				if (wheelIndex < gTank->mWheelsSimData.getNbWheels())
 				{
-					// 휠 중심 위치 계산
-					const PxVec3 suspTravelDir = gTank->mWheelsSimData.getSuspTravelDirection(wheelIndex);
-					const PxVec3 suspOffset = gTank->mWheelsSimData.getSuspForceAppPointOffset(wheelIndex);
-					const PxVec3 wheelOffset = gTank->mWheelsSimData.getWheelCentreOffset(wheelIndex);
+					const PxVehicleWheelQueryResult& wheelQuery = m_VehicleQueryResult;
+					const PxWheelQueryResult& wheelResult = wheelQuery.wheelQueryResults[wheelIndex];
 
-					const PxTransform chassisPose = actor->getGlobalPose();
-					const PxVec3 worldSuspPos = chassisPose.transform(wheelOffset);
+					// 휠 위치와 회전을 포함한 Transform
+					const PxTransform wheelPose(wheelResult.localPose.p);
 
-					// 휠 회전은 PxWheelQueryResult를 이용해야 정확하지만,
-					// 여기서는 위치만 변환 행렬로 줄게.
-					transform = PxMat44(PxTransform(worldSuspPos));
+					// 차량 차체의 글로벌 Pose 기준으로 변환
+					const PxTransform chassisPose = gTank->getRigidDynamicActor()->getGlobalPose();
+					PxTransform globalWheelPose = chassisPose*wheelPose;
+
+					//globalWheelPose.p *= 0.5f;
+					//globalWheelPose.p.y += 1.5f;
+
+					//globalWheelPose.p.y += 0.3f;
+
+					transform = PxMat44(globalWheelPose);
+					//transform = PxMat44(wheelPose);
 				}
 			}
-		}
-	}
 
-	return transform;
+		}
+		return transform;
+	}
 }
 
 void MyPhysicsEngine::CMyPhysicsEngine::Release_PhysX()

@@ -59,6 +59,7 @@ public:
 	void Add_Terrain_From_File(const char* fileName, float scale = 1.0f, float heightScale = 1.0f);
 	VehicleDesc initTankDesc();
 	void Add_Tank(float x, float y, float z);
+	void Set_Pos(float x, float y, float z);
 	void Set_Tank_ControlState(TankControlState TCS);
 	void Update_PhysX(float deltaTime);
 	PxMat44 Get_Tank_Transform(TankComponent TC);
@@ -87,6 +88,9 @@ private:
 	PxVehicleDriveTank* gTank = NULL;
 
 	TankControlState m_TankControlState;
+
+	PxVehicleWheelQueryResult m_VehicleQueryResult;
+	PxWheelQueryResult        m_WheelQueryResults[PX_MAX_NB_WHEELS]{};
 
 public:
 	static CMyPhysicsEngine* Get_Instance();

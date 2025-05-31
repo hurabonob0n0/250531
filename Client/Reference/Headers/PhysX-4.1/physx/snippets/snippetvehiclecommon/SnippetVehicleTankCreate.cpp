@@ -50,9 +50,9 @@ void computeWheelCenterActorOffsets
 	for(PxU32 i = 0; i < numWheels; i+=2)
 	{
 		//Left wheel offset from origin.
-		wheelCentreOffsets[i + 0] = PxVec3((-chassisDims.x + wheelWidth)*0.5f, -(chassisDims.y/2 + wheelRadius), wheelRearZ + i*deltaZ*0.5f);
+		wheelCentreOffsets[i + 0] = PxVec3((-chassisDims.x + wheelWidth * 1.6f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
 		//Right wheel offsets from origin.
-		wheelCentreOffsets[i + 1] = PxVec3((+chassisDims.x - wheelWidth)*0.5f, -(chassisDims.y/2 + wheelRadius), wheelRearZ + i*deltaZ*0.5f);
+		wheelCentreOffsets[i + 1] = PxVec3((+chassisDims.x - wheelWidth * 1.6f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
 	}
 }
 
@@ -99,7 +99,7 @@ void setupWheelsSimulationData
 		for(PxU32 i = 0; i < numWheels; i++)
 		{
 			suspensions[i].mMaxCompression = 0.4f;
-			suspensions[i].mMaxDroop = 0.2f;
+			suspensions[i].mMaxDroop = 0.1f;
 			suspensions[i].mSpringStrength = 30000.0f;
 			suspensions[i].mSpringDamperRate = 4500.0f;
 			suspensions[i].mSprungMass = suspSprungMasses[i];
@@ -199,8 +199,11 @@ PxVehicleDriveTank* createVehicleTank(const VehicleDesc& tankDesc, PxPhysics* ph
 	{
 		//Compute the wheel center offsets from the origin.
 		PxVec3 wheelCentreActorOffsets[PX_MAX_NB_WHEELS];
-		const PxF32 frontZ = chassisDims.z*0.35f;
-		const PxF32 rearZ = -chassisDims.z*0.35f;
+		/*const PxF32 frontZ = chassisDims.z*0.35f;
+		const PxF32 rearZ = -chassisDims.z*0.35f;*/
+		const PxF32 marginZ = 1.f; // 앞뒤 끝에서 좀 띄움
+		const PxF32 frontZ = chassisDims.z * 0.35f - marginZ;
+		const PxF32 rearZ = -chassisDims.z * 0.35f + marginZ - 0.5f;
 		tank::computeWheelCenterActorOffsets(frontZ, rearZ, chassisDims, wheelWidth, wheelRadius, numWheels, wheelCentreActorOffsets);
 
 		tank::setupWheelsSimulationData

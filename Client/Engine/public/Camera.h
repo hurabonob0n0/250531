@@ -17,7 +17,7 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
-private:
+protected:
 	bool m_isPaused = false;
 	float m_Speed = 1.f;
 
