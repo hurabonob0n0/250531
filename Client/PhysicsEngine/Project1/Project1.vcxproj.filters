@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Snippet">
+      <UniqueIdentifier>{42edb1e9-826a-48f2-b207-3f9e8790d4f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Snippet\headers">
+      <UniqueIdentifier>{d1d040c8-4d3b-4704-9a5f-cfd204440b79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Snippet\src">
+      <UniqueIdentifier>{9c3da904-bb06-4fd5-83e7-370dad2054fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngineClass">
+      <UniqueIdentifier>{4daf6a61-05dc-4a43-a0aa-398fa585047e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehicletank\SnippetVehicleTank.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehicletank\SnippetVehicleTankRender.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicle4WCreate.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTankCreate.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.cpp">
+      <Filter>Snippet\src</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPhysicsEngine.cpp">
+      <Filter>MyEngineClass</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleConcurrency.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleCreate.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleFilterShader.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleSceneQuery.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleTireFriction.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PhysX-4.1\physx\snippets\snippetvehiclecommon\SnippetVehicleWheelQueryResult.h">
+      <Filter>Snippet\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MyPhysicsEngine.h">
+      <Filter>MyEngineClass</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

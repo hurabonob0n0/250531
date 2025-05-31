@@ -1,0 +1,925 @@
+1. BoneName: RootNode, ParentIndex: -1
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+2. BoneName: M1A2_Glacis_Plate_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.274908, 1.4337, -0.00452698, 1, 
+3. BoneName: M1A2_Glacis_Plate_$AssimpFbx$_PreRotation, ParentIndex: 1
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+4. BoneName: M1A2_Glacis_Plate, ParentIndex: 2
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+5. BoneName: M1A2_Light_Glass_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-3.38992, 1.21794, -0.826228, 1, 
+6. BoneName: M1A2_Light_Glass_$AssimpFbx$_PreRotation, ParentIndex: 4
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+7. BoneName: M1A2_Light_Glass, ParentIndex: 5
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+8. BoneName: M1A2_Fences_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.0674, 1.71946, -0.962604, 1, 
+9. BoneName: M1A2_Fences_$AssimpFbx$_PreRotation, ParentIndex: 7
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+10. BoneName: M1A2_Fences, ParentIndex: 8
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+11. BoneName: M1A2_Wheel_028_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-2.8038, 0.813191, 1.63189, 1, 
+12. BoneName: M1A2_Wheel_028_$AssimpFbx$_PreRotation, ParentIndex: 10
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+13. BoneName: M1A2_Wheel_028_$AssimpFbx$_Rotation, ParentIndex: 11
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+14. BoneName: M1A2_Wheel_028, ParentIndex: 12
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+15. BoneName: M1A2_Wheel_029_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-2.8038, 0.813191, -1.61419, 1, 
+16. BoneName: M1A2_Wheel_029_$AssimpFbx$_PreRotation, ParentIndex: 14
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+17. BoneName: M1A2_Wheel_029_$AssimpFbx$_Rotation, ParentIndex: 15
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+18. BoneName: M1A2_Wheel_029, ParentIndex: 16
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+19. BoneName: M1A2_Turret_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.274908, 2.3519, -0.00452694, 1, 
+20. BoneName: M1A2_Turret_$AssimpFbx$_PreRotation, ParentIndex: 18
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+21. BoneName: M1A2_Turret, ParentIndex: 19
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+22. BoneName: W_Base_008_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.73501, 0.556349, 1.08906, 1, 
+23. BoneName: W_Base_008_$AssimpFbx$_PreRotation, ParentIndex: 21
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+24. BoneName: W_Base_008, ParentIndex: 22
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+25. BoneName: W_Base_010_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.251013, 0.556349, 1.08906, 1, 
+26. BoneName: W_Base_010_$AssimpFbx$_PreRotation, ParentIndex: 24
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+27. BoneName: W_Base_010, ParentIndex: 25
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+28. BoneName: W_Base_011_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.490987, 0.556349, 1.08906, 1, 
+29. BoneName: W_Base_011_$AssimpFbx$_PreRotation, ParentIndex: 27
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+30. BoneName: W_Base_011, ParentIndex: 28
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+31. BoneName: W_Base_012_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.23299, 0.556349, 1.08906, 1, 
+32. BoneName: W_Base_012_$AssimpFbx$_PreRotation, ParentIndex: 30
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+33. BoneName: W_Base_012, ParentIndex: 31
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+34. BoneName: W_Base_013_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.97499, 0.556349, 1.08906, 1, 
+35. BoneName: W_Base_013_$AssimpFbx$_PreRotation, ParentIndex: 33
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+36. BoneName: W_Base_013, ParentIndex: 34
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+37. BoneName: W_Base_009_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.993013, 0.556349, 1.08906, 1, 
+38. BoneName: W_Base_009_$AssimpFbx$_PreRotation, ParentIndex: 36
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+39. BoneName: W_Base_009, ParentIndex: 37
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+40. BoneName: W_Base_007_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.47701, 0.556349, 1.08906, 1, 
+41. BoneName: W_Base_007_$AssimpFbx$_PreRotation, ParentIndex: 39
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+42. BoneName: W_Base_007, ParentIndex: 40
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+43. BoneName: M1A2_Sprocket_Right_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.72165, 0.853124, 1.42807, 1, 
+44. BoneName: M1A2_Sprocket_Right_$AssimpFbx$_PreRotation, ParentIndex: 42
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+45. BoneName: M1A2_Sprocket_Right_$AssimpFbx$_Rotation, ParentIndex: 43
+0.970557, -1.69698e-07, 0.24087, 0, 
+2.16961e-07, 1, -1.69698e-07, 0, 
+-0.24087, 2.16961e-07, 0.970557, -0, 
+0, 0, -0, 1, 
+46. BoneName: M1A2_Sprocket_Right, ParentIndex: 44
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+47. BoneName: M1A2_Sprocket_Left_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.72631, 0.854796, -1.66456, 1, 
+48. BoneName: M1A2_Sprocket_Left_$AssimpFbx$_PreRotation, ParentIndex: 46
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+49. BoneName: M1A2_Sprocket_Left_$AssimpFbx$_Rotation, ParentIndex: 47
+-0.970557, -8.48488e-08, -0.24087, 0, 
+-6.63652e-08, 1, -8.48488e-08, 0, 
+0.24087, -6.63652e-08, -0.970557, -0, 
+0, 0, -0, 1, 
+50. BoneName: M1A2_Sprocket_Left, ParentIndex: 48
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+51. BoneName: W_Base_006_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.47701, 0.556349, -1.08352, 1, 
+52. BoneName: W_Base_006_$AssimpFbx$_PreRotation, ParentIndex: 50
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+53. BoneName: W_Base_006_$AssimpFbx$_Rotation, ParentIndex: 51
+0.999905, 3.32441e-07, 0.0137551, 0, 
+-3.32472e-07, 1, -0, 0, 
+-0.0137551, -4.57318e-09, 0.999905, -0, 
+0, 0, -0, 1, 
+54. BoneName: W_Base_006, ParentIndex: 52
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+55. BoneName: W_Base_005_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.73401, 0.556349, -1.08352, 1, 
+56. BoneName: W_Base_005_$AssimpFbx$_PreRotation, ParentIndex: 54
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+57. BoneName: W_Base_005, ParentIndex: 55
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+58. BoneName: W_Base_004_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.991013, 0.556349, -1.08352, 1, 
+59. BoneName: W_Base_004_$AssimpFbx$_PreRotation, ParentIndex: 57
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+60. BoneName: W_Base_004, ParentIndex: 58
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+61. BoneName: W_Base_003_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.248013, 0.556349, -1.08352, 1, 
+62. BoneName: W_Base_003_$AssimpFbx$_PreRotation, ParentIndex: 60
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+63. BoneName: W_Base_003, ParentIndex: 61
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+64. BoneName: W_Base_002_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.494987, 0.556349, -1.08352, 1, 
+65. BoneName: W_Base_002_$AssimpFbx$_PreRotation, ParentIndex: 63
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+66. BoneName: W_Base_002, ParentIndex: 64
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+67. BoneName: W_Base_001_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.23799, 0.556349, -1.08352, 1, 
+68. BoneName: W_Base_001_$AssimpFbx$_PreRotation, ParentIndex: 66
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+69. BoneName: W_Base_001, ParentIndex: 67
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+70. BoneName: W_Base_000_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.98099, 0.556349, -1.08352, 1, 
+71. BoneName: W_Base_000_$AssimpFbx$_PreRotation, ParentIndex: 69
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+72. BoneName: W_Base_000, ParentIndex: 70
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+73. BoneName: M1A2_Fences_02_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.01885, 1.94867, -4.79221e-07, 1, 
+74. BoneName: M1A2_Fences_02_$AssimpFbx$_PreRotation, ParentIndex: 72
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+75. BoneName: M1A2_Fences_02, ParentIndex: 73
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+76. BoneName: M1A2_Fences_003_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.38776, 2.48508, -0.595428, 1, 
+77. BoneName: M1A2_Fences_003_$AssimpFbx$_PreRotation, ParentIndex: 75
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+78. BoneName: M1A2_Fences_003, ParentIndex: 76
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+79. BoneName: M1A2_Wheel_020_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.62386, 0.398452, -1.61419, 1, 
+80. BoneName: M1A2_Wheel_020_$AssimpFbx$_PreRotation, ParentIndex: 78
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+81. BoneName: M1A2_Wheel_020_$AssimpFbx$_Rotation, ParentIndex: 79
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+82. BoneName: M1A2_Wheel_020, ParentIndex: 80
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+83. BoneName: M1A2_Optical_Periscope_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.274908, 2.63623, -0.00452702, 1, 
+84. BoneName: M1A2_Optical_Periscope_$AssimpFbx$_PreRotation, ParentIndex: 82
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+85. BoneName: M1A2_Optical_Periscope, ParentIndex: 83
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+86. BoneName: M1A2_Wheel_019_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.880858, 0.398452, -1.61419, 1, 
+87. BoneName: M1A2_Wheel_019_$AssimpFbx$_PreRotation, ParentIndex: 85
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+88. BoneName: M1A2_Wheel_019_$AssimpFbx$_Rotation, ParentIndex: 86
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+89. BoneName: M1A2_Wheel_019, ParentIndex: 87
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+90. BoneName: Cylinder047_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.798802, 2.35696, -1.04911, 1, 
+91. BoneName: Cylinder047_$AssimpFbx$_PreRotation, ParentIndex: 89
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+92. BoneName: Cylinder047, ParentIndex: 90
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+93. BoneName: M1A2_Wheel_018_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.137858, 0.398452, -1.61419, 1, 
+94. BoneName: M1A2_Wheel_018_$AssimpFbx$_PreRotation, ParentIndex: 92
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+95. BoneName: M1A2_Wheel_018_$AssimpFbx$_Rotation, ParentIndex: 93
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+96. BoneName: M1A2_Wheel_018, ParentIndex: 94
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+97. BoneName: M1A2_Gun_Mantlet_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.52942, 1.93412, 4.68791e-07, 1, 
+98. BoneName: M1A2_Gun_Mantlet_$AssimpFbx$_PreRotation, ParentIndex: 96
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+99. BoneName: M1A2_Gun_Mantlet, ParentIndex: 97
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+100. BoneName: M1A2_Wheel_017_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.605142, 0.398452, -1.61419, 1, 
+101. BoneName: M1A2_Wheel_017_$AssimpFbx$_PreRotation, ParentIndex: 99
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+102. BoneName: M1A2_Wheel_017_$AssimpFbx$_Rotation, ParentIndex: 100
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+103. BoneName: M1A2_Wheel_017, ParentIndex: 101
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+104. BoneName: M2-50_Base_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.0682564, 2.52984, 0.470548, 1, 
+105. BoneName: M2-50_Base_$AssimpFbx$_PreRotation, ParentIndex: 103
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+106. BoneName: M2-50_Base, ParentIndex: 104
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+107. BoneName: M1A2_Wheel_005_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.34814, 0.398452, -1.61419, 1, 
+108. BoneName: M1A2_Wheel_005_$AssimpFbx$_PreRotation, ParentIndex: 106
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+109. BoneName: M1A2_Wheel_005_$AssimpFbx$_Rotation, ParentIndex: 107
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+110. BoneName: M1A2_Wheel_005, ParentIndex: 108
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+111. BoneName: M1A2_Wheel_024_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.605142, 0.398452, 1.63189, 1, 
+112. BoneName: M1A2_Wheel_024_$AssimpFbx$_PreRotation, ParentIndex: 110
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+113. BoneName: M1A2_Wheel_024_$AssimpFbx$_Rotation, ParentIndex: 111
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+114. BoneName: M1A2_Wheel_024, ParentIndex: 112
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+115. BoneName: M1A2_Wheel_006_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.09114, 0.398452, -1.61419, 1, 
+116. BoneName: M1A2_Wheel_006_$AssimpFbx$_PreRotation, ParentIndex: 114
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+117. BoneName: M1A2_Wheel_006_$AssimpFbx$_Rotation, ParentIndex: 115
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+118. BoneName: M1A2_Wheel_006, ParentIndex: 116
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+119. BoneName: M1A2_Wheel_025_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.137858, 0.398452, 1.63189, 1, 
+120. BoneName: M1A2_Wheel_025_$AssimpFbx$_PreRotation, ParentIndex: 118
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+121. BoneName: M1A2_Wheel_025_$AssimpFbx$_Rotation, ParentIndex: 119
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+122. BoneName: M1A2_Wheel_025, ParentIndex: 120
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+123. BoneName: M1A2_Wheel_007_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.83194, 0.393555, -1.61419, 1, 
+124. BoneName: M1A2_Wheel_007_$AssimpFbx$_PreRotation, ParentIndex: 122
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+125. BoneName: M1A2_Wheel_007_$AssimpFbx$_Rotation, ParentIndex: 123
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+126. BoneName: M1A2_Wheel_007, ParentIndex: 124
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+127. BoneName: M1A2_Wheel_026_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-0.880858, 0.398452, 1.63189, 1, 
+128. BoneName: M1A2_Wheel_026_$AssimpFbx$_PreRotation, ParentIndex: 126
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+129. BoneName: M1A2_Wheel_026_$AssimpFbx$_Rotation, ParentIndex: 127
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+130. BoneName: M1A2_Wheel_026, ParentIndex: 128
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+131. BoneName: M1A2_Chain_01_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.72415, 0.839993, -1.42791, 1, 
+132. BoneName: M1A2_Chain_01_$AssimpFbx$_PreRotation, ParentIndex: 130
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+133. BoneName: M1A2_Chain_01, ParentIndex: 131
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+134. BoneName: M1A2_Chain_02_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.38958, 0.839993, 1.54561, 1, 
+135. BoneName: M1A2_Chain_02_$AssimpFbx$_PreRotation, ParentIndex: 133
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+136. BoneName: M1A2_Chain_02, ParentIndex: 134
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+137. BoneName: M1A2_Shield_02_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.798802, 2.44377, -1.04911, 1, 
+138. BoneName: M1A2_Shield_02_$AssimpFbx$_PreRotation, ParentIndex: 136
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+139. BoneName: M1A2_Shield_02, ParentIndex: 137
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+140. BoneName: M1A2_Shield_01_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.274908, 2.39991, -0.00452702, 1, 
+141. BoneName: M1A2_Shield_01_$AssimpFbx$_PreRotation, ParentIndex: 139
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+142. BoneName: M1A2_Shield_01, ParentIndex: 140
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+143. BoneName: M1A2_Wheel_023_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.83414, 0.398452, 1.63189, 1, 
+144. BoneName: M1A2_Wheel_023_$AssimpFbx$_PreRotation, ParentIndex: 142
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+145. BoneName: M1A2_Wheel_023_$AssimpFbx$_Rotation, ParentIndex: 143
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+146. BoneName: M1A2_Wheel_023, ParentIndex: 144
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+147. BoneName: M1A2_Commander_Cupola_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.07202, 2.46489, 0.38785, 1, 
+148. BoneName: M1A2_Commander_Cupola_$AssimpFbx$_PreRotation, ParentIndex: 146
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+149. BoneName: M1A2_Commander_Cupola, ParentIndex: 147
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+150. BoneName: M1A2_Wheel_021_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.34814, 0.398452, 1.63189, 1, 
+151. BoneName: M1A2_Wheel_021_$AssimpFbx$_PreRotation, ParentIndex: 149
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+152. BoneName: M1A2_Wheel_021_$AssimpFbx$_Rotation, ParentIndex: 150
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+153. BoneName: M1A2_Wheel_021, ParentIndex: 151
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+154. BoneName: M1A2_Cupola_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+1.25044, 2.38613, -0.568384, 1, 
+155. BoneName: M1A2_Cupola_$AssimpFbx$_PreRotation, ParentIndex: 153
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+156. BoneName: M1A2_Cupola, ParentIndex: 154
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+157. BoneName: M1A2_Wheel_027_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.62386, 0.398452, 1.63189, 1, 
+158. BoneName: M1A2_Wheel_027_$AssimpFbx$_PreRotation, ParentIndex: 156
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+159. BoneName: M1A2_Wheel_027_$AssimpFbx$_Rotation, ParentIndex: 157
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+160. BoneName: M1A2_Wheel_027, ParentIndex: 158
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+161. BoneName: M1A2_Panel_01_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+3.28132, 1.89674, -5.25117e-07, 1, 
+162. BoneName: M1A2_Panel_01_$AssimpFbx$_PreRotation, ParentIndex: 160
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+163. BoneName: M1A2_Panel_01, ParentIndex: 161
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+164. BoneName: M1A2_Wheel_022_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+2.09114, 0.398452, 1.63189, 1, 
+165. BoneName: M1A2_Wheel_022_$AssimpFbx$_PreRotation, ParentIndex: 163
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+166. BoneName: M1A2_Wheel_022_$AssimpFbx$_Rotation, ParentIndex: 164
+0.950411, 0, 0.310997, 0, 
+0, 1, -0, 0, 
+-0.310997, -0, 0.950411, -0, 
+0, 0, -0, 1, 
+167. BoneName: M1A2_Wheel_022, ParentIndex: 165
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+168. BoneName: M1A2_Shield_03_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.798784, 2.65834, -1.04933, 1, 
+169. BoneName: M1A2_Shield_03_$AssimpFbx$_PreRotation, ParentIndex: 167
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+170. BoneName: M1A2_Shield_03, ParentIndex: 168
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+171. BoneName: M1A2_Main_Gun_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.40949, 1.92451, -0.104527, 1, 
+172. BoneName: M1A2_Main_Gun_$AssimpFbx$_PreRotation, ParentIndex: 170
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+173. BoneName: M1A2_Main_Gun, ParentIndex: 171
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+174. BoneName: M1A2_Co-Axial_Gun_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+-1.79063, 2.01314, 0.255288, 1, 
+175. BoneName: M1A2_Co-Axial_Gun_$AssimpFbx$_PreRotation, ParentIndex: 173
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+176. BoneName: M1A2_Co-Axial_Gun, ParentIndex: 174
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+177. BoneName: M2-50_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.0769184, 2.74968, 0.492439, 1, 
+178. BoneName: M2-50_$AssimpFbx$_PreRotation, ParentIndex: 176
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+179. BoneName: M2-50, ParentIndex: 177
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+180. BoneName: M1A2_Optical_Periscope_02_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.792745, 2.7269, -1.12765, 1, 
+181. BoneName: M1A2_Optical_Periscope_02_$AssimpFbx$_PreRotation, ParentIndex: 179
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+182. BoneName: M1A2_Optical_Periscope_02, ParentIndex: 180
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
+183. BoneName: M240P_$AssimpFbx$_Translation, ParentIndex: 0
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0.797866, 2.65934, -1.3315, 1, 
+184. BoneName: M240P_$AssimpFbx$_PreRotation, ParentIndex: 182
+-1.19209e-07, 0, -1, 0, 
+1, -4.37114e-08, -1.19209e-07, 0, 
+-4.37114e-08, -1, 5.2108e-15, -0, 
+0, 0, 0, 1, 
+185. BoneName: M240P, ParentIndex: 183
+1, 0, -0, 0, 
+0, 1, -0, 0, 
+-0, -0, 1, -0, 
+0, 0, -0, 1, 
