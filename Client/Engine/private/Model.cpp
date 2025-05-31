@@ -125,6 +125,64 @@ void CModel::Make_Root_Combined_Matrix(_fmatrix WorldMat)
 	m_Bones[0]->Set_CombinedMatrix( m_Bones[0]->Get_BoneMatrix() * WorldMat);
 }
 
+void CModel::Multiply_Mesh_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
+{
+	/* 메시의 상태행렬에 뼈의 상태행렬을 곱한다. */
+	/* 메시의 상태행렬 = 뼈의 상태행렬 * 메시의 상태행렬 */
+	m_Meshes[iMeshIndex]->m_Bone->Mul_CombinedTransformationMatrix(WorldMat);
+}
+
+//void CModel::Save_For_Tank_Bones()
+//{
+//	struct BoneData {
+//		char        m_szName[MAX_PATH];
+//		_float4x4   m_TransformationMatrix;
+//		int         m_iParentBoneIndex;
+//	};
+//
+//	BoneData bones[3];
+//
+//	strcpy_s(bones[0].m_szName, "RootNode");
+//	XMStoreFloat4x4(&bones[0].m_TransformationMatrix, XMMatrixIdentity());
+//	bones[0].m_iParentBoneIndex = -1;
+//
+//	strcpy_s(bones[1].m_szName, "PotabNode");
+//	XMStoreFloat4x4(&bones[1].m_TransformationMatrix, XMMatrixIdentity());
+//	bones[1].m_iParentBoneIndex = 0;
+//
+//	strcpy_s(bones[2].m_szName, "PosinNode");
+//	XMStoreFloat4x4(&bones[2].m_TransformationMatrix, XMMatrixIdentity());
+//	bones[2].m_iParentBoneIndex = 1;
+//
+//	std::ofstream fout("../bin/Models/Tank/TankBones", std::ios::binary);
+//	if (fout.is_open())
+//	{
+//		uint32_t iNumBones = 57;
+//		fout.write(reinterpret_cast<const char*>(&iNumBones), sizeof(uint32_t));
+//
+//		for (int i = 0; i < 3; ++i)
+//		{
+//			fout.write(reinterpret_cast<const char*>(bones[i].m_szName), MAX_PATH);
+//			fout.write(reinterpret_cast<const char*>(&bones[i].m_TransformationMatrix), sizeof(_float4x4));
+//			fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), sizeof(int));
+//		}
+//
+//		for (int i = 0; i < 55; ++i) {
+//			if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14 || i == 15 || i == 16 || i == 17 || i == 18 ||
+//				i == 19 || i == 20 || i == 21 || i == 22 || i == 23 || i == 38 || i == 39)
+//			{
+//				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_szName), MAX_PATH);
+//				fout.write(reinterpret_cast<const char*>(&bones[i].m_TransformationMatrix), sizeof(_float4x4));
+//				fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), 0);
+//			}
+//		}
+//
+//		fout.close();
+//	}
+//
+//	
+//}
+
 
 
 HRESULT CModel::Ready_Meshes()

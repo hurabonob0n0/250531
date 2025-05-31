@@ -183,6 +183,17 @@ HRESULT CMesh::Ready_Anim_Mesh(const aiMesh * pAIMesh, const vector<class CBone*
 
 	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
 
+	/*std::ofstream fout("../bin/Models/Tank/TankVertecies", std::ios::binary);
+	if (fout.is_open())
+	{
+		fout.write(reinterpret_cast<const char*>(pVertices), m_VertexBufferByteSize);
+		fout.close();
+	}
+	else
+	{
+		MessageBoxA(nullptr, "Failed to open TankVertecies file for writing.", "Error", MB_OK);
+	}*/
+
 	delete[] pVertices;
 	pVertices = nullptr;
 

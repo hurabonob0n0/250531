@@ -26,6 +26,8 @@ public:
 private:
 	CModel* m_VIBuffer;
 	bool	KeyInput = false;
+	float   m_fPotapRotation = 0.f;
+	float   m_fPosinRotation = 0.f;
 
 public:
 	void set_MyPlayer() {

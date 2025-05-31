@@ -69,10 +69,10 @@ HRESULT CBone::Initialize(const aiNode * pAINode, _int iParentBoneIndex)
 
 void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones)
 {
-	/*if (-1 == m_iParentBoneIndex)
+	if (-1 == m_iParentBoneIndex)
 		m_CombindTransformationMatrix = m_TransformationMatrix;
 
-	else*/
+	else
 	if(m_iParentBoneIndex != -1)
 	{
 		/* m_CombindTransformationMatrix  = 나만의 상태행렬(TransformationMatrix) * 부모의 최종행렬(Parent`s CombinedMatrix) */

@@ -38,7 +38,7 @@ public:
 public:
 	void Set_MaterialIndex(_uint Matindex);
 
-private:
+public:
 	char				m_szName[MAX_PATH] = "";
 	_uint				m_iMaterialIndex = { 0 };
 	CBone*				m_Bone = nullptr;

@@ -155,8 +155,8 @@ PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& 
 		const PxF32 sinTheta = PxSin(i*PxPi*2.0f/16.0f);
 		const PxF32 y = radius*cosTheta;
 		const PxF32 z = radius*sinTheta;
-		points[2*i+0] = PxVec3(-width/2.0f, y, z);
-		points[2*i+1] = PxVec3(+width/2.0f, y, z);
+		points[2*i+0] = PxVec3(-width/2.f, y, z);
+		points[2*i+1] = PxVec3(+width/2.f, y, z);
 	}
 
 	return createConvexMesh(points,32,physics,cooking);

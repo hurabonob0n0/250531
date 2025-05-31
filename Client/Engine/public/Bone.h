@@ -44,6 +44,10 @@ public:
 	{
 		XMStoreFloat4x4(&m_TransformationMatrix, (XMLoadFloat4x4(&m_TransformationMatrix) * Transformmatrix));
 	}
+	void Mul_CombinedTransformationMatrix(_fmatrix CombinedTransformmatrix)
+	{
+		XMStoreFloat4x4(&m_CombindTransformationMatrix, (XMLoadFloat4x4(&m_CombindTransformationMatrix) * CombinedTransformmatrix));
+	}
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);

@@ -170,6 +170,17 @@ void CTank::Tick(float fTimeDelta)
 
     m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 
+    if (m_GameInstance->Key_Pressing(VK_RIGHT))
+        m_fPotapRotation += 1.f * fTimeDelta;
+
+    if (m_GameInstance->Key_Pressing(VK_LEFT))
+        m_fPotapRotation -= 1.f * fTimeDelta;
+
+    if (m_GameInstance->Key_Pressing(VK_UP))
+        m_fPosinRotation+= 1.f * fTimeDelta;
+
+    if (m_GameInstance->Key_Pressing(VK_DOWN))
+        m_fPosinRotation -= 1.f * fTimeDelta;
 
 
     /*if (m_GameInstance->Key_Down(VK_SPACE))
@@ -208,10 +219,103 @@ void CTank::LateTick(float fTimeDelta)
         XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
         XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
     );
+    XMMATRIX mat2 = XMMATRIX(
+        XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
+        XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
+        XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
+        XMVectorSet(0,0,0, pxMat.column3.w)
+    );
 
-    m_VIBuffer->Make_Root_Combined_Matrix(mat);//m_TransformCom->Get_WorldMatrix());
+
+    PxMat44 pxMatL1 = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIFTH_WHEEL);
+
+    // PxMat44은 row-major 이므로 열 단위로 XMVECTOR를 생성
+    XMMATRIX matL1 = XMMATRIX(
+        XMVectorSet(pxMatL1.column0.x, pxMatL1.column0.y, pxMatL1.column0.z, pxMatL1.column0.w),
+        XMVectorSet(pxMatL1.column1.x, pxMatL1.column1.y, pxMatL1.column1.z, pxMatL1.column1.w),
+        XMVectorSet(pxMatL1.column2.x, pxMatL1.column2.y, pxMatL1.column2.z, pxMatL1.column2.w),
+        XMVectorSet(pxMatL1.column3.x, pxMatL1.column3.y, pxMatL1.column3.z, pxMatL1.column3.w)
+    );
+
+    //m_VIBuffer->Make_Root_Combined_Matrix(mat);
+    //m_VIBuffer->Make_Root_Combined_Matrix(XMMatrixIdentity());
+
+
+    XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation) * mat;
+
+    XMMATRIX matPosin = XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_RIGHT), m_fPosinRotation) * matPotap;
 
     m_VIBuffer->Invalidate_Bones();
+
+
+#pragma region Chassis
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(0, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(1, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(2, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(3, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(4, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(6, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(7, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(8, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(9, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(10, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(11, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(12, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(13, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(14, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(15, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(16, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(17, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(18, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(19, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(20, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(21, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(22, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(23, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(38, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(39, mat);
+#pragma endregion Chassis
+
+#pragma region Potap
+
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(5, matPotap );
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(25, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(27, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(31, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(40, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(41, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(43, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(45, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(47, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(49, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(52, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(53, matPotap);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(54, matPotap);
+
+#pragma endregion Potap
+
+#pragma region Posin
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
+#pragma endregion Posin
+
+#pragma region Wheels
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(24, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(26, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(28, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(30, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(32, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(34, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(36, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(46, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(37, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(35, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(33, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(44, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(48, mat);
+    m_VIBuffer->Multiply_Mesh_Combined_Matrix(42, mat);
+#pragma endregion Wheels
 
     m_VIBuffer->Update();
 }
