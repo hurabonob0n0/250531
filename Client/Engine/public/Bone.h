@@ -46,14 +46,15 @@ public:
 	}
 	void Mul_CombinedTransformationMatrix(_fmatrix CombinedTransformmatrix)
 	{
-		XMStoreFloat4x4(&m_CombindTransformationMatrix, (XMLoadFloat4x4(&m_CombindTransformationMatrix) * CombinedTransformmatrix));
+		XMStoreFloat4x4(&m_CombindTransformationMatrix, (CombinedTransformmatrix * XMLoadFloat4x4(&m_CombindTransformationMatrix)));
 	}
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);
+	HRESULT Initialize(const char* szName, const _float4x4& transformMat, _int iParentIndex);
 	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones);
 
-private:
+public:
 	_char				m_szName[MAX_PATH] = "";
 	_float4x4			m_TransformationMatrix; /* 현재 뼈만의 상태 */
 	_float4x4			m_CombindTransformationMatrix; /* 현재 뼈만의 상태 * 부모뼈의 상태(m_CombindTransformationMatrix) */
@@ -63,6 +64,7 @@ private:
 
 public:
 	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
+	static CBone* Create(const char* szName, const _float4x4& transformMat, _int iParentIndex);
 	CBone* Clone();
 	virtual void Free() override;
 };

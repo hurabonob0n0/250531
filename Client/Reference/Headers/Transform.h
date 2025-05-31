@@ -61,9 +61,14 @@ public:
 
 	void Turn(XMVECTOR vAxis, float fTimeDelta);
 	void Rotation(XMVECTOR vAxis, float fRadian);
+	void Orbit_For_TPS(_fvector vCenter, float fYRot, float fXRot);
+	void Orbit_For_FPS(_fvector vCenter, float fYRot, float fXRot);
+	void Orbit(_fvector vCenter, float fYawDeg, float fPitchDeg, float fDistance, float fDeltaTime, float fLagSpeed = 6.f);
 
 	/*void Look_At(_fvector vTargetPoint);
 	void Chase_Target(_fvector vTargetPoint, _float fTimeDelta, _float fMargin = 0.1f);*/
+
+	void Look_At(_fvector vTargetPoint);
 
 public:
 	HRESULT Initialize_Prototype() override;

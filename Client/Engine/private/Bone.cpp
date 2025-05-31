@@ -67,6 +67,15 @@ HRESULT CBone::Initialize(const aiNode * pAINode, _int iParentBoneIndex)
 	//return S_OK;
 }
 
+HRESULT CBone::Initialize(const char* szName, const _float4x4& transformMat, _int iParentIndex)
+{
+	strcpy_s(m_szName, szName);
+	memcpy(&m_TransformationMatrix, &transformMat, sizeof(_float4x4));
+	XMStoreFloat4x4(&m_CombindTransformationMatrix, XMMatrixIdentity());
+	m_iParentBoneIndex = iParentIndex;
+	return S_OK;
+}
+
 void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones)
 {
 	if (-1 == m_iParentBoneIndex)
@@ -95,6 +104,22 @@ CBone * CBone::Create(const aiNode * pAINode, _int iParentBoneIndex)
 	return pInstance;
 }
 
+CBone* CBone::Create(const char* szName, const _float4x4& transformMat, _int iParentIndex)
+{
+	CBone* pInstance = new CBone();
+
+	if (FAILED(pInstance->Initialize(szName, transformMat, iParentIndex)))
+	{
+		MSG_BOX("Failed to Created : CBone");
+		Safe_Release(pInstance);
+	}
+	/*strcpy_s(pInstance->m_szName, szName);
+	memcpy(&pInstance->m_TransformationMatrix, &transformMat, sizeof(_float4x4));
+	XMStoreFloat4x4(&pInstance->m_CombindTransformationMatrix, XMMatrixIdentity());
+	pInstance->m_iParentBoneIndex = iParentIndex;*/
+
+	return pInstance;
+}
 CBone * CBone::Clone()
 {
 	return new CBone(*this);

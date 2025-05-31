@@ -70,11 +70,17 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 	std::vector<PxHeightFieldSample> samples(width * height);
 	for (int row = 0; row < height; ++row) {
 		for (int col = 0; col < width; ++col) {
-			int idx = row * width + col;
-			float h = image[idx] * 255.f * 0.125f; // 정규화 높이값
-			samples[idx].height = static_cast<PxI16>(h);
-			samples[idx].materialIndex0 = 0;
-			samples[idx].materialIndex1 = 0;
+			// 회전 적용 인덱스
+			int rotatedRow = col;
+			int rotatedCol = height - 1 - row;
+
+			int rotatedIdx = rotatedRow * height + rotatedCol; // 폭과 높이가 바뀜
+			int srcIdx = row * width + col;
+
+			float h = image[srcIdx] * 255.f * 0.125f;
+			samples[rotatedIdx].height = static_cast<PxI16>(h);
+			samples[rotatedIdx].materialIndex0 = 0;
+			samples[rotatedIdx].materialIndex1 = 0;
 		}
 	}
 	stbi_image_free(image);

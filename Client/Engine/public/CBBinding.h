@@ -22,6 +22,9 @@ public:
 	void Set_TexCoordMatrix(_matrix TexCoordmat);
 	void Set_MaterialIndex(_uint MatIndex);
 
+public:
+	_uint Get_MaterialIndex() { return m_ObjConstants.MaterialIndex; }
+
 private:
 	UINT CalcConstantBufferByteSize(UINT byteSize)
 	{

@@ -9,6 +9,7 @@ CTransform::CTransform(const CTransform& rhs) : CComponent(rhs)
 }
 
 
+
 HRESULT CTransform::Initialize_Prototype()
 {
     XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
@@ -113,6 +114,110 @@ void CTransform::Turn(XMVECTOR vAxis, float fTimeDelta)
 
 void CTransform::Rotation(XMVECTOR vAxis, float fRadian)
 {
+    XMFLOAT3 vRight;
+    XMFLOAT3 vUp;
+    XMVECTOR vLook = Get_State(STATE_LOOK);
+
+    XMMATRIX		RotationMatrix = XMMatrixRotationAxis(vAxis, fRadian);
+
+    XMVECTOR vWorldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    vLook = XMVector3Normalize(XMVector3TransformNormal(vLook, RotationMatrix));
+
+    XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(vWorldUp, vLook)));
+
+    XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(vLook, XMLoadFloat3(&vRight))));
+
+    Set_State(STATE_RIGHT, XMLoadFloat3(&vRight));
+    Set_State(STATE_UP, XMLoadFloat3(&vUp));
+    Set_State(STATE_LOOK, vLook);
+}
+
+void CTransform::Orbit_For_TPS(_fvector vCenter, float fYRot, float fXRot)
+{
+    _vector vPosition = Get_State(STATE_POSITION);
+    _vector vToCenter = vPosition - vCenter;
+
+    XMMATRIX matRotationY = XMMatrixRotationY(fYRot);
+    XMMATRIX matRotationX = XMMatrixRotationAxis(Get_State(STATE_RIGHT), fXRot);
+
+    XMMATRIX matRot = matRotationX * matRotationY;
+
+    vToCenter = XMVector3TransformNormal(vToCenter, matRot);
+
+    // 4. 새 위치 = 중심 + 회전된 벡터
+    _vector vNewPos = vCenter + vToCenter;
+
+    Set_State(STATE_POSITION, vNewPos);
+
+    // 5. 새 위치에서 중심을 바라보도록 방향 설정
+    Look_At(vCenter);
+}
+
+void CTransform::Orbit_For_FPS(_fvector vCenter, float fYRot, float fXRot)
+{
+    _vector vPosition = Get_State(STATE_POSITION);
+    _vector vToCenter = vCenter - vPosition;
+
+    XMMATRIX matRotationY = XMMatrixRotationY(fYRot);
+    XMMATRIX matRotationX = XMMatrixRotationAxis(Get_State(STATE_RIGHT), fXRot);
+
+    XMMATRIX matRot = matRotationX * matRotationY;
+
+    vToCenter = XMVector3TransformNormal(vToCenter, matRot);
+
+    // 4. 새 위치 = 중심 + 회전된 벡터
+    _vector vNewPos = vCenter + vToCenter;
+
+    Set_State(STATE_POSITION, vNewPos);
+
+    // 5. 새 위치에서 중심을 바라보도록 방향 설정
+    Look_At(vNewPos + vToCenter);
+}
+
+void CTransform::Orbit(_fvector vCenter, float fYawDeg, float fPitchDeg, float fDistance, float fDeltaTime, float fLagSpeed)
+{
+    // 1. 회전 행렬 생성
+    XMMATRIX matRotY = XMMatrixRotationY(XMConvertToRadians(fYawDeg));
+    XMMATRIX matRotX = XMMatrixRotationAxis(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(fPitchDeg));
+    XMMATRIX matRot = matRotX * matRotY;
+
+    // 2. 회전된 거리 벡터 계산
+    _vector vOffset = XMVectorSet(0.f, 0.f, -fDistance, 0.f);
+    vOffset = XMVector3TransformNormal(vOffset, matRot);
+
+    // 3. 목표 위치 계산
+    _vector vGoalPos = vCenter + vOffset;
+
+    // 4. 현재 위치 가져오기
+    _vector vCurrPos = Get_State(STATE_POSITION);
+
+    // 5. 보간
+    float alpha = 1.f - expf(-fLagSpeed * fDeltaTime);
+    _vector vNewPos = XMVectorLerp(vCurrPos, vGoalPos, alpha);
+
+    // 6. 적용
+    Set_State(STATE_POSITION, vNewPos);
+    Look_At(vCenter);
+}
+
+void CTransform::Look_At(_fvector vTargetPoint)
+{
+    XMFLOAT3 vRight;
+    XMFLOAT3 vUp;
+    XMVECTOR vLook =vTargetPoint - Get_State(STATE_POSITION);
+
+    XMVECTOR vWorldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    vLook = XMVector3Normalize(vLook);
+
+    XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(vWorldUp, vLook)));
+
+    XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(vLook, XMLoadFloat3(&vRight))));
+
+    Set_State(STATE_RIGHT, XMLoadFloat3(&vRight));
+    Set_State(STATE_UP, XMLoadFloat3(&vUp));
+    Set_State(STATE_LOOK, vLook);
 }
 
 void CTransform::Free()

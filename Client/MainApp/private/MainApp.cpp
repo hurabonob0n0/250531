@@ -92,7 +92,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
 	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/Terrain.png", 1.f, 1.f);
-	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,100.f,0.f);
+	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,60.f,0.f);
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
@@ -107,8 +107,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 
-	_matrix mat = XMMatrixTranslation(0.f, 20.f, -20.f);
-	m_GameInstance->AddObject("Camera", "Camera", &mat);
+	
 
 	/*_matrix mat1 = XMMatrixTranslation(0.f, 5.f, 10.f);
 	m_GameInstance->AddObject("DefaultObject", "DefaultObject", &mat1);*/
@@ -116,12 +115,13 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//m_GameInstance->AddObject("BoxObject", "BoxObject", nullptr);
 
 	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
-	_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat2);
+	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
+	m_GameInstance->AddObject("Tank", "Tank", nullptr);
 
+	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 #pragma region For Server
 
@@ -205,6 +205,18 @@ int CMainApp::Run()
 				m_Input_Dev->UpdateKeyStates();
 				m_Input_Dev->ResetPerFrame();
 
+
+				//RECT rect;
+				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				//POINT center = {
+				//	(rect.right - rect.left) / 2,
+				//	(rect.bottom - rect.top) / 2
+				//};
+
+				//// 클라이언트 좌표 → 스크린 좌표로 변환
+				//ClientToScreen(m_hMainWnd, &center);
+
+				//SetCursorPos(center.x, center.y);
 			}
 			else
 			{

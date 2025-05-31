@@ -23,11 +23,18 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+	void Set_PotapRotation(float fDegree);
+	void Set_PoSinpRotation(float fDegree);
+
 private:
 	CModel* m_VIBuffer;
 	bool	KeyInput = false;
 	float   m_fPotapRotation = 0.f;
 	float   m_fPosinRotation = 0.f;
+
+	float   m_TestZ = 0.f;
+	float	m_TestX = 0.f;
 
 public:
 	void set_MyPlayer() {
