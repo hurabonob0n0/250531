@@ -345,9 +345,21 @@ void CTank::LateTick(float fTimeDelta)
 	else
 	{
 
+
+		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
+
+
+		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
+		m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
+
 		//여기서 받은 데이터로 매트릭스 바꿔줌
-		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix());
 		m_VIBuffer->Invalidate_Bones();
+
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
+
 		m_VIBuffer->Update();
 	}
 
@@ -355,8 +367,10 @@ void CTank::LateTick(float fTimeDelta)
 
 void CTank::Render()
 {
+
 	for (int i = 0; i < 55; ++i)
 		m_VIBuffer->Render(i);
+
 }
 
 void CTank::Set_PotapRotation(float fDegree)
@@ -402,8 +416,7 @@ void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
 {
 	
 	m_TransformCom->Set_WorldMatrix(mat);
-	m_fPotapRotation = PotapRot;
-	m_fPosinRotation = PosinRot;
-	
+	Set_PotapRotation(PotapRot);
+	Set_PoSinpRotation(PosinRot);
 
 }
