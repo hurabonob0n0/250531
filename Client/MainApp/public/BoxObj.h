@@ -4,6 +4,7 @@
 
 BEGIN(Engine)
 class CVIBuffer_Geos;
+
 END
 
 BEGIN(Client)
@@ -24,6 +25,7 @@ public:
 
 private:
 	CVIBuffer_Geos* m_VIBuffer;
+
 
 public:
 	void Free() override;

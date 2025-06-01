@@ -41,6 +41,8 @@ HRESULT CBoxObj::Initialize(void* pArg)
 void CBoxObj::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
+
+    m_TransformCom->Go_Straight(fTimeDelta);
 }
 
 void CBoxObj::LateTick(float fTimeDelta)

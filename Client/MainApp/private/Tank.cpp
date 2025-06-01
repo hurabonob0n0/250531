@@ -108,41 +108,6 @@ void CTank::Tick(float fTimeDelta)
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 	}
-	//if (m_GameInstance->Key_Pressing(VK_RIGHT))
-	//    m_TestX += 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_LEFT))
-	//    m_TestX -= 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_UP))
-	//    m_TestZ += 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_DOWN))
-	//    m_TestZ -= 10.f * fTimeDelta;
-	//    //m_fPosinRotation += 1.f * fTimeDelta;
-
-	//_float4x4 matworld;
-	//XMStoreFloat4x4(&matworld, XMMatrixIdentity());
-
-	//m_TransformCom->Set_WorldMatrix(matworld);
-
-	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_TestX, 100.f, m_TestZ, 1.f));
-
-	//else
-	//{
-	//	if (m_GameInstance->Key_Pressing('W'))
-	//		m_TransformCom->Go_Straight(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('A'))
-	//		m_TransformCom->Go_Left(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('S'))
-	//		m_TransformCom->Go_Backward(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('D'))
-	//		m_TransformCom->Go_Right(fTimeDelta);
-	//}
-
 
 
 }
@@ -300,10 +265,27 @@ void CTank::LateTick(float fTimeDelta)
 #pragma endregion
 
 
+		_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
+		float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
+		//float yawDeg = XMConvertToDegrees(yaw);
 
-		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation - yaw);
 
 		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
+
+		//if(m_fPosinRotation  )
+
+		/*XMMATRIX matPosinforDir = XMMatrixRotationX(-m_fPosinRotation);
+
+		_vector worldforward = XMVectorSet(0, 0, 1, 0);
+		worldforward = XMVector4Transform(worldforward, m_TransformCom->Get_WorldMatrix());
+		worldforward = XMVector4Transform(worldforward, matPotap);
+		worldforward = XMVector4Transform(worldforward, matPosinforDir);*/
+
+		/*XMFLOAT3 vRight;
+		XMFLOAT3 vUp;*/
+
+		
 
 
 		m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
@@ -345,9 +327,21 @@ void CTank::LateTick(float fTimeDelta)
 	else
 	{
 
+		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+
+		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
+
+
+		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
+		m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
+
 		//여기서 받은 데이터로 매트릭스 바꿔줌
-		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix());
 		m_VIBuffer->Invalidate_Bones();
+
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
+		m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
+
 		m_VIBuffer->Update();
 	}
 

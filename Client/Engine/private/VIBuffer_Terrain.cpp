@@ -239,6 +239,8 @@ void CVIBuffer_Terrain::Make_Buffer(const char* pHeightmapPath, float heightScal
     m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
     CGameInstance::Get_Instance()->Execute_Flush_and_Reset();
+
+    vecPoints.clear();
 }
 
 XMFLOAT3 CVIBuffer_Terrain::Add3(const XMFLOAT3& a, XMVECTOR b)
