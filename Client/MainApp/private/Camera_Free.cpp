@@ -1,6 +1,7 @@
 #include "Client_pch.h"
 #include "Camera_Free.h"
 #include "GameInstance.h"
+#include "Client_Globals.h"
 
 CCamera_Free::CCamera_Free() : CCamera()
 {
@@ -31,10 +32,10 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", g_PlayerID.load(), "TransformCom");
 	Safe_AddRef(m_TankTransform);
 
-	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
+	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", g_PlayerID.load());
 	Safe_AddRef(m_Tank);
 
 	m_Distance_TPS = 20.f;

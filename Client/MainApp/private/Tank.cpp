@@ -128,20 +128,20 @@ void CTank::Tick(float fTimeDelta)
 
 	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_TestX, 100.f, m_TestZ, 1.f));
 
-	else
-	{
-		if (m_GameInstance->Key_Pressing('W'))
-			m_TransformCom->Go_Straight(fTimeDelta);
+	//else
+	//{
+	//	if (m_GameInstance->Key_Pressing('W'))
+	//		m_TransformCom->Go_Straight(fTimeDelta);
 
-		if (m_GameInstance->Key_Pressing('A'))
-			m_TransformCom->Go_Left(fTimeDelta);
+	//	if (m_GameInstance->Key_Pressing('A'))
+	//		m_TransformCom->Go_Left(fTimeDelta);
 
-		if (m_GameInstance->Key_Pressing('S'))
-			m_TransformCom->Go_Backward(fTimeDelta);
+	//	if (m_GameInstance->Key_Pressing('S'))
+	//		m_TransformCom->Go_Backward(fTimeDelta);
 
-		if (m_GameInstance->Key_Pressing('D'))
-			m_TransformCom->Go_Right(fTimeDelta);
-	}
+	//	if (m_GameInstance->Key_Pressing('D'))
+	//		m_TransformCom->Go_Right(fTimeDelta);
+	//}
 
 
 
@@ -342,11 +342,10 @@ void CTank::LateTick(float fTimeDelta)
 
 	}
 
-
-
-
 	else
 	{
+
+		//여기서 받은 데이터로 매트릭스 바꿔줌
 		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix());
 		m_VIBuffer->Invalidate_Bones();
 		m_VIBuffer->Update();
@@ -397,4 +396,14 @@ void CTank::SendMyStateToServer()
 	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
 	auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+}
+
+void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
+{
+	
+	m_TransformCom->Set_WorldMatrix(mat);
+	m_fPotapRotation = PotapRot;
+	m_fPosinRotation = PosinRot;
+	
+
 }

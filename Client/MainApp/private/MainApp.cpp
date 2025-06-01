@@ -111,7 +111,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain.png", 0.06f, 1.f));
+	//m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain.png", 0.06f, 1.f));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 
@@ -120,7 +120,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	//m_GameInstance->Add_PrototypeObject("BoxObject", CBoxObj::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
-	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
+	//m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 
 	
 
@@ -132,26 +132,25 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
 	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", nullptr);
-	_matrix mat2 = XMMatrixTranslation(10.f, 30.f, 10.f);
+	_matrix mat2 = XMMatrixTranslation(10.f, 50.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);
 	/*_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);*/
 
+
+
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
-	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
-
-
-
-	
+	//m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", g_PlayerID.load()))->set_MyPlayer();
 	
 
 	m_GameInstance->Execute_CommandList();
 
 	m_GameInstance->Flush_CommandQueue();
 
-	
+	SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 	
 	return S_OK;
 }

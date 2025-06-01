@@ -41,8 +41,9 @@ public:
 		_myPlayer = true;
 	}
 	void SendMyStateToServer();
+	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 
-private:
+public:
 	bool _myPlayer = false;
 
 private:
