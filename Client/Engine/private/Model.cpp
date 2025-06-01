@@ -12,7 +12,7 @@ CModel::CModel(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
 CModel::CModel(const CModel & rhs)
 	: CComponent(rhs)
 	, m_iNumMeshes(rhs.m_iNumMeshes)
-	, m_Meshes(rhs.m_Meshes)
+	//, m_Meshes(rhs.m_Meshes)
 	, m_eModelType(rhs.m_eModelType)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
 {
@@ -21,10 +21,11 @@ CModel::CModel(const CModel & rhs)
 		m_Bones.push_back(pPrototypeBone->Clone());
 	}
 
-	for (auto& pMesh : m_Meshes)
+	for (auto& pMesh : rhs.m_Meshes)
 	{
-		pMesh->Set_Bone(m_Bones);
-		Safe_AddRef(pMesh);	
+		CMesh* pClonedMesh = dynamic_cast<CMesh*>(pMesh->Clone(nullptr));
+		pClonedMesh->Set_Bone(m_Bones);
+		m_Meshes.push_back(pClonedMesh);
 	}
 }
 

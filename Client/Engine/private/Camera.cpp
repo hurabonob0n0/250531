@@ -26,7 +26,7 @@ HRESULT CCamera::Initialize(void* pArg)
 void CCamera::Tick(float fTimeDelta)
 {
 	if (m_GameInstance->Key_Down(VK_PAUSE))
-		m_isPaused != m_isPaused;
+		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
 
