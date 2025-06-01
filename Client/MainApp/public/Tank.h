@@ -33,8 +33,8 @@ private:
 	float   m_fPotapRotation = 0.f;
 	float   m_fPosinRotation = 0.f;
 
-	float   m_TestZ = 0.f;
-	float	m_TestX = 0.f;
+	float   m_TestZ = -512.f;
+	float	m_TestX = -512.f;
 
 public:
 	void set_MyPlayer() {

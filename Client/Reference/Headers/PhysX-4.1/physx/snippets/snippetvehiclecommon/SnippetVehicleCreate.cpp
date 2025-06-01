@@ -67,23 +67,48 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 	unsigned char* image = stbi_load(path, &width, &height, &channels, 1);
 	if (!image) return nullptr;
 
+	//std::vector<PxHeightFieldSample> samples(width * height);
+	//for (int row = 0; row < height; ++row) {
+	//	for (int col = 0; col < width; ++col) {
+	//		// 180도 회전 인덱스
+	//		int rotatedRow = height - 1 - row;
+	//		int rotatedCol = width - 1 - col;
+
+	//		int rotatedIdx = rotatedRow * width + rotatedCol;
+	//		int srcIdx = row * width + col;
+
+	//		float h = image[srcIdx] * 255.f * 0.125f;
+	//		samples[rotatedIdx].height = static_cast<PxI16>(h);
+	//		samples[rotatedIdx].materialIndex0 = 0;
+	//		samples[rotatedIdx].materialIndex1 = 0;
+	//	}
+	//} 180도 회전
+	//std::vector<PxHeightFieldSample> samples(width * height);
+	//for (int row = 0; row < height; ++row) {
+	//	for (int col = 0; col < width; ++col) {
+	//		int idx = row * width + col; // 그대로 사용
+	//		float h = image[idx] * 255.f * 0.125f;
+
+	//		samples[idx].height = static_cast<PxI16>(h);
+	//		samples[idx].materialIndex0 = 0;
+	//		samples[idx].materialIndex1 = 0;
+	//	}
+	//}
+	//stbi_image_free(image); 기본
 	std::vector<PxHeightFieldSample> samples(width * height);
 	for (int row = 0; row < height; ++row) {
 		for (int col = 0; col < width; ++col) {
-			// 회전 적용 인덱스
-			int rotatedRow = col;
-			int rotatedCol = height - 1 - row;
-
-			int rotatedIdx = rotatedRow * height + rotatedCol; // 폭과 높이가 바뀜
 			int srcIdx = row * width + col;
+			int dstIdx = col * height + row; // x ↔ z 교체
 
-			float h = image[srcIdx] * 255.f * 0.125f;
-			samples[rotatedIdx].height = static_cast<PxI16>(h);
-			samples[rotatedIdx].materialIndex0 = 0;
-			samples[rotatedIdx].materialIndex1 = 0;
+			float h = image[srcIdx] * 255.f * 0.06f;
+
+			samples[dstIdx].height = static_cast<PxI16>(h);
+			samples[dstIdx].materialIndex0 = 0;
+			samples[dstIdx].materialIndex1 = 0;
 		}
 	}
-	stbi_image_free(image);
+	stbi_image_free(image);//x축z축 바꿈
 
 	PxHeightFieldDesc desc;
 	desc.nbRows = height;
@@ -96,7 +121,7 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 	if (!heightField) return nullptr;
 
 	PxHeightFieldGeometry hfGeom(heightField, PxMeshGeometryFlags(), 0.01f, 1.f, 1.f);
-	PxTransform pose(PxVec3(-4096, 0, -4096), PxQuat(PxIdentity));
+	PxTransform pose(PxVec3(-512.5, 0, -512.5), PxQuat(PxIdentity));
 	PxRigidStatic* actor = physics->createRigidStatic(pose);
 
 	PxShape* shape = physics->createShape(hfGeom, *material);
