@@ -34,7 +34,7 @@ HRESULT CTank::Initialize(void* pArg)
 	MaterialData mat{};
 	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds"));
 	mat.NormalMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds"));
-	m_VIBuffer->Set_MatOffsets(mat.DiffuseMapIndex); // Camera¸¦ ¸ÕÀú Ãß°¡ÇÑ´Ù°í °¡Á¤.
+	m_VIBuffer->Set_MatOffsets(mat.DiffuseMapIndex); // Cameraë¥¼ ë¨¼ì € ì¶”ê°€í•œë‹¤ê³  ê°€ì •.
 	m_GameInstance->Add_Material("Tank_Glacis", mat);
 
 	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glass_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds"));
@@ -108,41 +108,6 @@ void CTank::Tick(float fTimeDelta)
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 	}
-	//if (m_GameInstance->Key_Pressing(VK_RIGHT))
-	//    m_TestX += 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_LEFT))
-	//    m_TestX -= 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_UP))
-	//    m_TestZ += 10.f * fTimeDelta;
-
-	//if (m_GameInstance->Key_Pressing(VK_DOWN))
-	//    m_TestZ -= 10.f * fTimeDelta;
-	//    //m_fPosinRotation += 1.f * fTimeDelta;
-
-	//_float4x4 matworld;
-	//XMStoreFloat4x4(&matworld, XMMatrixIdentity());
-
-	//m_TransformCom->Set_WorldMatrix(matworld);
-
-	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_TestX, 100.f, m_TestZ, 1.f));
-
-	//else
-	//{
-	//	if (m_GameInstance->Key_Pressing('W'))
-	//		m_TransformCom->Go_Straight(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('A'))
-	//		m_TransformCom->Go_Left(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('S'))
-	//		m_TransformCom->Go_Backward(fTimeDelta);
-
-	//	if (m_GameInstance->Key_Pressing('D'))
-	//		m_TransformCom->Go_Right(fTimeDelta);
-	//}
-
 
 
 }
@@ -155,7 +120,7 @@ void CTank::LateTick(float fTimeDelta)
 	{
 		PxMat44 pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_CHASSIS);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -172,7 +137,7 @@ void CTank::LateTick(float fTimeDelta)
 
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIRST_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L1Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -181,7 +146,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SECOND_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R1Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -190,7 +155,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_THIRD_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L2Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -199,7 +164,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FOURTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R2Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -208,7 +173,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_FIFTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L3Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -217,7 +182,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SIXTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R3Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -226,7 +191,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_LEFT_SEVENTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L4Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -235,7 +200,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FIRST_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R4Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -244,7 +209,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SECOND_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L5Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -253,7 +218,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_THIRD_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R5Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -262,7 +227,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FOURTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L6Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -271,7 +236,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_FIFTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R6Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -280,7 +245,7 @@ void CTank::LateTick(float fTimeDelta)
 		);
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SIXTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX L7Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -290,7 +255,7 @@ void CTank::LateTick(float fTimeDelta)
 
 		pxMat = m_pPhysicsEngine->Get_Tank_Transform(MyPhysicsEngine::CMyPhysicsEngine::TC_RIGHT_SEVENTH_WHEEL);
 
-		// PxMat44Àº row-major ÀÌ¹Ç·Î ¿­ ´ÜÀ§·Î XMVECTOR¸¦ »ý¼º
+		// PxMat44ì€ row-major ì´ë¯€ë¡œ ì—´ ë‹¨ìœ„ë¡œ XMVECTORë¥¼ ìƒì„±
 		XMMATRIX R7Mat = XMMATRIX(
 			XMVectorSet(pxMat.column0.x, pxMat.column0.y, pxMat.column0.z, pxMat.column0.w),
 			XMVectorSet(pxMat.column1.x, pxMat.column1.y, pxMat.column1.z, pxMat.column1.w),
@@ -300,10 +265,27 @@ void CTank::LateTick(float fTimeDelta)
 #pragma endregion
 
 
+		_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
+		float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
+		//float yawDeg = XMConvertToDegrees(yaw);
 
-		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation - yaw);
 
 		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
+
+		//if(m_fPosinRotation  )
+
+		/*XMMATRIX matPosinforDir = XMMatrixRotationX(-m_fPosinRotation);
+
+		_vector worldforward = XMVectorSet(0, 0, 1, 0);
+		worldforward = XMVector4Transform(worldforward, m_TransformCom->Get_WorldMatrix());
+		worldforward = XMVector4Transform(worldforward, matPotap);
+		worldforward = XMVector4Transform(worldforward, matPosinforDir);*/
+
+		/*XMFLOAT3 vRight;
+		XMFLOAT3 vUp;*/
+
+		
 
 
 		m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
@@ -347,13 +329,14 @@ void CTank::LateTick(float fTimeDelta)
 
 
 		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+
 		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
 
 
 		m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
 		m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
 
-		//¿©±â¼­ ¹ÞÀº µ¥ÀÌÅÍ·Î ¸ÅÆ®¸¯½º ¹Ù²ãÁÜ
+		//ì—¬ê¸°ì„œ ë°›ì€ ë°ì´í„°ë¡œ ë§¤íŠ¸ë¦­ìŠ¤ ë°”ê¿”ì¤Œ
 		m_VIBuffer->Invalidate_Bones();
 
 		m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);

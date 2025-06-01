@@ -30,7 +30,6 @@ HRESULT CDefaultObj::Initialize(void* pArg)
     XMStoreFloat4x4( &MD.MatTransform, XMMatrixIdentity());
     MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BrickDiffuse", CTexture::Create(L"../bin/Models/Basic/bricks.dds"));
     MD.NormalMapIndex = m_GameInstance->Add_Texture("BrickNormal", CTexture::Create(L"../bin/Models/Basic/bricks_nmap.dds"));
-
     m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("BrickMat", MD));
 
     m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom");
@@ -43,6 +42,8 @@ HRESULT CDefaultObj::Initialize(void* pArg)
 void CDefaultObj::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
+
+    m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 }
 
 void CDefaultObj::LateTick(float fTimeDelta)
