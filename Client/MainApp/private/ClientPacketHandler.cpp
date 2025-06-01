@@ -1,5 +1,6 @@
 #include "Client_pch.h"
 #include "Client_Globals.h"
+#include "Tank.h"
 #include "ClientPacketHandler.h"
 #include "BufferReader.h"
 #include "BufferWriter.h"
@@ -122,26 +123,24 @@ void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 	PacketHeader header;
 	br >> header;
 
-	float PlayersPos[3];
-	br >> PlayersPos[0] >> PlayersPos[1] >> PlayersPos[2];
 
-	if (g_PlayerID.load() == 0) {
-		CGameInstance::Get_Instance()->Set_Pos_For_Server("Tank", 1, PlayersPos);
+	uint8 playerID;
+	_float4x4 mat{};
+	float potapRot = 0.0f;
+	float posinRot = 0.0f;
 
+	br >> playerID;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			br >> mat.m[i][j];
+		}
 	}
-	else {
 
-		CGameInstance::Get_Instance()->Set_Pos_For_Server("Tank", 0, PlayersPos);
-	}
-	//otherPosX = PlayersPos[0];
-	//otherPosY = PlayersPos[1];
-	//otherPosZ = PlayersPos[2];
-
-#pragma region 객체들 좌표값 넣어주기
-	uint16 id = ServiceManager::GetInstace().GetMyID();
-	//ex) objectlist.Get_object(objbox,id).set_pos(PlayersPos[id]);
-
-#pragma endregion TODO : LOCK걸고 PlayerID에 맞는 값 넣어주기
+	br >> potapRot;
+	br >> posinRot;
+	dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", playerID))->Set_OtherPlayerState(mat, potapRot, posinRot);
 }
 
 
@@ -160,6 +159,23 @@ SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 	sendBuffer->Close(bw.WriteSize());
 
 	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_FINISH_LOADING(uint64 id)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+	bw << id;
+
+	header->size = bw.WriteSize();
+	header->id = C_FINISH_LOADING;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+	return SendBufferRef();
 }
 
 SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
