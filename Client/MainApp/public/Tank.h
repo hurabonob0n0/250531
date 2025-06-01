@@ -40,6 +40,8 @@ public:
 	void set_MyPlayer() {
 		_myPlayer = true;
 	}
+	void SendMyStateToServer();
+
 private:
 	bool _myPlayer = false;
 

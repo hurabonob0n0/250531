@@ -55,7 +55,7 @@ public:
 
 	virtual void OnConnected() override
 	{
-		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001, 100, 10);
+		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
 		Send(sendBuffer);
 	}
 
@@ -88,6 +88,21 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	WI.isFullScreen = m_FullscreenState;
 
 	m_GameInstance->Initialize(WI, m_Input_Dev);
+
+
+
+
+
+#pragma region For Server
+
+	ConnectServer();
+
+#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
+
+
+
+
+
 
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
@@ -127,44 +142,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
-#pragma region For Server
 
-	//ClientServiceRef service = MakeShared<ClientService>(
-	//	NetAddress(L"127.0.0.1", 7777),
-	//	MakeShared<IocpCore>(),
-	//	MakeShared<ServerSession>,
-	//	1);
-
-	//ASSERT_CRASH(service->Start());
-
-	//ServiceManager::GetInstace().SetService(service);
-
-	//int32 threadCount = std::thread::hardware_concurrency();
-	//for (int32 i = 0; i < threadCount; i++)
-	//{
-	//	GThreadManager->Launch([=]()
-	//		{
-	//			while (true)
-	//			{
-	//				service->GetIocpCore()->Dispatch();
-	//			}
-	//		});
-	//}
-
-
-	//while (!g_ServerConnected.load()) {
-
-	//}
-
-	//if (g_PlayerID.load() == 0) {
-	//	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
-	//}
-	//else {
-	//	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 1))->set_MyPlayer();
-	//}
-
-
-#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
 	
 	
@@ -210,17 +188,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				//RECT rect;
-				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				//POINT center = {
-				//	(rect.right - rect.left) / 2,
-				//	(rect.bottom - rect.top) / 2
-				//};
+				RECT rect;
+				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				POINT center = {
+					(rect.right - rect.left) / 2,
+					(rect.bottom - rect.top) / 2
+				};
 
-				//// 클라이언트 좌표 → 스크린 좌표로 변환
-				//ClientToScreen(m_hMainWnd, &center);
+				// 클라이언트 좌표 → 스크린 좌표로 변환
+				ClientToScreen(m_hMainWnd, &center);
 
-				//SetCursorPos(center.x, center.y);
+				SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -382,6 +360,39 @@ void CMainApp::CalculateFrameStats()
 	}
 }
 
+
+void CMainApp::ConnectServer()
+{
+
+	ClientServiceRef service = MakeShared<ClientService>(
+		NetAddress(L"127.0.0.1", 7777),
+		MakeShared<IocpCore>(),
+		MakeShared<ServerSession>,
+		1);
+
+	ASSERT_CRASH(service->Start());
+
+	ServiceManager::GetInstace().SetService(service);
+
+	int32 threadCount = std::thread::hardware_concurrency();
+	for (int32 i = 0; i < threadCount; i++)
+	{
+		GThreadManager->Launch([=]()
+			{
+				while (true)
+				{
+					service->GetIocpCore()->Dispatch();
+				}
+			});
+	}
+
+	while (!g_GameStart.load()) {
+
+		int a = 0;
+	}
+
+}
+
 void CMainApp::Free()
 {
 	m_GameInstance->Release_Engine();
@@ -391,3 +402,4 @@ void CMainApp::Free()
 	Safe_Release(m_Input_Dev);
 	Safe_Release(m_GameInstance);
 }
+
