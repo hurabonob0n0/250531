@@ -23,3 +23,42 @@
 
 계획 오늘 물리엔진 연결 완성
 추가로 해야할 것들 : Terrain 텍스쳐 매핑, 그림자 그리기, 나무 심기, 충돌처리, 전체화면, 모델들 export해서 그리기, 땅에 바퀴자국남기기
+
+
+추가종속성
+Engine.lib
+assimp-vc140-mtd.lib
+Project1.lib
+Debug/ServerCore.lib
+PhysX_static_64.lib
+PhysXCharacterKinematic_static_64.lib
+PhysXCommon_static_64.lib
+PhysXCooking_static_64.lib
+PhysXExtensions_static_64.lib
+PhysXFoundation_static_64.lib
+PhysXVehicle_static_64.lib
+User32.lib
+Gdi32.lib
+
+추포디
+../public/
+../../Reference/Headers/
+../../Reference/Headers/PhysX-4.1\physx\include
+../../Reference/Headers/PhysX-4.1\physx\snippets
+../../Reference/Headers/PhysX-4.1\pxshared\include
+../../Reference/Headers/PhysX-4.1\physx\source\foundation\include
+../../Reference/Headers/PhysX-4.1\physx\snippets\snippetvehicletank
+
+전처리기
+_DEBUG
+WIN64
+PX_DEBUG=1
+PX_CHECKED=1
+PX_NVTX=0
+PX_SUPPORT_PVD=0
+CMAKE_INTDIR="debug"
+UNICODE
+_UNICODE
+
+추가 라이브러리 디렉터리
+../../Reference/Librarys/

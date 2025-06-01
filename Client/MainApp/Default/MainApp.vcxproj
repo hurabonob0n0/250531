@@ -93,14 +93,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN64;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=0;CMAKE_INTDIR="debug";UNICODE;_UNICODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Client_pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../public/;../../Reference/Headers/;../../Reference/Headers/PhysX-4.1\physx\include;../../Reference/Headers/PhysX-4.1\physx\snippets;../../Reference/Headers/PhysX-4.1\pxshared\include;../../Reference/Headers/PhysX-4.1\physx\source\foundation\include;../../Reference/Headers/PhysX-4.1\physx\snippets\snippetvehicletank</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,16 +112,19 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN64;PX_DEBUG=1;PX_CHECKED=1;PX_NVTX=0;PX_SUPPORT_PVD=0;CMAKE_INTDIR="debug";UNICODE;_UNICODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Client_pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../public/;../../Reference/Headers/;../../Reference/Headers/PhysX-4.1\physx\include;../../Reference/Headers/PhysX-4.1\physx\snippets;../../Reference/Headers/PhysX-4.1\pxshared\include;../../Reference/Headers/PhysX-4.1\physx\source\foundation\include;../../Reference/Headers/PhysX-4.1\physx\snippets\snippetvehicletank</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

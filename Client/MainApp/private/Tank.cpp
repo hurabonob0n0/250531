@@ -306,6 +306,9 @@ void CTank::LateTick(float fTimeDelta)
     m_VIBuffer->Set_Transform_Matrix(42 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R7Mat); // Right Seventh Wheel
 
 
+ //   m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
+	//m_VIBuffer->Set_Transform_Matrix(1, m_TransformCom->Get_WorldMatrix()); // Potap
+
     m_VIBuffer->Invalidate_Bones();
 
     m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
