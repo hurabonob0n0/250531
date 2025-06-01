@@ -21,6 +21,9 @@ public:
 public:
     void Make_Buffer(const char* pHeightmapPath, float heightScale, float cellSpacing);
 
+private:
+    XMFLOAT3 Add3(const XMFLOAT3& a, XMVECTOR b);
+
 public:
     HRESULT Render() override;
 

@@ -1,0 +1,20 @@
+@echo off
+set TEXCONV=texconv.exe
+set INPUT_DIR=.\Models\Tank\
+set OUTPUT_DIR=.\TankDDS\
+
+echo [텍스처 변환 시작]
+
+REM 출력 폴더가 없다면 생성
+if not exist %OUTPUT_DIR% (
+    mkdir %OUTPUT_DIR%
+)
+
+REM 확장자별로 루프 돌면서 변환 실행
+for %%F in (%INPUT_DIR%\*.png %INPUT_DIR%\*.jpg %INPUT_DIR%\*.jpeg %INPUT_DIR%\*.bmp %INPUT_DIR%\*.tga) do (
+    echo 변환 중: %%~nxF
+    %TEXCONV% -f R8G8B8A8_UNORM -m 1 -y -o %OUTPUT_DIR% "%%F"
+)
+
+echo [모든 텍스처 변환 완료!]
+pause

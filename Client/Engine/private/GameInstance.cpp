@@ -66,11 +66,11 @@ void CGameInstance::Initialize(WindowInfo windowInfo, CRawInput* pRawInput)
 		SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
 
-	//m_PSOMgr->AddPSO("PosNorPSO", CPSO::Create()->
-	//	SetInputLayout(CPSO::IT_POS_NOR)->
-	//	SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
-	//	SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
-	//	SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+	/*m_PSOMgr->AddPSO("PosNorPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_POS_NOR)->
+		SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());*/
 
 	//Renderer
 	m_MainRenderer = CRenderer::Create(Get_Device(),Get_CommandList(),this);

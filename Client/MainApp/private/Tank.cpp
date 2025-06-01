@@ -338,7 +338,7 @@ void CTank::LateTick(float fTimeDelta)
 		m_VIBuffer->Update();
 	
 		//for server
-		SendMyStateToServer();
+		//SendMyStateToServer();
 
 	}
 
