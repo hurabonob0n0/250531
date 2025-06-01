@@ -57,6 +57,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 void CCamera_Free::Tick(float fTimeDelta)
 {
 
+	//__super::Tick(fTimeDelta);
 	if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
@@ -120,7 +121,7 @@ void CCamera_Free::Tick_For_TPS(float fTimeDelta)
 	m_fXRot_TPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
 	m_Distance_TPS -= (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
 
-	m_fXRot_TPS = max(-89.f, min(89.f, m_fXRot_TPS));
+	m_fXRot_TPS = max(-85.f, min(85.f, m_fXRot_TPS));
 
 	_float4x4 mat;
 	XMStoreFloat4x4(&mat, XMMatrixIdentity());
@@ -140,9 +141,9 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 {
 	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta() * 0.005f;
 	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
-	m_Distance_FPS -= (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
+	m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
 
-	m_fXRot_FPS = max(-89.f, min(89.f, m_fXRot_FPS));
+	m_fXRot_FPS = max(-85.f, min(85.f, m_fXRot_FPS));
 
 	_float4x4 mat;
 	XMStoreFloat4x4(&mat, XMMatrixIdentity());

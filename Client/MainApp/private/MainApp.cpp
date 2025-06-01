@@ -91,12 +91,12 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
-	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/Height1.bmp", 1.f, 1.f);
+	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/Terrain.png", 1.f, 1.f);
 	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,60.f,0.f);
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Height1.bmp", 0.06f, 1.f));
+	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain.png", 0.06f, 1.f));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 
@@ -117,6 +117,10 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
 	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", nullptr);
+	_matrix mat2 = XMMatrixTranslation(10.f, 30.f, 10.f);
+	m_GameInstance->AddObject("Tank", "Tank", &mat2);
+	/*_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
+	m_GameInstance->AddObject("Tank", "Tank", &mat2);*/
 
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 

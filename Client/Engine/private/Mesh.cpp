@@ -11,12 +11,12 @@ CMesh::CMesh(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext)
 CMesh::CMesh(CMesh & rhs)
 	: CVIBuffer(rhs)
 {
+	strcpy_s(m_szName, rhs.m_szName); 
+	m_iMaterialIndex = rhs.m_iMaterialIndex;
 }
 
 HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIMesh, const vector< class CBone*>& Bones, _fmatrix PivotMatrix)
 {
-	m_CBBinding = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
-
 	m_iMaterialIndex = pAIMesh->mMaterialIndex;
 	strcpy_s(m_szName, pAIMesh->mName.data);
 
@@ -70,6 +70,7 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIM
 
 HRESULT CMesh::Initialize(void * pArg)
 {
+	m_CBBinding = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
 	return S_OK;
 }
 

@@ -121,7 +121,7 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 	if (!heightField) return nullptr;
 
 	PxHeightFieldGeometry hfGeom(heightField, PxMeshGeometryFlags(), 0.01f, 1.f, 1.f);
-	PxTransform pose(PxVec3(-512.5, 0, -512.5), PxQuat(PxIdentity));
+	PxTransform pose(PxVec3(-4096.f, 0, -4096.f), PxQuat(PxIdentity));
 	PxRigidStatic* actor = physics->createRigidStatic(pose);
 
 	PxShape* shape = physics->createShape(hfGeom, *material);
