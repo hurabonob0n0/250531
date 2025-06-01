@@ -336,7 +336,14 @@ void CTank::LateTick(float fTimeDelta)
 		m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
 		m_VIBuffer->Update();
+	
+		//for server
+		SendMyStateToServer();
+
 	}
+
+
+
 
 	else
 	{
@@ -381,4 +388,13 @@ CRenderObject* CTank::Clone(void* pArg)
 	CTank* pInstance = new CTank(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
+}
+
+
+void CTank::SendMyStateToServer()
+{
+	_float4x4 TempMat;
+	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
+	auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 }

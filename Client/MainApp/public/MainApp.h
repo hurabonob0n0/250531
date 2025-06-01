@@ -33,6 +33,11 @@ public:
 public: //----------- For Debug : FPS ---------------
 	void CalculateFrameStats();
 
+public://---For Server_Connect
+	void ConnectServer();
+
+	bool CanStart = false;
+
 
 private:
 	HINSTANCE	m_hAppInst = nullptr;
