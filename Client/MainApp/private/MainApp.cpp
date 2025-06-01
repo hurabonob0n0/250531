@@ -55,7 +55,7 @@ public:
 
 	virtual void OnConnected() override
 	{
-		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001, 100, 10);
+		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(10);
 		Send(sendBuffer);
 	}
 
@@ -88,6 +88,14 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	WI.isFullScreen = m_FullscreenState;
 
 	m_GameInstance->Initialize(WI, m_Input_Dev);
+
+#pragma region For Server
+
+	ConnectServer();
+
+#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
+
+
 
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
@@ -123,44 +131,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
-#pragma region For Server
-
-	//ClientServiceRef service = MakeShared<ClientService>(
-	//	NetAddress(L"127.0.0.1", 7777),
-	//	MakeShared<IocpCore>(),
-	//	MakeShared<ServerSession>,
-	//	1);
-
-	//ASSERT_CRASH(service->Start());
-
-	//ServiceManager::GetInstace().SetService(service);
-
-	//int32 threadCount = std::thread::hardware_concurrency();
-	//for (int32 i = 0; i < threadCount; i++)
-	//{
-	//	GThreadManager->Launch([=]()
-	//		{
-	//			while (true)
-	//			{
-	//				service->GetIocpCore()->Dispatch();
-	//			}
-	//		});
-	//}
-
-
-	//while (!g_ServerConnected.load()) {
-
-	//}
-
-	//if (g_PlayerID.load() == 0) {
-	//	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
-	//}
-	//else {
-	//	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 1))->set_MyPlayer();
-	//}
-
-
-#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
 	
 	
@@ -376,6 +346,38 @@ void CMainApp::CalculateFrameStats()
 		frameCnt = 0;
 		timeElapsed += 1.0f;
 	}
+}
+
+void CMainApp::ConnectServer()
+{
+
+	ClientServiceRef service = MakeShared<ClientService>(
+		NetAddress(L"127.0.0.1", 7777),
+		MakeShared<IocpCore>(),
+		MakeShared<ServerSession>,
+		1);
+
+	ASSERT_CRASH(service->Start());
+
+	ServiceManager::GetInstace().SetService(service);
+
+	int32 threadCount = std::thread::hardware_concurrency();
+	for (int32 i = 0; i < threadCount; i++)
+	{
+		GThreadManager->Launch([=]()
+			{
+				while (true)
+				{
+					service->GetIocpCore()->Dispatch();
+				}
+			});
+	}
+
+	while (!g_GameStart.load()) {
+
+		int a = 0;
+	}
+
 }
 
 void CMainApp::Free()

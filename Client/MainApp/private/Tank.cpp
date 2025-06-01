@@ -74,6 +74,8 @@ HRESULT CTank::Initialize(void* pArg)
 
 	m_pPhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 
+
+
     return S_OK;
 }
 
@@ -286,36 +288,39 @@ void CTank::LateTick(float fTimeDelta)
     XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
 
 
-	m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
-	m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
-    
+    m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
+    m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
 
-    m_VIBuffer->Set_Transform_Matrix(24 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L1Mat); // Left First Wheel
-    m_VIBuffer->Set_Transform_Matrix(26 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L2Mat); // Left Second Wheel
-    m_VIBuffer->Set_Transform_Matrix(28 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L3Mat); // Left Third Wheel
-    m_VIBuffer->Set_Transform_Matrix(30 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L4Mat); // Left Fourth Wheel
-    m_VIBuffer->Set_Transform_Matrix(32 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L5Mat); // Left Fifth Wheel
-    m_VIBuffer->Set_Transform_Matrix(34 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L6Mat); // Left Sixth Wheel
-    m_VIBuffer->Set_Transform_Matrix(36 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* L7Mat); // Left Seventh Wheel
-    m_VIBuffer->Set_Transform_Matrix(46 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R1Mat); // Right First Wheel
-    m_VIBuffer->Set_Transform_Matrix(37 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R2Mat); // Right Second Wheel
-    m_VIBuffer->Set_Transform_Matrix(35 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R3Mat); // Right Third Wheel
-    m_VIBuffer->Set_Transform_Matrix(33 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R4Mat); // Right Fourth Wheel
-    m_VIBuffer->Set_Transform_Matrix(44 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R5Mat); // Right Fifth Wheel
-    m_VIBuffer->Set_Transform_Matrix(48 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R6Mat); // Right Sixth Wheel
-    m_VIBuffer->Set_Transform_Matrix(42 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f))* R7Mat); // Right Seventh Wheel
+    m_VIBuffer->Set_Transform_Matrix(24 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L1Mat); // Left First Wheel
+    m_VIBuffer->Set_Transform_Matrix(26 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L2Mat); // Left Second Wheel
+    m_VIBuffer->Set_Transform_Matrix(28 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L3Mat); // Left Third Wheel
+    m_VIBuffer->Set_Transform_Matrix(30 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L4Mat); // Left Fourth Wheel
+    m_VIBuffer->Set_Transform_Matrix(32 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L5Mat); // Left Fifth Wheel
+    m_VIBuffer->Set_Transform_Matrix(34 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L6Mat); // Left Sixth Wheel
+    m_VIBuffer->Set_Transform_Matrix(36 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L7Mat); // Left Seventh Wheel
+    m_VIBuffer->Set_Transform_Matrix(46 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R1Mat); // Right First Wheel
+    m_VIBuffer->Set_Transform_Matrix(37 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R2Mat); // Right Second Wheel
+    m_VIBuffer->Set_Transform_Matrix(35 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R3Mat); // Right Third Wheel
+    m_VIBuffer->Set_Transform_Matrix(33 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R4Mat); // Right Fourth Wheel
+    m_VIBuffer->Set_Transform_Matrix(44 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R5Mat); // Right Fifth Wheel
+    m_VIBuffer->Set_Transform_Matrix(48 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R6Mat); // Right Sixth Wheel
+    m_VIBuffer->Set_Transform_Matrix(42 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R7Mat); // Right Seventh Wheel
 
 
- //   m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
-	//m_VIBuffer->Set_Transform_Matrix(1, m_TransformCom->Get_WorldMatrix()); // Potap
+    //   m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
+       //m_VIBuffer->Set_Transform_Matrix(1, m_TransformCom->Get_WorldMatrix()); // Potap
 
     m_VIBuffer->Invalidate_Bones();
 
     m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
     m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
     m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
- 
+
     m_VIBuffer->Update();
+
+
+    //for server
+    SendMyStateToServer();
 }
 
 void CTank::Render()
@@ -332,6 +337,14 @@ void CTank::Set_PotapRotation(float fDegree)
 void CTank::Set_PoSinpRotation(float fDegree)
 {
     m_fPosinRotation = fDegree;
+}
+
+void CTank::SendMyStateToServer()
+{
+    _float4x4 TempMat;
+    XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
+    auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation);
+    ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 }
 
 void CTank::Free()

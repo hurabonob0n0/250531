@@ -19,16 +19,24 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_TEST:
 		Handle_S_TEST(buffer, len);
 		break;
-	case S_SUCCES_LOGIN:
-		Handle_S_SUCCES_LOGIN(buffer, len);
+
+	case S_SUCCESS_LOGIN:
+		Handle_S_SUCCESS_LOGIN(buffer, len);
 		break;
+
+	case S_SUCCESS_ENTER_ROOM:
+		Handle_S_SUCCESS_ENTER_ROOM(buffer, len);
+		break;
+
+	case S_GAME_START:
+		Handle_S_GAME_START(buffer, len);
+		break;
+
 	case S_PLAYER_MOVE:
 		Handle_S_PLAYER_MOVE(buffer, len);
 		break;
 	
-	case S_ROOMCREATED:
-		Handle_S_ROOM_CREATED(buffer, len);
-		break;
+
 
 	default:
 		break;
@@ -65,7 +73,7 @@ void ClientPacketHandler::Handle_S_TEST(BYTE* buffer, int32 len)
 	cout << "ID: " << id << " HP : " << hp << " ATT : " << attack << endl;
 }
 
-void ClientPacketHandler::Handle_S_SUCCES_LOGIN(BYTE* buffer, int32 len)
+void ClientPacketHandler::Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len)
 {
 	BufferReader br(buffer, len);
 	PacketHeader header;
@@ -82,6 +90,32 @@ void ClientPacketHandler::Handle_S_SUCCES_LOGIN(BYTE* buffer, int32 len)
 
 #pragma endregion
 }
+
+void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
+{
+	BufferReader br(buffer, len);
+
+	PacketHeader header;
+	br >> header;
+
+	g_GameStart.store(true);
+
+}
+
+void ClientPacketHandler::Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len)
+{
+	BufferReader br(buffer, len);
+
+	PacketHeader header;
+	br >> header;
+
+	uint16 dummy;
+	br >> dummy;
+
+
+}
+
+
 
 void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 {
@@ -112,26 +146,15 @@ void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 #pragma endregion TODO : LOCK걸고 PlayerID에 맞는 값 넣어주기
 }
 
-void ClientPacketHandler::Handle_S_ROOM_CREATED(BYTE* buffer, int32 len)
-{
-	BufferReader br(buffer, len);
 
-	PacketHeader header;
-	br >> header;
 
-	uint16 dummy;
-	br >> dummy;
-
-	g_RoomCreated.store(true);
-}
-
-SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id, uint32 hp, uint16 attack)
+SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 {
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 
 	PacketHeader* header = bw.Reserve<PacketHeader>();
-	bw << id << hp << attack;
+	bw << id;
 
 	header->size = bw.WriteSize();
 	header->id = C_LOGIN;
@@ -158,14 +181,22 @@ SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
 	return sendBuffer;
 }
 
-SendBufferRef ClientPacketHandler::Make_C_MOVE(float x, float y, float z)
+SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation)
 {
 	
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 	
-	bw << x << y << z;
+	for (int i = 0; i < 4; ++i)
+	{
+		bw << worldMatrix.m[i][0];  // row i, col 0
+		bw << worldMatrix.m[i][1];  // row i, col 1
+		bw << worldMatrix.m[i][2];  // row i, col 2
+		bw << worldMatrix.m[i][3];  // row i, col 3
+	}
+	bw << potapRotation;
+	bw << posinRotation;
 
 	header->size = bw.WriteSize();
 	header->id = C_MOVEMENT;
