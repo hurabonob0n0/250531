@@ -55,7 +55,11 @@ public:		//For_FrameResourceMgr
 	CFrameResource* Get_Current_FrameResource() { return m_FrameResourceMgr->Get_Current_FrameResource(); }
 	void Flush_CommandQueue() { m_FrameResourceMgr->Flush_CommandQueue(); }
 	void Set_CurrentFramePBMats() { m_FrameResourceMgr->Set_CurrentFramePBMats(); }
-
+	void Execute_Flush_and_Reset() { 
+		m_Graphic_Dev->Execute_CommandList();
+		m_FrameResourceMgr->Flush_CommandQueue();
+		m_FrameResourceMgr->Reset_CommandList_and_Allocator(nullptr);
+	}
 public: //For ComponentMgr
 	HRESULT AddPrototype(const string& prototypeTag, CComponent* pPrototype) { return m_ComponentMgr->AddPrototype(prototypeTag, pPrototype); }
 	CComponent* Get_Component(const string& prototypeTag, void* pArg = nullptr) const { return m_ComponentMgr->GetComponent(prototypeTag, pArg); }

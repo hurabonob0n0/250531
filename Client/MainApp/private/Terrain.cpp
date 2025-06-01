@@ -21,11 +21,16 @@ HRESULT CTerrain::Initialize(void* pArg)
 {
     __super::Initialize(pArg);
 
-    m_RG = CRenderer::RG_BLEND;
+    m_RG = CRenderer::RG_NONBLEND;
 
-    m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
-    
+    m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);    
+
     m_VIBufferCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom");
+
+    MaterialData mat{};
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", CTexture::Create(L"../bin/Models/TerrainDDS/Diffuse.dds"));
+    mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", CTexture::Create(L"../bin/Models/TerrainDDS/Normal.dds"));
+    m_CBBindingCom->Set_MaterialIndex( m_GameInstance->Add_Material("TerrainMat", mat));
 
     return S_OK;
 }
