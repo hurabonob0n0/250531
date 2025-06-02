@@ -109,6 +109,9 @@
     <Filter Include="02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad">
       <UniqueIdentifier>{72136bf5-9639-4087-af00-20df5a388d07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\00.RenderObject\01.UIObject">
+      <UniqueIdentifier>{84597122-dde2-47e6-8dd4-3b65655770c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Engine_Defines.h">
@@ -240,6 +243,9 @@
     <ClInclude Include="..\public\VIBuffer_Quad.h">
       <Filter>02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UIObject.h">
+      <Filter>03.GameObject\00.RenderObject\01.UIObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -355,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Quad.cpp">
       <Filter>02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIObject.cpp">
+      <Filter>03.GameObject\00.RenderObject\01.UIObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

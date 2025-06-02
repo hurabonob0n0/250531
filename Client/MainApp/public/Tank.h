@@ -41,6 +41,8 @@ private:
 	float	m_TestX = -512.f;
 	bool	KeyInput = false;
 
+	_uint matindex= 0;
+
 public:
 	void set_MyPlayer() {
 		_myPlayer = true;

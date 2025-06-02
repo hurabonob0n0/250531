@@ -37,6 +37,7 @@ HRESULT CRenderObject::Initialize(void* pArg)
 
 void CRenderObject::Tick(float fTimeDelta)
 {
+	//__super::Tick(fTimeDelta);
 }
 
 void CRenderObject::LateTick(float fTimeDelta)

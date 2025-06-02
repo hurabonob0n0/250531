@@ -84,10 +84,10 @@ void CRenderer::Render()
 
     Render_NonBlend();
 
-    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("TerrainPSO"));
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("EffectPSO"));
     Render_Blend();
 
-    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("EffectPSO"));
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("UIPSO"));
     Render_UI();
     
     m_GameInstance->Present();

@@ -47,6 +47,9 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("EffectVS", CShader::ST_VS, L"../bin/Shaders/Effect.hlsl", nullptr);
 	m_ShaderMgr->AddShader("EffectPS", CShader::ST_PS, L"../bin/Shaders/Effect.hlsl", nullptr);
 
+	m_ShaderMgr->AddShader("UIVS", CShader::ST_VS, L"../bin/Shaders/UI.hlsl", nullptr);
+	m_ShaderMgr->AddShader("UIPS", CShader::ST_PS, L"../bin/Shaders/UI.hlsl", nullptr);
+
 
 	//PSOMgr
 	m_PSOMgr = CPSOMgr::Get_Instance();
@@ -74,6 +77,12 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+
+	m_PSOMgr->AddPSO("UIPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_MESH)->
+		SetVS(m_ShaderMgr->GetShaderObj("UIVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("UIPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
 
 	//Renderer

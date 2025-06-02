@@ -43,6 +43,9 @@
     <Filter Include="01.DefaultObj\Effect">
       <UniqueIdentifier>{f01edfda-8a9b-4991-883c-33c027880920}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\UI">
+      <UniqueIdentifier>{7545ea8f-d334-473c-ab7d-3bf8540b74f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -84,6 +87,9 @@
     <ClInclude Include="..\public\Effect.h">
       <Filter>01.DefaultObj\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI.h">
+      <Filter>01.DefaultObj\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -122,6 +128,9 @@
     <ClCompile Include="..\private\Effect.cpp">
       <Filter>01.DefaultObj\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI.cpp">
+      <Filter>01.DefaultObj\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
@@ -149,6 +158,9 @@
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Effect.hlsl">
+      <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders\UI.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

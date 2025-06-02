@@ -57,6 +57,7 @@
     <ClInclude Include="..\public\TextureMgr.h" />
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
+    <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\UploadBuffer.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -101,6 +102,7 @@
     <ClCompile Include="..\private\TextureMgr.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
+    <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Geos.cpp" />
     <ClCompile Include="..\private\VIBuffer_Quad.cpp" />

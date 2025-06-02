@@ -6,6 +6,7 @@
 #include "Tank.h"
 #include "Terrain.h"
 #include "Effect.h"
+#include "UI.h"
 
 /*-----------------
 	For Server
@@ -97,7 +98,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 #pragma region For Server
 
-	ConnectServer();
+	//ConnectServer();
 
 #pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
@@ -113,31 +114,34 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
+	//m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
+	
 
 	//m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
-	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
+	//m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
 	//m_GameInstance->Add_PrototypeObject("BoxObject", CBoxObj::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
-	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
-
-	
+	//m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
+	//m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
+	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
 
 	/*_matrix mat1 = XMMatrixTranslation(0.f, 5.f, 10.f);
 	m_GameInstance->AddObject("DefaultObject", "DefaultObject", &mat1);*/
 
 	//m_GameInstance->AddObject("BoxObject", "BoxObject", nullptr);
 
-	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
-	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
+
+
 	m_GameInstance->AddObject("Tank", "Tank", nullptr);
-	_matrix mat2 = XMMatrixTranslation(10.f, 20.f, 10.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat2);
+	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
+	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
+	//_matrix mat2 = XMMatrixTranslation(10.f, 20.f, 10.f);
+	//m_GameInstance->AddObject("Tank", "Tank", &mat2);
 	/*_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);*/
 	//m_GameInstance->AddObject("DefaultObject", "DefaultObject", nullptr);
@@ -146,16 +150,19 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
-	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	m_GameInstance->AddObject("Effect", "Effect", nullptr);
+	//m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
+	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+
+	m_GameInstance->AddObject("UI", "UI", nullptr);
 	
 
 	m_GameInstance->Execute_CommandList();
 
 	m_GameInstance->Flush_CommandQueue();
 
-	SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+	/*SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);*/
 	
 	return S_OK;
 }

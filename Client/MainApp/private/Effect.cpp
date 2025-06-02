@@ -24,7 +24,7 @@ HRESULT CEffect::Initialize_Prototype()
 
 HRESULT CEffect::Initialize(void* pArg)
 {
-    m_RG = CRenderer::RG_UI;
+    m_RG = CRenderer::RG_BLEND;
 
     __super::Initialize(pArg);
 
@@ -57,6 +57,8 @@ void CEffect::Tick(float fTimeDelta)
 
 void CEffect::LateTick(float fTimeDelta)
 {
+    if (m_AccumulatedTime < 3.f)
+    {
     __super::LateTick(fTimeDelta);
 
     m_AccumulatedTime += fTimeDelta;
@@ -85,6 +87,9 @@ void CEffect::LateTick(float fTimeDelta)
     //XMStoreFloat4x4(&m_TexCoordTransformCom, texTransform);
 
     m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
+
+    }
+
 }
 
 void CEffect::Render()
