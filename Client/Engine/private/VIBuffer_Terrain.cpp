@@ -82,7 +82,7 @@ void CVIBuffer_Terrain::Make_Buffer(const char* pHeightmapPath, float heightScal
                 (x - width / 2) * cellSpacing, y, (z - height / 2) * cellSpacing);
             vecPoints[idx].vNormal = XMFLOAT3(0.f, 0.f, 0.f); // 임시 노멀값 (후처리 필요)
             vecPoints[idx].vTangent = XMFLOAT3(0.f, 0.f, 0.f);
-            vecPoints[idx].vTexcoord = XMFLOAT2(x / 8192.f, z / 8192.f);
+            vecPoints[idx].vTexcoord = XMFLOAT2( x / ((float)width*2.f)+0.25f, z / ((float)height * 2.f) + 0.25f);
             //m_vertices[idx] = y;
         }
     }
@@ -173,9 +173,9 @@ void CVIBuffer_Terrain::Make_Buffer(const char* pHeightmapPath, float heightScal
             XMFLOAT3 p1 = vecPoints[i1].vPosition;
             XMFLOAT3 p2 = vecPoints[i2].vPosition;
 
-            XMFLOAT2& uv0 = vecPoints[i0].vTexcoord;
-            XMFLOAT2& uv1 = vecPoints[i1].vTexcoord;
-            XMFLOAT2& uv2 = vecPoints[i2].vTexcoord;
+            XMFLOAT2 uv0 = vecPoints[i0].vTexcoord;
+            XMFLOAT2 uv1 = vecPoints[i1].vTexcoord;
+            XMFLOAT2 uv2 = vecPoints[i2].vTexcoord;
 
             XMVECTOR edge1 = XMLoadFloat3(&p1) - XMLoadFloat3(&p0);
             XMVECTOR edge2 = XMLoadFloat3(&p2) - XMLoadFloat3(&p0);

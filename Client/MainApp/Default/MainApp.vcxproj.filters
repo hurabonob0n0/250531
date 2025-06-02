@@ -34,6 +34,15 @@
     <Filter Include="98.ForServer\PacketHandler">
       <UniqueIdentifier>{cc336ed7-ec91-4d01-b98a-ab0ee2c52db6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\Box">
+      <UniqueIdentifier>{a282c663-3323-4b1e-a042-4082915e0819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\Terrain">
+      <UniqueIdentifier>{ee3eb46d-163d-4333-9bc2-e60149954506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\Effect">
+      <UniqueIdentifier>{f01edfda-8a9b-4991-883c-33c027880920}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -42,20 +51,11 @@
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00.MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\DefaultObj.h">
-      <Filter>01.DefaultObj</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Camera_Free.h">
       <Filter>02.Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\BoxObj.h">
-      <Filter>01.DefaultObj</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Tank.h">
       <Filter>01.DefaultObj\Tank</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Terrain.h">
-      <Filter>01.DefaultObj</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Client_pch.h">
       <Filter>Client_Pch</Filter>
@@ -72,22 +72,25 @@
     <ClInclude Include="..\public\ServerSession.h">
       <Filter>98.ForServer\ServiceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\BoxObj.h">
+      <Filter>01.DefaultObj\Box</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DefaultObj.h">
+      <Filter>01.DefaultObj\Box</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Terrain.h">
+      <Filter>01.DefaultObj\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect.h">
+      <Filter>01.DefaultObj\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\private\DefaultObj.cpp">
-      <Filter>01.DefaultObj</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Camera_Free.cpp">
       <Filter>02.Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\BoxObj.cpp">
-      <Filter>01.DefaultObj</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Tank.cpp">
       <Filter>01.DefaultObj\Tank</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Terrain.cpp">
-      <Filter>01.DefaultObj</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Client_pch.cpp">
       <Filter>Client_Pch</Filter>
@@ -106,6 +109,18 @@
     </ClCompile>
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00.MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BoxObj.cpp">
+      <Filter>01.DefaultObj\Box</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DefaultObj.cpp">
+      <Filter>01.DefaultObj\Box</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Terrain.cpp">
+      <Filter>01.DefaultObj\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect.cpp">
+      <Filter>01.DefaultObj\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +143,12 @@
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\ShaderFiles\Default.hlsl">
+      <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders\Sky.hlsl">
+      <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders\Effect.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

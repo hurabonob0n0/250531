@@ -5,6 +5,7 @@
 #include "BoxObj.h"
 #include "Tank.h"
 #include "Terrain.h"
+#include "Effect.h"
 
 /*-----------------
 	For Server
@@ -40,7 +41,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	return mainApp->Run();
 }
 
-CMainApp::CMainApp() : m_GameInstance(CGameInstance::Get_Instance()), m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
+CMainApp::CMainApp() : m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
 {
 }
 
@@ -79,6 +80,7 @@ public:
 HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 {
 	Initialize_MainWindow(g_hInstance);
+	m_GameInstance = CGameInstance::Get_Instance();
 	m_Input_Dev->Initialize(m_hMainWnd);
 
 	WindowInfo WI;
@@ -106,21 +108,23 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
-	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/Terrain.png", 1.f, 1.f);
-	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,60.f,0.f);
+	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/HeightD.png", 1.f, 1.f);
+	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,40.f,0.f);
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	//m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain.png", 0.06f, 1.f));
+	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/HeightD.png", 0.12f, 1.f));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
+	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
 
 	//m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
+	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
 	//m_GameInstance->Add_PrototypeObject("BoxObject", CBoxObj::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
-	//m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
+	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 
 	
 
@@ -136,12 +140,13 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);
 	/*_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);*/
+	//m_GameInstance->AddObject("DefaultObject", "DefaultObject", nullptr);
 
 
 
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
-	//m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
+	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 	
 
@@ -187,17 +192,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				RECT rect;
-				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				POINT center = {
-					(rect.right - rect.left) / 2,
-					(rect.bottom - rect.top) / 2
-				};
+				//RECT rect;
+				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				//POINT center = {
+				//	(rect.right - rect.left) / 2,
+				//	(rect.bottom - rect.top) / 2
+				//};
 
-				// 클라이언트 좌표 → 스크린 좌표로 변환
-				ClientToScreen(m_hMainWnd, &center);
+				//// 클라이언트 좌표 → 스크린 좌표로 변환
+				//ClientToScreen(m_hMainWnd, &center);
 
-				SetCursorPos(center.x, center.y);
+				//SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -241,6 +246,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// 새로운 윈도우 크기를 저장합니다.
 		m_ClientWidth = LOWORD(lParam);
 		m_ClientHeight = HIWORD(lParam);
+		//m_FullscreenState = !m_FullscreenState;
+		if(m_GameInstance)
+			m_GameInstance->OnResize();
 		return 0;
 
 		// 윈도우가 파괴될 때 WM_DESTORY가 보내집니다.
@@ -256,7 +264,7 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_INPUT:
 		m_Input_Dev->Update_InputDev(lParam);
-		break;
+		return 0;
 
 	case WM_KEYUP:
 		if (wParam == VK_ESCAPE)
@@ -293,23 +301,25 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 	}
 
 	// 클라이언트의 크기를 기반으로 윈도우 사각형을 계산합니다.
-	RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
+	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
-	int height = R.bottom - R.top;
+	int height = R.bottom - R.top;*/
+
+	DWORD style = WS_VISIBLE | WS_POPUP;
 
 	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
+		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);
 	if (!m_hMainWnd)
 	{
 		MessageBox(0, L"CreateWindow Failed.", 0, 0);
-		return false;
+		return E_FAIL;
 	}
 
 	ShowWindow(m_hMainWnd, SW_SHOW);
 	UpdateWindow(m_hMainWnd);
 
-	return true;
+	return S_OK;
 }
 
 
