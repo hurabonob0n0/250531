@@ -36,6 +36,7 @@ public:
 	static SendBufferRef Make_C_FINISH_LOADING(uint64 id);
 	static SendBufferRef Make_C_KEYINPUT(uint8 key);
 	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation);
+	static SendBufferRef Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ);
 
 	USE_LOCK;
 	

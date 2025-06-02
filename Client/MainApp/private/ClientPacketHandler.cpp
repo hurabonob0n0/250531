@@ -221,3 +221,20 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float pot
 
 }
 
+SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << PosX << PosY << PosZ 
+		<< nDirX << nDirY << nDirZ;
+
+	header->size = bw.WriteSize();
+	header->id = C_SHOT;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+
+}
+

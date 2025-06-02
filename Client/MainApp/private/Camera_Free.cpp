@@ -142,8 +142,8 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 {
 	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta() * 0.005f;
 	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
-	m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
-
+	//m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
+	m_Distance_FPS = 6.f;
 	m_fXRot_FPS = max(-85.f, min(85.f, m_fXRot_FPS));
 
 	_float4x4 mat;
@@ -166,8 +166,15 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 	if (m_GameInstance->Mouse_Down(0))
 		m_GameInstance->AddObject("Effect", "Effect", &matforBox);
 
+
+
+	//if (m_GameInstance->Mouse_Down(0))
+	//	m_GameInstance->AddObject("DefaultObject", "BoxObj", &matforBox);
+
+	m_Tank->Set_ShotMatrix(matforBox);
 	m_Tank->Set_PotapRotation(m_fYRot_FPS);
 	m_Tank->Set_PoSinpRotation(m_fXRot_FPS);
+
 }
 
 void CCamera_Free::Free()
