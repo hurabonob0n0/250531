@@ -160,14 +160,11 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 	m_TransformCom->Orbit_For_FPS(TankPos, m_fYRot_FPS, m_fXRot_FPS);
 
 	_matrix matforBox = XMMatrixIdentity();
-	
-	/*XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f,1.f,0.f,0.f), worldforward)));
-	
-	XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(worldforward, XMLoadFloat3(&vRight))));
-	matforBox.r[1] = vUp;*/
-	matforBox.r[2] = m_TransformCom->Get_State(CTransform::STATE_LOOK);
 	matforBox.r[3] = m_TransformCom->Get_State(CTransform::STATE_POSITION);
 
+
+	if (m_GameInstance->Mouse_Down(0))
+		m_GameInstance->AddObject("Effect", "Effect", &matforBox);
 
 
 

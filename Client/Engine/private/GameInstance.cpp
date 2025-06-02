@@ -6,7 +6,7 @@ CGameInstance::CGameInstance() : m_Graphic_Dev(CGraphic_Dev::Get_Instance()),m_F
 {
 }
 
-void CGameInstance::Initialize(WindowInfo windowInfo, CRawInput* pRawInput)
+void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 {
 	ID3D12Debug* debugController;
 	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
@@ -44,6 +44,10 @@ void CGameInstance::Initialize(WindowInfo windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("PosNorVS", CShader::ST_VS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
 	m_ShaderMgr->AddShader("PosNorPS", CShader::ST_PS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
 
+	m_ShaderMgr->AddShader("EffectVS", CShader::ST_VS, L"../bin/Shaders/Effect.hlsl", nullptr);
+	m_ShaderMgr->AddShader("EffectPS", CShader::ST_PS, L"../bin/Shaders/Effect.hlsl", nullptr);
+
+
 	//PSOMgr
 	m_PSOMgr = CPSOMgr::Get_Instance();
 
@@ -66,11 +70,11 @@ void CGameInstance::Initialize(WindowInfo windowInfo, CRawInput* pRawInput)
 		SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
 
-	//m_PSOMgr->AddPSO("PosNorPSO", CPSO::Create()->
-	//	SetInputLayout(CPSO::IT_POS_NOR)->
-	//	SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
-	//	SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
-	//	SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+	m_PSOMgr->AddPSO("EffectPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_MESH)->
+		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
 
 	//Renderer
 	m_MainRenderer = CRenderer::Create(Get_Device(),Get_CommandList(),this);

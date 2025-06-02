@@ -22,7 +22,7 @@ private:
 	virtual ~CGameInstance() = default;
 
 public:
-	void Initialize(WindowInfo windowInfo,CRawInput* pRawInput);
+	void Initialize(WindowInfo& windowInfo,CRawInput* pRawInput);
 	void Update(CTimer* pTimer);
 	void Late_Update(CTimer* pTimer);
 	void Draw();
@@ -35,6 +35,7 @@ public:		//For_GraphicDev
 	UINT Get_CBVUAVSRVHeapSize() { return m_Graphic_Dev->Get_CBVUAVSRVHeapSize(); }
 	void Set_BackBuffer_and_DSV() { m_Graphic_Dev->Set_BackBuffer_and_DSV(); }
 	void Present() { m_Graphic_Dev->Present(); }
+	void OnResize() { m_Graphic_Dev->OnResize(); }
 
 public:		//For_InputDev
 	bool Key_Down(UINT vkey) {return m_Input_Dev->Key_Down(vkey);}

@@ -42,6 +42,11 @@ public:
 		m_WorldMatrix = Worldmat;
 	}
 
+	void Set_WorldMatrix(const XMMATRIX& Worldmat)
+	{
+		XMStoreFloat4x4(&m_WorldMatrix, Worldmat);
+	}
+
 	//void Set_Scale(float fScale) {
 	//	_matrix mat = Get_WorldMatrix();
 	//	mat.r[0] *= 2;

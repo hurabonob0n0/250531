@@ -106,6 +106,9 @@
     <Filter Include="02.Utilities\00.Component\04.CBBinding">
       <UniqueIdentifier>{59a08ece-9e19-4333-b501-d39d0ded14c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad">
+      <UniqueIdentifier>{72136bf5-9639-4087-af00-20df5a388d07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Engine_Defines.h">
@@ -234,6 +237,9 @@
     <ClInclude Include="..\public\CBBinding.h">
       <Filter>02.Utilities\00.Component\04.CBBinding</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Quad.h">
+      <Filter>02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -346,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="..\private\CBBinding.cpp">
       <Filter>02.Utilities\00.Component\04.CBBinding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Quad.cpp">
+      <Filter>02.Utilities\00.Component\00.VIBuffer\01.VIBuffer_Quad</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

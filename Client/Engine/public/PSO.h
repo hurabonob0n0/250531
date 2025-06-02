@@ -26,6 +26,7 @@ public:
     CPSO* SetRS(ID3D12RootSignature* RS);
     CPSO* SetForSkyBox();
     CPSO* Create_PSO();
+    CPSO* setForBlending();
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

@@ -119,6 +119,11 @@ CPSO* CPSO::Create_PSO() {
     return this;
 }
 
+CPSO* CPSO::setForBlending()
+{
+    return nullptr;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;

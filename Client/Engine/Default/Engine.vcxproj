@@ -63,6 +63,7 @@
     </ClInclude>
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Geos.h" />
+    <ClInclude Include="..\public\VIBuffer_Quad.h" />
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +103,7 @@
     <ClCompile Include="..\private\Transform.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Geos.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Quad.cpp" />
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
     <ClCompile Include="..\public\d3dUtil.cpp" />
     <ClCompile Include="..\public\DDSTextureLoader.cpp" />

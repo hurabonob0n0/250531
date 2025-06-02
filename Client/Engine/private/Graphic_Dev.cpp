@@ -1,4 +1,5 @@
 #include "Graphic_Dev.h"
+#include "GameInstance.h"
 
 IMPLEMENT_SINGLETON(CGraphic_Dev)
 
@@ -142,6 +143,8 @@ void CGraphic_Dev::OnResize()
     assert(m_Device);
     assert(m_SwapChain);
     assert(m_CommandListAlloc);
+
+    CGameInstance::Get_Instance()->Flush_CommandQueue();
 
     if (FAILED(m_CommandList->Reset(m_CommandListAlloc, nullptr)))
         MSG_BOX("Failed to Reset CommandList");
