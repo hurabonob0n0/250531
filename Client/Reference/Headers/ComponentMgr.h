@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "VIBuffer_Terrain.h"
 #include "CBBinding.h"
+#include "VIBuffer_Quad.h"
 
 class CComponentMgr : public CBase
 {

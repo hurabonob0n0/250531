@@ -101,7 +101,7 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 			int srcIdx = row * width + col;
 			int dstIdx = col * height + row; // x ¡ê z ±³Ã¼
 
-			float h = image[srcIdx] * 255.f * 0.06f;
+			float h = image[srcIdx] * 255.f * 0.12f;
 
 			samples[dstIdx].height = static_cast<PxI16>(h);
 			samples[dstIdx].materialIndex0 = 0;
@@ -121,7 +121,7 @@ PxRigidStatic* createDrivableTerrainFromImage(const char* path, const PxFilterDa
 	if (!heightField) return nullptr;
 
 	PxHeightFieldGeometry hfGeom(heightField, PxMeshGeometryFlags(), 0.01f, 1.f, 1.f);
-	PxTransform pose(PxVec3(-4096.f, 0, -4096.f), PxQuat(PxIdentity));
+	PxTransform pose(PxVec3(-2048.f, 0, -2048.f), PxQuat(PxIdentity));
 	PxRigidStatic* actor = physics->createRigidStatic(pose);
 
 	PxShape* shape = physics->createShape(hfGeom, *material);
