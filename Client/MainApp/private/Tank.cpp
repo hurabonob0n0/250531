@@ -82,6 +82,12 @@ void CTank::Tick(float fTimeDelta)
 {
 	if (_myPlayer)
 	{
+
+		PopAllBulletMatrix([](const _matrix& mat) {
+			_matrix tempMat = mat; 
+			CGameInstance::Get_Instance()->AddObject("DefaultObject", "BulletObj", &tempMat);
+			});
+
 		if (m_GameInstance->Key_Down('U'))
 			m_TankConsrolState.leftThrust = true;
 
@@ -106,9 +112,10 @@ void CTank::Tick(float fTimeDelta)
 		if (m_GameInstance->Key_Up('L'))
 			m_TankConsrolState.rightBrake = false;
 
-		if (m_GameInstance->Mouse_Down(0))
-			m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-
+		if (m_GameInstance->Mouse_Down(0)) {
+			//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
+			SendShootDataToServer();
+		}
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 	}
@@ -324,7 +331,7 @@ void CTank::LateTick(float fTimeDelta)
 		m_VIBuffer->Update();
 	
 		//for server
-		//SendMyStateToServer();
+		SendMyStateToServer();
 
 	}
 
@@ -429,6 +436,25 @@ void CTank::SendShootDataToServer()
 
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
+}
+
+void CTank::PushBulletMatrix(const _matrix& mat)
+{
+	std::lock_guard<std::mutex> lock(BulletQueueMutex);
+	BulletQueue.push(mat);
+}
+
+void CTank::PopAllBulletMatrix(std::function<void(const _matrix&)> processFunc)
+{
+	std::lock_guard<std::mutex> lock(BulletQueueMutex);
+	while (!BulletQueue.empty())
+	{
+		const _matrix& mat = BulletQueue.front();
+		processFunc(mat);
+		BulletQueue.pop();
+	}
 }
 
 void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)

@@ -43,7 +43,7 @@ void CDefaultObj::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-    m_TransformCom->Go_Straight(fTimeDelta * 10.f);
+    //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 }
 
 void CDefaultObj::LateTick(float fTimeDelta)

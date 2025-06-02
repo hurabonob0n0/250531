@@ -142,8 +142,8 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 {
 	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta() * 0.005f;
 	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
-	//m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
-	m_Distance_FPS = 6.f;
+	m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
+
 	m_fXRot_FPS = max(-85.f, min(85.f, m_fXRot_FPS));
 
 	_float4x4 mat;
@@ -159,17 +159,33 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 
 	m_TransformCom->Orbit_For_FPS(TankPos, m_fYRot_FPS, m_fXRot_FPS);
 
-	_matrix matforBox = XMMatrixIdentity();
-	matforBox.r[3] = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	//_matrix matforBox = XMMatrixIdentity();
 
+	/*XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f,1.f,0.f,0.f), worldforward)));
 
-	if (m_GameInstance->Mouse_Down(0))
-		m_GameInstance->AddObject("Effect", "Effect", &matforBox);
+	XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(worldforward, XMLoadFloat3(&vRight))));
+	matforBox.r[1] = vUp;*/
+	//matforBox.r[2] = m_TransformCom->Get_State(CTransform::STATE_LOOK);
+	//matforBox.r[3] = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+
 
 
 
 	//if (m_GameInstance->Mouse_Down(0))
 	//	m_GameInstance->AddObject("DefaultObject", "BoxObj", &matforBox);
+
+	_vector camPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	_vector camLook = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));
+
+	// 총알 스폰 위치: 카메라 방향 기준 정면 6.f 앞
+	_vector muzzlePos = camPos + camLook * 6.f;
+
+	// 총알용 행렬 구성
+	_matrix matforBox = XMMatrixIdentity();
+	matforBox.r[2] = camLook;       // Look 방향
+	matforBox.r[3] = muzzlePos;     // 위치
+
+	// 발사 정보 전달
 
 	m_Tank->Set_ShotMatrix(matforBox);
 	m_Tank->Set_PotapRotation(m_fYRot_FPS);
