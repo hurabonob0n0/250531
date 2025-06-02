@@ -47,14 +47,14 @@ public:
 		XMStoreFloat4x4(&m_WorldMatrix, Worldmat);
 	}
 
-	//void Set_Scale(float fScale) {
-	//	_matrix mat = Get_WorldMatrix();
-	//	mat.r[0] *= 2;
-	//	mat.r[1] *= 2;
-	//	mat.r[2] *= 2;
+	void Set_Scale(float fScale) {
+		_matrix mat = Get_WorldMatrix();
+		mat.r[0] *= fScale;
+		mat.r[1] *= fScale;
+		mat.r[2] *= fScale;
 
-	//	XMStoreFloat4x4(&m_WorldMatrix,)
-	//}
+		XMStoreFloat4x4(&m_WorldMatrix, mat);
+	}
 
 public:
 	HRESULT Go_Straight(float fTimeDelta);

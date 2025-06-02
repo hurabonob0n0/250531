@@ -1,4 +1,8 @@
+//=============================================================================
+// Sky.fx by Frank Luna (C) 2011 All Rights Reserved.
+//=============================================================================
 
+// Include common HLSL code.
 #include "Common.hlsl"
 
 struct VertexIn
@@ -14,7 +18,7 @@ struct VertexOut
     float4 PosH : SV_POSITION;
     float2 TexC : TEXCOORD;
 };
-
+ 
 VertexOut VS(VertexIn vin)
 {
     VertexOut vout;
@@ -32,7 +36,7 @@ float4 PS(VertexOut pin) : SV_Target
     
     uint diffuseMapIndex = matData.DiffuseMapIndex;
     
-    float4 color = /*float4(1.f, 1.f, 1.f, 1.f);*/ gTextureMaps[diffuseMapIndex].Sample(gsamLinearWrap, pin.TexC);
+    float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC); /*float4(1.f, 1.f, 1.f, 1.f);*/
     
     if (color.a <= 0.1f)
         discard;
@@ -40,3 +44,4 @@ float4 PS(VertexOut pin) : SV_Target
     return color;
 	
 }
+
