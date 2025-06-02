@@ -114,7 +114,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	//m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
+	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
@@ -126,7 +126,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
 	//m_GameInstance->Add_PrototypeObject("BoxObject", CBoxObj::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
-	//m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
+	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 	//m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
 
@@ -151,7 +151,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
 	m_GameInstance->AddObject("Effect", "Effect", nullptr);
-	//m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
+	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 	m_GameInstance->AddObject("UI", "UI", nullptr);

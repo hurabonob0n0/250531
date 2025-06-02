@@ -46,6 +46,7 @@ public:		//For_InputDev
 	//bool Mouse_Up(MOUSEKEYSTATE button);
 	//bool Mouse_Pressing(MOUSEKEYSTATE button);
 	bool Mouse_Down(UINT button) { return m_Input_Dev->Mouse_Down(button); }
+	bool Mouse_Up(UINT button) { return m_Input_Dev->Mouse_Up(button); }
 
 	SHORT Get_Mouse_XDelta() { return m_Input_Dev->Get_Mouse_XDelta(); }
 	SHORT Get_Mouse_YDelta() { return m_Input_Dev->Get_Mouse_YDelta(); }
