@@ -13,12 +13,14 @@ enum
 	S_SUCCESS_ENTER_ROOM = 3,
 	S_GAME_START = 4,
 	S_PLAYER_MOVE = 5,
+	S_WEAPON_HIT = 6,
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
 	C_MOVEMENT = 1004,
 	C_SHOT = 1005
 };
+
 
 
 class ClientPacketHandler
@@ -30,6 +32,8 @@ public:
 	static void Handle_S_GAME_START(BYTE* buffer, int32 len);
 	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
+	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);
+
 
 
 	static SendBufferRef Make_C_LOGIN(uint64 id);

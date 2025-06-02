@@ -39,6 +39,7 @@ public://---For Server_Connect
 	bool CanStart = false;
 
 
+
 private:
 	HINSTANCE	m_hAppInst = nullptr;
 	HWND		m_hMainWnd = nullptr;

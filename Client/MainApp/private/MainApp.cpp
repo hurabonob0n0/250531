@@ -97,7 +97,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 #pragma region For Server
 
-	//ConnectServer();
+	ConnectServer();
 
 #pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
@@ -154,8 +154,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->Flush_CommandQueue();
 
-	/*SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);*/
+	SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 	
 	return S_OK;
 }
@@ -192,17 +192,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				//RECT rect;
-				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				//POINT center = {
-				//	(rect.right - rect.left) / 2,
-				//	(rect.bottom - rect.top) / 2
-				//};
+				RECT rect;
+				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				POINT center = {
+					(rect.right - rect.left) / 2,
+					(rect.bottom - rect.top) / 2
+				};
 
-				//// 클라이언트 좌표 → 스크린 좌표로 변환
-				//ClientToScreen(m_hMainWnd, &center);
+				// 클라이언트 좌표 → 스크린 좌표로 변환
+				ClientToScreen(m_hMainWnd, &center);
 
-				//SetCursorPos(center.x, center.y);
+				SetCursorPos(center.x, center.y);
 			}
 			else
 			{

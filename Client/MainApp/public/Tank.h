@@ -1,6 +1,7 @@
 #pragma once
 #include "RenderObject.h"
 #include "MyPhysicsEngine.h"
+#include <functional>
 
 BEGIN(Engine)
 class CModel;
@@ -49,6 +50,8 @@ public:
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 
+
+
 public:
 	bool _myPlayer = false;
 
@@ -56,11 +59,19 @@ private:
 	MyPhysicsEngine::CMyPhysicsEngine* m_pPhysicsEngine = nullptr;
 	MyPhysicsEngine::CMyPhysicsEngine::TankControlState m_TankConsrolState{};
 
+public:
+	void PushBulletMatrix(const _matrix& mat);
+	void PopAllBulletMatrix(std::function<void(const _matrix&)> processFunc);
+
+private:
+	std::queue<_matrix> BulletQueue;
+	std::mutex BulletQueueMutex;
 
 public:
 	void Free() override;
 	static CTank* Create();
 	CRenderObject* Clone(void* pArg);
+
 
 
 };

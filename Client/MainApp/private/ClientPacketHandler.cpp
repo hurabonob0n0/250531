@@ -37,6 +37,10 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		Handle_S_PLAYER_MOVE(buffer, len);
 		break;
 
+	case S_WEAPON_HIT:
+		Handle_S_WEAPON_HIT(buffer, len);
+		break;
+
 	default:
 		break;
 	}
@@ -114,6 +118,31 @@ void ClientPacketHandler::Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len)
 
 }
 
+void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
+{
+	BufferReader br(buffer, len);
+
+	PacketHeader header;
+	br >> header;
+
+	float X;
+	float Y;
+	float Z;
+
+	br >> X >> Y >> Z;
+
+	//typedef XMMATRIX					_matrix;
+
+	_vector hitPos = XMVectorSet(X, Y, Z, 1.f);
+
+	// 2. 월드 행렬 생성 (기본 단위 행렬에서 위치만 설정)
+	_matrix Hit_Matrix = XMMatrixIdentity();
+	Hit_Matrix.r[3] = hitPos;
+
+	dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", g_PlayerID.load()))->PushBulletMatrix(Hit_Matrix);
+
+}
+
 
 
 void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
@@ -175,7 +204,7 @@ SendBufferRef ClientPacketHandler::Make_C_FINISH_LOADING(uint64 id)
 	sendBuffer->Close(bw.WriteSize());
 
 	return sendBuffer;
-	return SendBufferRef();
+
 }
 
 SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
