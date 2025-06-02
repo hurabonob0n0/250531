@@ -236,11 +236,55 @@ void CVIBuffer_Terrain::Make_Buffer(const char* pHeightmapPath, float heightScal
     m_IndexBufferGPU = d3dUtil::CreateDefaultBuffer(m_Device,
         m_CommandList, indices.data(), m_IndexBufferByteSize, &m_IndexBufferUploader);
 
+    Save_TerrainMesh_ToFile("../bin/Models/Terrain/TerrainVertices", vecPoints, indices);
+
     m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
     CGameInstance::Get_Instance()->Execute_Flush_and_Reset();
 
     vecPoints.clear();
+}
+
+void CVIBuffer_Terrain::Make_Buffer(const char* filepath)
+{
+    std::ifstream ifs(filepath, std::ios::binary);
+    if (!ifs.is_open())
+    {
+        
+        return;
+    }
+
+    // 정점 정보 읽기
+    ifs.read(reinterpret_cast<char*>(&m_VertexNum), sizeof(UINT));
+    ifs.read(reinterpret_cast<char*>(&m_VertexByteStride), sizeof(UINT));
+    ifs.read(reinterpret_cast<char*>(&m_VertexBufferByteSize), sizeof(UINT));
+
+    std::vector<VTXMESH> vertices(m_VertexNum);
+    ifs.read(reinterpret_cast<char*>(vertices.data()), m_VertexBufferByteSize);
+
+    // 인덱스 정보 읽기
+    ifs.read(reinterpret_cast<char*>(&m_IndexNum), sizeof(UINT));
+    ifs.read(reinterpret_cast<char*>(&m_IndexFormat), sizeof(DXGI_FORMAT));
+    ifs.read(reinterpret_cast<char*>(&m_IndexBufferByteSize), sizeof(UINT));
+
+    std::vector<UINT32> indices(m_IndexNum);
+    ifs.read(reinterpret_cast<char*>(indices.data()), m_IndexBufferByteSize);
+
+    ifs.close();
+
+    // 버퍼 생성
+    m_VertexBufferGPU = d3dUtil::CreateDefaultBuffer(m_Device,
+        m_CommandList, vertices.data(), m_VertexBufferByteSize, &m_VertexBufferUploader);
+
+    m_IndexBufferGPU = d3dUtil::CreateDefaultBuffer(m_Device,
+        m_CommandList, indices.data(), m_IndexBufferByteSize, &m_IndexBufferUploader);
+
+    m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+    CGameInstance::Get_Instance()->Execute_Flush_and_Reset();
+
+    vertices.clear();
+    indices.clear();
 }
 
 XMFLOAT3 CVIBuffer_Terrain::Add3(const XMFLOAT3& a, XMVECTOR b)
@@ -252,6 +296,32 @@ XMFLOAT3 CVIBuffer_Terrain::Add3(const XMFLOAT3& a, XMVECTOR b)
     return result;
 }
 
+
+void CVIBuffer_Terrain::Save_TerrainMesh_ToFile(const std::string& filename,
+    const std::vector<VTXMESH>& vertices,
+    const std::vector<UINT32>& indices)
+{
+    std::ofstream ofs(filename, std::ios::binary);
+    if (!ofs.is_open())
+    {
+        return;
+    }
+
+    ofs.write(reinterpret_cast<const char*>(&m_VertexNum), sizeof(UINT));
+    ofs.write(reinterpret_cast<const char*>(&m_VertexByteStride), sizeof(UINT));
+    ofs.write(reinterpret_cast<const char*>(&m_VertexBufferByteSize), sizeof(UINT));
+    ofs.write(reinterpret_cast<const char*>(vertices.data()), m_VertexBufferByteSize);
+
+
+    ofs.write(reinterpret_cast<const char*>(&m_IndexNum), sizeof(UINT));
+    ofs.write(reinterpret_cast<const char*>(&m_IndexFormat), sizeof(DXGI_FORMAT));
+    ofs.write(reinterpret_cast<const char*>(&m_IndexBufferByteSize), sizeof(UINT));
+    ofs.write(reinterpret_cast<const char*>(indices.data()), m_IndexBufferByteSize);
+
+    ofs.close();
+
+}
+
 HRESULT CVIBuffer_Terrain::Render()
 {
     m_CommandList->IASetVertexBuffers(0, 1, &VertexBufferView());
@@ -261,7 +331,7 @@ HRESULT CVIBuffer_Terrain::Render()
     return S_OK;
 }
 
-CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, const char* pHeightmapPath, float heightScale, float cellSpacing)
+CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, const char* pHeightmapPath)
 {
     CVIBuffer_Terrain* pInstance = new CVIBuffer_Terrain(pDevice, pCommandList);
     if (FAILED(pInstance->Initialize_Prototype()))
@@ -269,7 +339,7 @@ CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D12Device* pDevice, ID3D12Graphi
         Safe_Release(pInstance);
         return nullptr;
     }
-    pInstance->Make_Buffer(pHeightmapPath, heightScale, cellSpacing);
+    pInstance->Make_Buffer(pHeightmapPath);
     return pInstance;
 }
 

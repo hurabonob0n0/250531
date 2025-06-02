@@ -27,6 +27,15 @@ _uint CMaterialMgr::Get_Mat_Index(string matName)
 	return index;
 }
 
+_uint CMaterialMgr::Get_Mat_Size()
+{
+	_uint index = 0;
+	for (auto& iter = m_MatMap.begin(); iter != m_MatMap.end(); ++iter) {
+		++index;
+	}
+	return index;
+}
+
 void CMaterialMgr::Set_Materials()
 {
 	auto matBuffer = CGameInstance::Get_Instance()->Get_Current_FrameResource()->m_MaterialCB->Resource();

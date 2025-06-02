@@ -34,7 +34,7 @@ HRESULT CTank::Initialize(void* pArg)
 	MaterialData mat{};
 	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds"));
 	mat.NormalMapIndex = m_GameInstance->Add_Texture("Tank_Glacis_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds"));
-	m_VIBuffer->Set_MatOffsets(mat.DiffuseMapIndex); // Camera를 먼저 추가한다고 가정.
+	m_VIBuffer->Set_MatOffsets(m_GameInstance->Get_Mat_Size());
 	m_GameInstance->Add_Material("Tank_Glacis", mat);
 
 	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Tank_Glass_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds"));

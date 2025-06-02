@@ -16,6 +16,8 @@ public:
 public:
 	_uint Get_Mat_Index(string matName);
 
+	_uint Get_Mat_Size();
+
 public:
 	void Set_Materials();
 

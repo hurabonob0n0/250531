@@ -82,6 +82,7 @@ public:
 
 public: //For MaterialMgr
 	int Add_Material(string matName, MaterialData matInstance) { return m_MaterialMgr->Add_Material(matName, matInstance); }
+	_uint Get_Mat_Size() { return m_MaterialMgr->Get_Mat_Size(); }
 
 public: //For TextureMgr
 	int Add_Texture(string texname, CTexture* texInstance, CTextureMgr::TEXTURETYPE TT = CTextureMgr::TT_TEXTURE2D) {

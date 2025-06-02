@@ -29,6 +29,8 @@ private:
 	CBBinding* m_CBBindingCom;
 	CTransform* m_CameraTransform;
 
+	MaterialData MD{};
+
 private:
 	float m_AccumulatedTime = 0.f;
 

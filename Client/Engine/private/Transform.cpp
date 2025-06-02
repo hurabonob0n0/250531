@@ -207,6 +207,8 @@ void CTransform::Look_At(_fvector vTargetPoint)
     XMFLOAT3 vUp;
     XMVECTOR vLook =vTargetPoint - Get_State(STATE_POSITION);
 
+    float length = XMVectorGetX( XMVector3Length(vLook));
+
     XMVECTOR vWorldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
     vLook = XMVector3Normalize(vLook);
@@ -214,6 +216,16 @@ void CTransform::Look_At(_fvector vTargetPoint)
     XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(vWorldUp, vLook)));
 
     XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(vLook, XMLoadFloat3(&vRight))));
+
+    /*vRight.x *= length;
+    vRight.y *= length;
+    vRight.z *= length;
+    vUp.x *= length;
+    vUp.y *= length;
+    vUp.z *= length;
+    vLook *= length;*/
+    
+    
 
     Set_State(STATE_RIGHT, XMLoadFloat3(&vRight));
     Set_State(STATE_UP, XMLoadFloat3(&vUp));
