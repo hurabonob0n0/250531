@@ -26,21 +26,27 @@ public:
 public:
 	void Set_PotapRotation(float fDegree);
 	void Set_PoSinpRotation(float fDegree);
-
+	void Set_ShotDir(XMVECTOR Vec);
+	void Set_ShotMatrix(_matrix mat);
 private:
 	CModel* m_VIBuffer;
-	bool	KeyInput = false;
+	
+	_matrix ShotMatrix;
+	XMVECTOR vShotDir;
 	float   m_fPotapRotation = 0.f;
 	float   m_fPosinRotation = 0.f;
 
 	float   m_TestZ = -512.f;
 	float	m_TestX = -512.f;
+	bool	KeyInput = false;
 
 public:
 	void set_MyPlayer() {
 		_myPlayer = true;
 	}
 	void SendMyStateToServer();
+	void SendShootDataToServer();
+
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 
 public:
@@ -55,6 +61,8 @@ public:
 	void Free() override;
 	static CTank* Create();
 	CRenderObject* Clone(void* pArg);
+
+
 };
 
 END

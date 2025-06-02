@@ -106,6 +106,10 @@ void CTank::Tick(float fTimeDelta)
 		if (m_GameInstance->Key_Up('L'))
 			m_TankConsrolState.rightBrake = false;
 
+		if (m_GameInstance->Mouse_Down(0))
+			m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
+
+
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 	}
 
@@ -366,6 +370,16 @@ void CTank::Set_PoSinpRotation(float fDegree)
 	m_fPosinRotation = fDegree;
 }
 
+void CTank::Set_ShotDir(XMVECTOR Vec)
+{
+	vShotDir = Vec;
+}
+
+void CTank::Set_ShotMatrix(_matrix mat)
+{
+	ShotMatrix = mat;
+}
+
 void CTank::Free()
 {
 	__super::Free();
@@ -393,6 +407,28 @@ void CTank::SendMyStateToServer()
 	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
 	auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+}
+
+void CTank::SendShootDataToServer()
+{
+	_float4x4 TempMat;
+	XMStoreFloat4x4(&TempMat, ShotMatrix);
+	_vector vPos = ShotMatrix.r[3];
+	_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
+
+	_float3 fPos, fDir;
+	XMStoreFloat3(&fPos, vPos);
+	XMStoreFloat3(&fDir, vDir);
+
+
+	float data[6] = {
+	   fPos.x, fPos.y, fPos.z,  // 위치
+	   fDir.x, fDir.y, fDir.z   // 정규화된 방향
+	};
+
+
+	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
+		fDir.x, fDir.y, fDir.z);
 }
 
 void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
