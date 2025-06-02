@@ -140,8 +140,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Tank", "Tank", nullptr);
 	//_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	//m_GameInstance->AddObject("Tank", "Tank", nullptr);
-	//_matrix mat2 = XMMatrixTranslation(10.f, 20.f, 10.f);
-	//m_GameInstance->AddObject("Tank", "Tank", &mat2);
+	_matrix mat2 = XMMatrixTranslation(10.f, 20.f, 10.f);
+	m_GameInstance->AddObject("Tank", "Tank", &mat2);
 	/*_matrix mat2 = XMMatrixTranslation(0.f, 100.f, 0.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);*/
 	//m_GameInstance->AddObject("DefaultObject", "DefaultObject", nullptr);
@@ -152,7 +152,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddObject("Effect", "Effect", nullptr);
 	//m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 	m_GameInstance->AddObject("UI", "UI", nullptr);
 	

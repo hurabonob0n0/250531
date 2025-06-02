@@ -42,7 +42,7 @@ HRESULT CUI::Initialize(void* pArg)
 void CUI::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
-    if (m_GameInstance->Mouse_Down(1))
+    if (m_GameInstance->Mouse_Down(0))
         m_isFPS = !m_isFPS;
 }
 

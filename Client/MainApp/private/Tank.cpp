@@ -117,10 +117,27 @@ void CTank::Tick(float fTimeDelta)
 
 		if (m_GameInstance->Mouse_Down(0)) {
 			//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-			SendShootDataToServer();
+			//SendShootDataToServer();
 		}
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
+	}
+
+	else
+	{
+
+		if (m_GameInstance->Key_Pressing('W'))
+			m_TransformCom->Go_Straight(fTimeDelta*10.f);
+
+		if (m_GameInstance->Key_Pressing('A'))
+			m_TransformCom->Go_Left(fTimeDelta * 10.f);
+
+		if (m_GameInstance->Key_Pressing('S'))
+			m_TransformCom->Go_Backward(fTimeDelta * 10.f);
+
+		if (m_GameInstance->Key_Pressing('D'))
+			m_TransformCom->Go_Right(fTimeDelta * 10.f);
+
 	}
 
 
