@@ -256,7 +256,7 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
-	bw << PosX << PosY << PosZ 
+	bw <<PosX << PosY << PosZ
 		<< nDirX << nDirY << nDirZ;
 
 	header->size = bw.WriteSize();

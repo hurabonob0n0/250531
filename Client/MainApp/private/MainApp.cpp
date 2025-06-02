@@ -147,7 +147,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", g_PlayerID.load()))->set_MyPlayer();
 	
 
 	m_GameInstance->Execute_CommandList();

@@ -85,7 +85,7 @@ void CTank::Tick(float fTimeDelta)
 
 		PopAllBulletMatrix([](const _matrix& mat) {
 			_matrix tempMat = mat; 
-			CGameInstance::Get_Instance()->AddObject("DefaultObject", "BulletObj", &tempMat);
+			CGameInstance::Get_Instance()->AddObject("Effect", "Effectobj", &tempMat);
 			});
 
 		if (m_GameInstance->Key_Down('U'))
