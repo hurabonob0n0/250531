@@ -199,17 +199,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				RECT rect;
-				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				POINT center = {
-					(rect.right - rect.left) / 2,
-					(rect.bottom - rect.top) / 2
-				};
+				//RECT rect;
+				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				//POINT center = {
+				//	(rect.right - rect.left) / 2,
+				//	(rect.bottom - rect.top) / 2
+				//};
 
-				// 클라이언트 좌표 → 스크린 좌표로 변환
-				ClientToScreen(m_hMainWnd, &center);
+				//// 클라이언트 좌표 → 스크린 좌표로 변환
+				//ClientToScreen(m_hMainWnd, &center);
 
-				SetCursorPos(center.x, center.y);
+				//SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -254,8 +254,8 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		m_ClientWidth = LOWORD(lParam);
 		m_ClientHeight = HIWORD(lParam);
 		//m_FullscreenState = !m_FullscreenState;
-		if(m_GameInstance)
-			m_GameInstance->OnResize();
+		/*if(m_GameInstance)
+			m_GameInstance->OnResize();*/
 		return 0;
 
 		// 윈도우가 파괴될 때 WM_DESTORY가 보내집니다.
@@ -313,10 +313,19 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 	int width = R.right - R.left;
 	int height = R.bottom - R.top;*/
 
-	DWORD style = WS_VISIBLE | WS_POPUP;
+	/*DWORD style = WS_VISIBLE | WS_POPUP;
 
 	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);
+		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);*/
+
+	RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
+	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+	int width = R.right - R.left;
+	int height = R.bottom - R.top;
+
+	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
+
 	if (!m_hMainWnd)
 	{
 		MessageBox(0, L"CreateWindow Failed.", 0, 0);

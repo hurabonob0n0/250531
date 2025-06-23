@@ -12,7 +12,7 @@ int CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE 
             return index;
     }
 
-    Safe_AddRef(texInstance);
+    //Safe_AddRef(texInstance);
 
     m_TexMap[texname] = texInstance;
 
