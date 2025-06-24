@@ -8,6 +8,10 @@ CTexture::CTexture() : CBase()
 void CTexture::Initialize_Prototype(const wchar_t* Filename)
 {
     CreateDDSTextureFromFile12(GETDEVICE,GETCOMMANDLIST, Filename, &m_Resource, &m_UploadHeap);
+
+    CGameInstance::Get_Instance()->Execute_Flush_and_Reset();
+
+    Safe_Release(m_UploadHeap);
 }
 
 CTexture* CTexture::Create(const wchar_t* Filename)

@@ -1,4 +1,5 @@
 #include "VIBuffer.h"
+#include "GameInstance.h"
 
 
 CVIBuffer::CVIBuffer(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList) : CComponent(pDevice, pCommandList)
@@ -75,6 +76,10 @@ void CVIBuffer::Create_Buffer(ID3D12Resource** GPU, ID3D12Resource** Uploader, c
 		*GPU,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		D3D12_RESOURCE_STATE_GENERIC_READ));
+
+	CGameInstance::Get_Instance()->Execute_Flush_and_Reset();
+
+	DisposeUploaders();
 
 	// 주의: 아직 CommandList가 실행되기 전이기 때문에 uploadBuffer는 해제하면 안된다!
 
