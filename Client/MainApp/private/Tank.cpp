@@ -117,7 +117,7 @@ void CTank::Tick(float fTimeDelta)
 
 		if (m_GameInstance->Mouse_Down(0)) {
 			//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-			//SendShootDataToServer();
+			SendShootDataToServer();
 		}
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
@@ -351,7 +351,7 @@ void CTank::LateTick(float fTimeDelta)
 		m_VIBuffer->Update();
 	
 		//for server
-		//SendMyStateToServer();
+		SendMyStateToServer();
 
 	}
 
@@ -359,7 +359,15 @@ void CTank::LateTick(float fTimeDelta)
 	{
 
 
-		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+		/*XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation);
+
+		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);*/
+
+		_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
+		float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
+		//float yawDeg = XMConvertToDegrees(yaw);
+
+		XMMATRIX matPotap = XMMatrixRotationY(m_fPotapRotation - yaw);
 
 		XMMATRIX matPosin = XMMatrixRotationY(m_fPosinRotation);
 

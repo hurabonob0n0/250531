@@ -98,7 +98,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 #pragma region For Server
 
-	//ConnectServer();
+	ConnectServer();
 
 #pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
@@ -150,9 +150,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 
-	m_GameInstance->AddObject("Effect", "Effect", nullptr);
+	//m_GameInstance->AddObject("Effect", "Effect", nullptr);
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", g_PlayerID.load()))->set_MyPlayer();
 
 	m_GameInstance->AddObject("UI", "UI", nullptr);
 	
@@ -161,8 +161,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->Flush_CommandQueue();
 
-	/*SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);*/
+	SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
+	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 	
 	return S_OK;
 }
@@ -199,17 +199,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				//RECT rect;
-				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				//POINT center = {
-				//	(rect.right - rect.left) / 2,
-				//	(rect.bottom - rect.top) / 2
-				//};
+				RECT rect;
+				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				POINT center = {
+					(rect.right - rect.left) / 2,
+					(rect.bottom - rect.top) / 2
+				};
 
-				//// 클라이언트 좌표 → 스크린 좌표로 변환
-				//ClientToScreen(m_hMainWnd, &center);
+				// 클라이언트 좌표 → 스크린 좌표로 변환
+				ClientToScreen(m_hMainWnd, &center);
 
-				//SetCursorPos(center.x, center.y);
+				SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -390,7 +390,7 @@ void CMainApp::ConnectServer()
 {
 
 	ClientServiceRef service = MakeShared<ClientService>(
-		NetAddress(L"127.0.0.1", 7777),
+		NetAddress(L"10.20.11.29", 7777),
 		MakeShared<IocpCore>(),
 		MakeShared<ServerSession>,
 		1);

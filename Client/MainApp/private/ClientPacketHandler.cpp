@@ -139,8 +139,8 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 	_matrix Hit_Matrix = XMMatrixIdentity();
 	Hit_Matrix.r[3] = hitPos;
 
-	dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", g_PlayerID.load()))->PushBulletMatrix(Hit_Matrix);
-
+	//dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", g_PlayerID.load()))->PushBulletMatrix(Hit_Matrix);
+	CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
 }
 
 
