@@ -79,7 +79,11 @@ void CRenderer::Render()
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
     Render_Priority();
-   
+    
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("TerrainPSO"));
+
+    Render_NonLight();
+
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("DefaultPSO"));
 
     Render_NonBlend();

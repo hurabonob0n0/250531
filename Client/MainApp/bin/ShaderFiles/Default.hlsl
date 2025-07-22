@@ -76,7 +76,7 @@ float4 PS(VertexOut pin) : SV_Target
 
     float fShade = max(dot(normalize(gLights[0].Direction) * -1.f, pin.NormalW), 0.2f);
     
-    float4 fColor = float4(0.65f, 0.65f, 0.65f, 1.f);
+    float4 fColor = float4(0, 0, 1.f, 1.f);
     
     fColor *= fShade;
     

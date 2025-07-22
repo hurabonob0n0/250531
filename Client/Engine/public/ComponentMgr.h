@@ -7,6 +7,8 @@
 #include "VIBuffer_Terrain.h"
 #include "CBBinding.h"
 #include "VIBuffer_Quad.h"
+#include "VIBuffer_Mesh.h"
+#include "MeshModel.h"
 
 class CComponentMgr : public CBase
 {

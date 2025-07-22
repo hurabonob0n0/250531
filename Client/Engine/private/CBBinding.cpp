@@ -59,8 +59,6 @@ void CBBinding::Set_World_TexCoord_And_Update(CTransform* pTransformCom, CTransf
 
 void CBBinding::Update_CBView()
 {
-    m_ObjConstants;
-
     m_FrameResourceMgr->Get_Current_FrameResource()->m_ObjectCB->CopyData(m_ObjCBIndex, m_ObjConstants);
 }
 
@@ -71,8 +69,6 @@ void CBBinding::Set_On_Shader()
     D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = m_FrameResourceMgr->Get_Current_FrameResource()->m_ObjectCB->Resource()->GetGPUVirtualAddress();
 
     objCBAddress += m_ObjCBIndex * objCBByteSize;
-
-    m_ObjConstants;
 
     m_CommandList->SetGraphicsRootConstantBufferView(0, objCBAddress);
 }

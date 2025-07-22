@@ -144,6 +144,11 @@ void CModel::Set_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
 	m_Bones[iMeshIndex]->Set_TransformationMatrix(WorldMat);
 }
 
+void CModel::Multiply_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
+{
+	m_Bones[iMeshIndex]->Mul_TransformationMatrix(WorldMat);
+}
+
 void CModel::Save_For_Tank_Bones()
 {
 	struct BoneData {

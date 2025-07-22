@@ -32,7 +32,13 @@ HRESULT CUI::Initialize(void* pArg)
 
     m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
+    m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.77f);
+
     m_TransformCom->Set_Scale(2.f);
+
+    m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
+
+    m_CBBinding->Set_Pad0(1);
 
     m_isFPS = false;
 
@@ -42,7 +48,7 @@ HRESULT CUI::Initialize(void* pArg)
 void CUI::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
-    if (m_GameInstance->Key_Down('M'))
+    if (m_GameInstance->Mouse_Down(1))
         m_isFPS = !m_isFPS;
 }
 

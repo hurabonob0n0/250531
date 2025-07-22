@@ -155,7 +155,7 @@ VehicleDesc initTankDesc()
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
 	const PxF32 chassisMass = 6200.0f;
-	const PxVec3 chassisDims(3.8f, 1.5f, 9.6f);
+	const PxVec3 chassisDims(3.8f, 2.f, 9.6f);
 	const PxVec3 chassisMOI
 		((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass/12.0f,
 		 (chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass/12.0f,

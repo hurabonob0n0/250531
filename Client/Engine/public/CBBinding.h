@@ -21,6 +21,9 @@ public:
 	void Set_TexCoordMatrix(CTransform* pTexCoordTransformCom);
 	void Set_TexCoordMatrix(_matrix TexCoordmat);
 	void Set_MaterialIndex(_uint MatIndex);
+	void Set_Pad0(_uint Pad) { m_ObjConstants.ObjPad0 = Pad; }
+	void Set_Pad1(_uint Pad) { m_ObjConstants.ObjPad1 = Pad; }
+	void Set_Pad2(_uint Pad) { m_ObjConstants.ObjPad2 = Pad; }
 
 public:
 	_uint Get_MaterialIndex() { return m_ObjConstants.MaterialIndex; }

@@ -5,6 +5,8 @@
 
 BEGIN(Engine)
 class CModel;
+class CBBinding;
+class CVIBuffer_Quad;
 END
 
 
@@ -34,14 +36,19 @@ private:
 	
 	_matrix ShotMatrix;
 	XMVECTOR vShotDir;
-	float   m_fPotapRotation = 0.f;
-	float   m_fPosinRotation = 0.f;
+	float   m_fPotapRotation = 0.f;			//이게 카메라가 주는 회전값
+	float   m_fPosinRotation = 0.f;			//이게 카메라가 주는 회전값
+	float	m_fCamPotapRot = 0.f;
+	float	m_fCamPosinRot = 0.f;
 
 	float   m_TestZ = -512.f;
 	float	m_TestX = -512.f;
 	bool	KeyInput = false;
 
 	_uint matindex= 0;
+
+private:
+	void RotPotap_And_Posin(float fTimeDelta);
 
 public:
 	void set_MyPlayer() {
@@ -52,6 +59,21 @@ public:
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 
+
+private:		//For PosinCrosshair
+	CBBinding*				m_CBBindingQuad;
+	CVIBuffer_Quad*			m_VIBufferQuad;
+	CRenderer::RENDERGROUP	m_RGQuad = CRenderer::RENDERGROUP::RG_UI;
+	CTransform*				m_QuadWorldTransform;
+	CTransform*				m_QuadTexTransform;
+	bool					m_isQuadTurn = false;
+	float					m_fSameTime = 0.f;
+	bool					m_isFPS = false;
+
+private:		//For PosinCrosshair
+	void Initialize_For_PosinQuad();
+	void Tick_For_Posin_Image(float fTimeDelta);
+	void Render_For_Posin_Image();
 
 
 public:
@@ -73,9 +95,6 @@ public:
 	void Free() override;
 	static CTank* Create();
 	CRenderObject* Clone(void* pArg);
-
-
-
 };
 
 END

@@ -33,6 +33,7 @@ HRESULT CTerrain::Initialize(void* pArg)
     mat.Roughness = 0.9f;
     mat.FresnelR0 = XMFLOAT3{ 0.f,0.f,0.f };
     m_CBBindingCom->Set_MaterialIndex( m_GameInstance->Add_Material("TerrainMat", mat));
+    m_CBBindingCom->Set_Pad0(1);
 
     return S_OK;
 }

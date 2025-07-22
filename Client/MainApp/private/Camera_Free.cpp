@@ -32,10 +32,10 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", g_PlayerID.load(), "TransformCom");
+	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
 	Safe_AddRef(m_TankTransform);
 
-	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", g_PlayerID.load());
+	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
 	Safe_AddRef(m_Tank);
 
 	m_Distance_TPS = 20.f;
@@ -44,7 +44,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_fXRot_TPS = 0.f;
 
-	m_Distance_FPS = 20.f;
+	m_Distance_FPS = 10.f;
 
 	m_fXRot_FPS = 0.f;
 
@@ -140,8 +140,8 @@ void CCamera_Free::Tick_For_TPS(float fTimeDelta)
 
 void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 {
-	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta() * 0.005f;
-	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
+	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta()* 0.1f;
+	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.1f;
 	m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
 
 	m_fXRot_FPS = max(-85.f, min(85.f, m_fXRot_FPS));
@@ -157,7 +157,12 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, myPos);
 
-	m_TransformCom->Orbit_For_FPS(TankPos, m_fYRot_FPS, m_fXRot_FPS);
+	m_TransformCom->Orbit_For_FPS(TankPos,XMConvertToRadians( m_fYRot_FPS), XMConvertToRadians(m_fXRot_FPS));
+
+	myPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	float y = XMVectorGetY(myPos) + 5.f;
+	myPos = XMVectorSetY(myPos, y);
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, myPos);
 
 	//_matrix matforBox = XMMatrixIdentity();
 

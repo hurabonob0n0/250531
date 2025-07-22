@@ -1,7 +1,7 @@
 @echo off
 set TEXCONV=texconv.exe
-set INPUT_DIR=.\Models\Tank\
-set OUTPUT_DIR=.\TankDDS\Tank\
+set INPUT_DIR=.\Models\Posin\
+set OUTPUT_DIR=.\Models\Posin\
 
 echo [텍스처 변환 시작]
 

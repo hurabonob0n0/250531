@@ -59,6 +59,39 @@ void CEffect::LateTick(float fTimeDelta)
 {
     if (m_AccumulatedTime < 3.f)
     {
+    //__super::LateTick(fTimeDelta);
+
+    //m_AccumulatedTime += fTimeDelta;
+
+    //// 총 프레임 수
+    //const int totalFrames = 64;
+    //const int framesPerRow = 8;
+
+    //// 애니메이션 속도 (초당 프레임 수)
+    //float frameRate = 24.f;
+    //int currentFrame = static_cast<int>(m_AccumulatedTime * frameRate);
+    //if (currentFrame >= totalFrames) currentFrame = totalFrames - 1; // 마지막 프레임 고정
+
+    //int row = currentFrame / framesPerRow;
+    //int col = currentFrame % framesPerRow;
+
+    //// UV 변환행렬 구성
+    //XMMATRIX scale = XMMatrixScaling(1.0f / 8.0f, 1.0f / 8.0f, 1.f);
+    //XMMATRIX trans = XMMatrixTranslation((float)col / 8.0f, (float)row / 8.0f, 0.f);
+
+    //// 최종 텍스처 변환 행렬
+    //XMMATRIX texTransform = scale * trans;
+
+    //m_TexCoordTransformCom->Set_WorldMatrix(texTransform);
+
+    ////XMStoreFloat4x4(&m_TexCoordTransformCom, texTransform);
+
+    //m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
+
+    }
+    if (m_AccumulatedTime >= 3)
+        m_AccumulatedTime = 0.f;
+
     __super::LateTick(fTimeDelta);
 
     m_AccumulatedTime += fTimeDelta;
@@ -88,7 +121,6 @@ void CEffect::LateTick(float fTimeDelta)
 
     m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
 
-    }
 
 }
 

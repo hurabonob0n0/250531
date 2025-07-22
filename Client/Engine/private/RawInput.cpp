@@ -107,7 +107,7 @@ bool CRawInput::Key_Pressing(UINT vkey)
 
 bool CRawInput::Mouse_Down(UINT button)
 {
-	if (!m_bMousePrevState[button] && m_bMouseCurrState[button])
+	/*if (!m_bMousePrevState[button] && m_bMouseCurrState[button])
 	{
 		m_bMousePrevState[button] = true;
 		return true;
@@ -115,12 +115,14 @@ bool CRawInput::Mouse_Down(UINT button)
 	if (m_bMousePrevState[button] && !m_bMouseCurrState[button])
 		m_bMousePrevState[button] = false;
 
-	return false;
+	return false;*/
+
+	return m_bMouseCurrState[button] && !m_bMousePrevState[button];
 }
 
 bool CRawInput::Mouse_Up(UINT button)
 {
-	if (m_bMousePrevState[button] && !m_bMouseCurrState[button])
+	/*if (m_bMousePrevState[button] && !m_bMouseCurrState[button])
 	{
 		m_bMousePrevState[button] = false;
 		return true;
@@ -128,20 +130,25 @@ bool CRawInput::Mouse_Up(UINT button)
 	if (!m_bMousePrevState[button] && m_bMouseCurrState[button])
 		m_bMousePrevState[button] = true;
 
-	return false;
+	return false;*/
+
+	return !m_bMouseCurrState[button] && m_bMousePrevState[button];
 }
 
 bool CRawInput::Mouse_Pressing(UINT button)
 {
-	return m_bMouseCurrState[button];
+	return m_bMouseCurrState[button] && m_bMousePrevState[button];
 }
 
 void CRawInput::ResetPerFrame()
 {
-	// Mouse delta 초기화
-	m_MouseDelta[0] = 0;
-	m_MouseDelta[1] = 0;
-	m_MouseDelta[2] = 0;
+	//// Mouse delta 초기화
+	//m_MouseDelta[0] = 0;
+	//m_MouseDelta[1] = 0;
+	//m_MouseDelta[2] = 0;
+
+	memcpy(m_bMousePrevState, m_bMouseCurrState, sizeof(m_bMousePrevState));
+	ZeroMemory(m_MouseDelta, sizeof(m_MouseDelta));
 }
 
 void CRawInput::UpdateKeyStates()

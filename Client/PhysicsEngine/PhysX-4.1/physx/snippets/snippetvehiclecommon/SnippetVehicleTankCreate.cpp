@@ -50,9 +50,9 @@ void computeWheelCenterActorOffsets
 	for(PxU32 i = 0; i < numWheels; i+=2)
 	{
 		//Left wheel offset from origin.
-		wheelCentreOffsets[i + 0] = PxVec3((-chassisDims.x + wheelWidth * 1.6f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
+		wheelCentreOffsets[i + 0] = PxVec3((-chassisDims.x + wheelWidth * 3.f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
 		//Right wheel offsets from origin.
-		wheelCentreOffsets[i + 1] = PxVec3((+chassisDims.x - wheelWidth * 1.6f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
+		wheelCentreOffsets[i + 1] = PxVec3((+chassisDims.x - wheelWidth * 3.f)*0.5f, -(chassisDims.y/2 - 1.f + wheelRadius), wheelRearZ + i*deltaZ*0.425f);
 	}
 }
 

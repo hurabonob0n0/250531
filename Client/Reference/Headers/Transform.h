@@ -14,6 +14,10 @@ public:
 	virtual ~CTransform() = default;
 
 public:
+	void Identity() {
+		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	}
+
 	XMVECTOR Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
@@ -52,6 +56,13 @@ public:
 		mat.r[0] *= fScale;
 		mat.r[1] *= fScale;
 		mat.r[2] *= fScale;
+
+		XMStoreFloat4x4(&m_WorldMatrix, mat);
+	}
+
+	void Set_Scale(STATE state,float fScale) {
+		_matrix mat = Get_WorldMatrix();
+		mat.r[state] *= fScale;
 
 		XMStoreFloat4x4(&m_WorldMatrix, mat);
 	}

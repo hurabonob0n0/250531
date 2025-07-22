@@ -46,6 +46,12 @@
     <Filter Include="01.DefaultObj\UI">
       <UniqueIdentifier>{7545ea8f-d334-473c-ab7d-3bf8540b74f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\WinningTeam">
+      <UniqueIdentifier>{bbda55c2-cb62-41ab-a85a-189e1869ff7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\Trees">
+      <UniqueIdentifier>{c925d9d7-8430-4f6b-9e41-7610f533040b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -90,6 +96,12 @@
     <ClInclude Include="..\public\UI.h">
       <Filter>01.DefaultObj\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\WinningTeam.h">
+      <Filter>01.DefaultObj\WinningTeam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Tree.h">
+      <Filter>01.DefaultObj\Trees</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -130,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UI.cpp">
       <Filter>01.DefaultObj\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WinningTeam.cpp">
+      <Filter>01.DefaultObj\WinningTeam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Tree.cpp">
+      <Filter>01.DefaultObj\Trees</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
