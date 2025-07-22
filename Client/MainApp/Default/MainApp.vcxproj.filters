@@ -52,6 +52,12 @@
     <Filter Include="01.DefaultObj\Trees">
       <UniqueIdentifier>{c925d9d7-8430-4f6b-9e41-7610f533040b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97.ForLobby">
+      <UniqueIdentifier>{42dfef34-e2ef-4590-a791-06368658bfbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-00.GameLobby">
+      <UniqueIdentifier>{0085ea6f-40fe-41c0-8a45-8a97a488c99b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -102,6 +108,9 @@
     <ClInclude Include="..\public\Tree.h">
       <Filter>01.DefaultObj\Trees</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GameLobby.h">
+      <Filter>97.ForLobby\97-00.GameLobby</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -148,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Tree.cpp">
       <Filter>01.DefaultObj\Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameLobby.cpp">
+      <Filter>97.ForLobby\97-00.GameLobby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
