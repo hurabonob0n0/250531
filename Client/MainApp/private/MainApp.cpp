@@ -109,31 +109,31 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 
 
-	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
+	/*m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
 	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/HeightD.png", 1.f, 1.f);
-	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(500.f,40.f,0.f);
+	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(500.f,40.f,0.f);*/
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
-	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
+	/*m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("MeshModelCom", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX"));
+	m_GameInstance->AddPrototype("MeshModelCom", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX"));*/
 	
 
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
-	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
+	/*m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
-	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
+	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());*/
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
-	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
-	//m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
-	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
+	//m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
+	////m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
+	//m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
 	
-	_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
+	/*_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat1);
 	_matrix mat2 = XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(500.f, 40.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);
@@ -144,16 +144,16 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	_matrix mat6 = XMMatrixRotationY(XMConvertToRadians(200.f)) * XMMatrixTranslation(450.f, 40.f, -50.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat6);
 
-	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
+	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);*/
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat4);
 
 
 
 	m_GameInstance->AddObject("Camera", "Camera", nullptr);
-	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
-	m_GameInstance->AddObject("Effect", "Effect", &mat3);
+	/*_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
+	m_GameInstance->AddObject("Effect", "Effect", &mat3);*/
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	/*dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();*/
 
 	//m_GameInstance->AddObject("UI", "UI", nullptr);
 
@@ -196,7 +196,7 @@ int CMainApp::Run()
 
 				CalculateFrameStats();
 				Update(m_Timer);
-				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
+				//m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
 				Late_Update(m_Timer);
 				Draw();
 
@@ -204,17 +204,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				RECT rect;
-				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				POINT center = {
-					(rect.right - rect.left) / 2,
-					(rect.bottom - rect.top) / 2
-				};
-				 
-				// 클라이언트 좌표 → 스크린 좌표로 변환
-				ClientToScreen(m_hMainWnd, &center);
+				//RECT rect;
+				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				//POINT center = {
+				//	(rect.right - rect.left) / 2,
+				//	(rect.bottom - rect.top) / 2
+				//};
+				// 
+				//// 클라이언트 좌표 → 스크린 좌표로 변환
+				//ClientToScreen(m_hMainWnd, &center);
 
-				SetCursorPos(center.x, center.y);
+				//SetCursorPos(center.x, center.y);
 			}
 			else
 			{
