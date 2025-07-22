@@ -19,6 +19,8 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <windows.h>
+#include <chrono>
 
 /*--------------------------
 	For Server Connection
@@ -28,3 +30,6 @@
 
 using ClientSessionRef = shared_ptr<class ClientSession>;
 using PlayerRef = shared_ptr<class Player>;
+
+#define LOBBY_WINCX  1024
+#define LOBBY_WINCY  768

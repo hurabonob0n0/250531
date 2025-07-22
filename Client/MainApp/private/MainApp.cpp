@@ -20,8 +20,16 @@
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
 
+/*----------------
+	For Lobby
+---------------*/
+#include "GameLobby.h"
 
 IMPLEMENT_SINGLETON(CMainApp)
+
+bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd);
+LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+HWND g_hWnd;
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -36,6 +44,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
 {
 	//_CrtSetBreakAlloc(8420);
+
+	if (!RunLobbyWindowLoop(hInstance, showCmd))
+		return 0;
 
 	CMainApp* mainApp = CMainApp::Get_Instance();
 	if (FAILED(mainApp->Initialize(hInstance)))
@@ -433,3 +444,80 @@ void CMainApp::Free()
 	Safe_Release(m_GameInstance);
 }
 
+bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
+{
+	HWND hWnd;
+	MSG msg = { 0 };
+
+	// 윈도우 클래스 등록
+	WNDCLASS wc = {};
+	wc.lpfnWndProc = LobbyWndProc;
+	wc.hInstance = hInstance;
+	wc.lpszClassName = L"LobbyWnd";
+	RegisterClass(&wc);
+
+	RECT rc{ 0,0,LOBBY_WINCX,LOBBY_WINCY };
+
+	hWnd = CreateWindow(L"LobbyWnd", L"게임 로비", WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
+
+	ShowWindow(hWnd, showCmd);
+	UpdateWindow(hWnd);
+
+	g_hWnd = hWnd;
+	
+	GameLobby Game_Lobby;
+
+	Game_Lobby.Initialize(hWnd);
+
+	constexpr double desiredFPS = 60.0;
+	constexpr double desiredFrameTime = 1000.0 / desiredFPS; // 16.66 ms
+
+	bool bStartGame = false;
+
+	while (true)
+	{
+		auto frameStart = chrono::high_resolution_clock::now();
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				break;
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			Game_Lobby.Update();
+			Game_Lobby.Late_Update();
+			Game_Lobby.Render();
+			if (Game_Lobby.GameStart())
+			{
+				DestroyWindow(hWnd);
+				bStartGame = true;
+				break;
+			}
+		}
+		auto frameEnd = chrono::high_resolution_clock::now();
+		auto elapsed = chrono::duration_cast<chrono::milliseconds>(frameEnd - frameStart).count();
+
+		if (elapsed < desiredFrameTime)
+		{
+			Sleep(static_cast<DWORD>(desiredFrameTime - elapsed));
+		}
+	}
+
+	Game_Lobby.Release();
+	return bStartGame;
+}
+
+LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_DESTROY:
+		//PostQuitMessage(0);
+		break;
+	}
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}
