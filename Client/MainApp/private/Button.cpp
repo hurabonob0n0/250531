@@ -42,6 +42,21 @@ void Button::Initialize()
 		m_tInfo.fCX = 268.f;
 		m_tInfo.fCY = 125.f;
 		break;
+
+	case BUTTON_EXIT:
+		m_tInfo.fCX = 223.f;
+		m_tInfo.fCY = 105.f;
+		break;
+
+	case BUTTON_READY:
+		m_tInfo.fCX = 223.f;
+		m_tInfo.fCY = 105.f;
+		break;
+
+	case BUTTON_START:
+		m_tInfo.fCX = 223.f;
+		m_tInfo.fCY = 105.f;
+		break;
 	default:
 		break;
 
@@ -60,7 +75,14 @@ int Button::Update()
 		if (Key_Manager::Get_Instance()->Key_Down(VK_LBUTTON))
 		{
 
-			isClick = true;
+			auto now = std::chrono::steady_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - _lastClickTime);
+
+			if (duration.count() >= 1000) 
+			{
+				isClick = true;
+				_lastClickTime = now;
+			}
 
 		}
 		MouseOn = true;
@@ -76,6 +98,7 @@ int Button::Update()
 			m_bDead = true;
 			MultiPlay = false;
 			Level_Manager::Get_Instance()->SetGamePlayMode();
+			isClick = false;
 			break;
 
 		case BUTTON_MULTIPLAY:
@@ -83,16 +106,19 @@ int Button::Update()
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOMLIST);
 		
 			MultiPlay = true;
+			isClick = false;
 			break;
 		case BUTTON_CREATE: {
 			auto sendBuffer = ClientPacketHandler::Make_C_CREATEROOM(1);
 			Network_Manager::GetInstance()->Send(sendBuffer);
+			isClick = false;
 		}
 			break;
 		case BUTTON_JOIN: {
 
 			auto sendBuffer = ClientPacketHandler::Make_C_JOINROOM(1);
 			Network_Manager::GetInstance()->Send(sendBuffer);
+			isClick = false;
 
 		}
 
@@ -104,6 +130,21 @@ int Button::Update()
 			isClick = false;
 		}
 			break;
+
+		case BUTTON_READY: {
+
+
+		}
+						 break;
+		case BUTTON_START: {
+
+
+		}
+						 break;
+		case BUTTON_EXIT:{
+
+
+		}
 		default:
 			break;
 
@@ -296,6 +337,107 @@ void Button::Render(HDC hDC)
 				RGB(255, 255, 255));
 		}
 		break;
+	case BUTTON_EXIT:
+		if (MouseOn) {
+
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"ExitOn");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
+		else {
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"ExitOff");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
+		break;
+
+	case BUTTON_READY:
+		if (MouseOn) {
+
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"ReadyOn");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
+		else {
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"ReadyOff");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
+		break;
+
+
+	case BUTTON_START:
+		if (MouseOn) {
+
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"StartOn");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
+		else {
+			HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"StartOff");
+			GdiTransparentBlt(
+				hDC,
+				m_tRect.left,
+				m_tRect.top,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				hMemDC,
+				0,
+				0,
+				(int)m_tInfo.fCX,
+				(int)m_tInfo.fCY,
+				RGB(255, 255, 255));
+		}
 	default:
 		break;
 

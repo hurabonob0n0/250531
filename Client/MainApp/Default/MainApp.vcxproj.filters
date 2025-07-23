@@ -100,6 +100,9 @@
     <Filter Include="97.ForLobby\97-06.Room_Manager">
       <UniqueIdentifier>{1e7baa7d-dd60-4ad6-8bf9-f08fb43d09ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\Level_Room">
+      <UniqueIdentifier>{026de808-6b7f-4231-8d01-e7b8a35043c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -198,6 +201,9 @@
     <ClInclude Include="..\public\Room_Manager.h">
       <Filter>97.ForLobby\97-06.Room_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Level_Room.h">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Room</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -286,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Room_Manager.cpp">
       <Filter>97.ForLobby\97-06.Room_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Room.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Room</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

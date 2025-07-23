@@ -184,6 +184,7 @@
     <ClInclude Include="..\public\Level.h" />
     <ClInclude Include="..\public\Level_Manager.h" />
     <ClInclude Include="..\public\Level_Menu.h" />
+    <ClInclude Include="..\public\Level_Room.h" />
     <ClInclude Include="..\public\Level_RoomList.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\MyBmp.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\private\Level.cpp" />
     <ClCompile Include="..\private\Level_Manager.cpp" />
     <ClCompile Include="..\private\Level_Menu.cpp" />
+    <ClCompile Include="..\private\Level_Room.cpp" />
     <ClCompile Include="..\private\Level_RoomList.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\MyBmp.cpp" />

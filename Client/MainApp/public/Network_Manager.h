@@ -34,6 +34,8 @@ public:
 	void PushCommand(); 
 
 
+	bool isConnected() { return _connected; };
+
 public:
 	int GetMyClientID() { return MyClientID; };
 

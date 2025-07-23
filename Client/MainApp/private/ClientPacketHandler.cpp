@@ -7,6 +7,7 @@
 #include "ServiceManager.h"
 #include "GameInstance.h"
 #include "Room_Manager.h"
+#include "Level_Manager.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -28,9 +29,15 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_ROOM_DATA:
 		Handle_S_GET_ROOMDATA(buffer, len);
 		break;
+	
+	case S_ROOM_ENTER:
+		Handle_S_ROOM_ENTER(buffer, len);
+		break;
+
 	case S_SUCCESS_ENTER_ROOM:
 		Handle_S_SUCCESS_ENTER_ROOM(buffer, len);
 		break;
+
 
 	case S_GAME_START:
 		Handle_S_GAME_START(buffer, len);
@@ -198,6 +205,18 @@ void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
 		
 	}
 	Room_Manager::Get_Instance()->SetRoomList(tempList);
+
+}
+
+void ClientPacketHandler::Handle_S_ROOM_ENTER(BYTE* buffer, int32 len)
+{
+
+	BufferReader br(buffer, len);
+
+	PacketHeader header;
+	br >> header;
+
+	Level_Manager::Get_Instance()->Ready_EnterRoom();
 }
 
 

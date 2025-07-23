@@ -17,7 +17,12 @@ public:
 
 	void Show_RoomList();
 
-private:
+	void Set_RoomList();
 
+private:
+	std::vector<Room_Data> m_vecRoomBars;
+	std::vector<std::pair<RECT, Room_Data>> m_vecRoomRects;
+	
+	Room_Data* CurRoomData = nullptr;
 };
 

@@ -25,9 +25,15 @@ public:
 		}
 	}
 
+	const std::vector<Room_Data>& GetRoomList() const
+	{
+		return vRoom_List;
+	}
+
 	void SetRoomList(const std::vector<Room_Data>& newList)
 	{
 		vRoom_List = newList;
+		isChange = true;
 	}
 
 
@@ -40,6 +46,8 @@ public:
 	{
 		vRoom_List.clear();
 	}
+
+	bool isChange = false;
 
 private:
 	static	Room_Manager* m_pInstance;

@@ -20,7 +20,7 @@ public:
 	bool GetButtonDown(){ return isClick; };
 
 private:
-
+	std::chrono::steady_clock::time_point _lastClickTime = std::chrono::steady_clock::now();
 	BUTTON_ID My_ID;
 	bool MouseOn;
 	bool isClick;

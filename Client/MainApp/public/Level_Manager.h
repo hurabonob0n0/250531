@@ -1,6 +1,7 @@
 #pragma once
 #include "Level_Menu.h"
 #include "Level_RoomList.h"
+#include "Level_Room.h"
 
 class Level_Manager
 {
@@ -45,6 +46,14 @@ public:
 	};
 	void SetGamePlayMode() { GoPlay = true; };
 
+	void Ready_EnterRoom() {
+		EnterRoom = true;
+	}
+	
+	void Ready_ExitRoom() {
+
+		ExitRoom = true;
+	}
 
 private:
 	static	Level_Manager*			m_pInstance;
@@ -52,6 +61,9 @@ private:
 	LEVEL_ID						m_ePreLevel;
 	LEVEL_ID						m_eCurLevel;
 
+	
+	bool EnterRoom = false;
+	bool ExitRoom = false;
 	bool GoPlay = false;
 };
 

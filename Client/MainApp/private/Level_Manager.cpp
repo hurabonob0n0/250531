@@ -26,7 +26,9 @@ void Level_Manager::Level_Change(LEVEL_ID eID)
 			break;
 		case LEVEL_ROOMLIST:
 			m_pLevel = new Level_RoomList;
-
+			break;
+		case LEVEL_ROOM:
+			m_pLevel = new Level_Room;
 			break;
 		default:
 			break;
@@ -40,6 +42,15 @@ void Level_Manager::Level_Change(LEVEL_ID eID)
 
 int Level_Manager::Update()
 {
+	if (EnterRoom) {
+		Level_Change(LEVEL_ROOM);
+		EnterRoom = false;
+	}
+	if (ExitRoom) {
+
+
+	}
+
 	m_pLevel->Update();
 	return 0;
 }

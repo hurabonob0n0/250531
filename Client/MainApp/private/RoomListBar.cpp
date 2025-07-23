@@ -1,5 +1,6 @@
 #include "Client_pch.h"
 #include "RoomListBar.h"
+#include "Bmp_Manager.h"
 
 RoomListBar::RoomListBar()
 {
@@ -20,7 +21,7 @@ void RoomListBar::Initialize()
 int RoomListBar::Update()
 {
 
-
+    __super::Update_Rect();
 	return 0;
 }
 
@@ -30,6 +31,21 @@ void RoomListBar::Late_Update()
 
 void RoomListBar::Render(HDC hDC)
 {
+
+    HDC	hMemDC = Bmp_Manager::Get_Instance()->Find_Img(L"RoomListbox");
+    GdiTransparentBlt(
+        hDC,
+        m_tRect.left,
+        m_tRect.top,
+        (int)m_tInfo.fCX,
+        (int)m_tInfo.fCY,
+        hMemDC,
+        0,
+        0,
+        (int)m_tInfo.fCX,
+        (int)m_tInfo.fCY,
+        RGB(255, 255, 255));
+
     // 텍스트 영역 분할: 총 3등분
     const int totalWidth = (int)m_tInfo.fCX;
     const int sectionWidth = totalWidth / 3;
@@ -49,7 +65,7 @@ void RoomListBar::Render(HDC hDC)
 
     // RoomID 출력
     {
-        RECT rc = { left, top, left + sectionWidth, top + height };
+        RECT rc = { left +20, top, left + sectionWidth, top + height };
         wchar_t szRoomID[32] = {};
         swprintf_s(szRoomID, L"Room(%d)", Room_data.RoomID);
         DrawText(hDC, szRoomID, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
@@ -57,14 +73,14 @@ void RoomListBar::Render(HDC hDC)
 
     // Active/UnActive 출력
     {
-        RECT rc = { left + sectionWidth, top, left + sectionWidth * 2, top + height };
+        RECT rc = { left + sectionWidth + 20, top, left + sectionWidth * 2, top + height };
         const wchar_t* status = Room_data.isActive ? L"Active" : L"UnActive";
         DrawText(hDC, status, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     }
 
     // (Cur/Max) 출력
     {
-        RECT rc = { left + sectionWidth * 2, top, left + sectionWidth * 3, top + height };
+        RECT rc = { left + sectionWidth * 2 + 40, top, left + sectionWidth * 3, top + height };
         wchar_t szPlayer[32] = {};
         swprintf_s(szPlayer, L"(%d/%d)", Room_data.CurPlayer, Room_data.MaxPlayer);
         DrawText(hDC, szPlayer, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);

@@ -61,7 +61,17 @@ void GameLobby::InitBmps(HWND hand)
 	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/JoinOn.bmp", L"JoinOn", hand);
 	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/RefreshOff.bmp", L"RefreshOff", hand);
 	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/RefreshON.bmp", L"RefreshON", hand);
+	
+	
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/ExitOn.bmp", L"ExitOn", hand);
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/ExitOff.bmp", L"ExitOff", hand);
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/ReadyOff.bmp", L"ReadyOff", hand);
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/ReadyOn.bmp", L"ReadyOn", hand);
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/StartOn.bmp", L"StartOn", hand);
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/StartOff.bmp", L"StartOff", hand);
 
+
+	Bmp_Manager::Get_Instance()->Insert_Bmp(L"../bin/LobbyBmps/RoomBack.bmp", L"RoomBack", hand);
 
 
 }

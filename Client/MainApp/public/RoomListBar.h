@@ -1,7 +1,8 @@
 #pragma once
 #include "GameObject.h"
-class RoomListBar : GameObject
+class RoomListBar : public GameObject
 {
+public:
 	RoomListBar();
 	virtual ~RoomListBar();
 
