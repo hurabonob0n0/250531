@@ -32,4 +32,34 @@ using ClientSessionRef = shared_ptr<class ClientSession>;
 using PlayerRef = shared_ptr<class Player>;
 
 #define LOBBY_WINCX  1024
-#define LOBBY_WINCY  768
+#define LOBBY_WINCY  880
+
+struct Room_Data {
+
+
+	unsigned char	MaxPlayer;
+	unsigned char	CurPlayer;
+	bool			isActive;
+	unsigned char	RoomID;
+
+};
+
+
+/*------------------
+	팀 false = Red
+	팀 True  = Blue
+
+	포지션 False = 조종수
+	포지션 True = 포수
+
+
+
+-------------------*/
+
+struct Room_Ready_Data {
+
+	bool Team;
+	bool Position;
+	bool IsReady = false;
+
+};

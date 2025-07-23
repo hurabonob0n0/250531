@@ -6,7 +6,7 @@
 #include "BufferWriter.h"
 #include "ServiceManager.h"
 #include "GameInstance.h"
-
+#include "Room_Manager.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -25,6 +25,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		Handle_S_SUCCESS_LOGIN(buffer, len);
 		break;
 
+	case S_ROOM_DATA:
+		Handle_S_GET_ROOMDATA(buffer, len);
+		break;
 	case S_SUCCESS_ENTER_ROOM:
 		Handle_S_SUCCESS_ENTER_ROOM(buffer, len);
 		break;
@@ -172,40 +175,33 @@ void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 	dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", playerID))->Set_OtherPlayerState(mat, potapRot, posinRot);
 }
 
-
-
-SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
+void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 
-	PacketHeader* header = bw.Reserve<PacketHeader>();
-	bw << id;
+	BufferReader br(buffer, len);
 
-	header->size = bw.WriteSize();
-	header->id = C_LOGIN;
+	PacketHeader header;
+	br >> header;
 
-	sendBuffer->Close(bw.WriteSize());
+	uint32 roomCount;
+	br >> roomCount;
 
-	return sendBuffer;
+	std::vector<Room_Data> tempList;
+	tempList.reserve(roomCount);
+
+	for (uint32 i = 0; i < roomCount; ++i)
+	{
+		Room_Data data;
+		br >> data;
+
+		tempList.push_back(data);
+		
+	}
+	Room_Manager::Get_Instance()->SetRoomList(tempList);
 }
 
-SendBufferRef ClientPacketHandler::Make_C_FINISH_LOADING(uint64 id)
-{
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 
-	PacketHeader* header = bw.Reserve<PacketHeader>();
-	bw << id;
 
-	header->size = bw.WriteSize();
-	header->id = C_FINISH_LOADING;
-
-	sendBuffer->Close(bw.WriteSize());
-
-	return sendBuffer;
-
-}
 
 SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
 {
@@ -267,3 +263,114 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 
 }
 
+SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+	bw << id;
+
+	header->size = bw.WriteSize();
+	header->id = C_LOGIN;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+
+SendBufferRef ClientPacketHandler::Make_C_MOVE(float x, float y, float z)
+{
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << x << y << z;
+
+	header->size = bw.WriteSize();
+	header->id = C_MOVEMENT;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+
+}
+
+SendBufferRef ClientPacketHandler::Make_C_SHOWROOM(uint8 Dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << Dummy;
+
+	header->size = bw.WriteSize();
+	header->id = C_SHOW_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+
+}
+
+SendBufferRef ClientPacketHandler::Make_C_JOINROOM(uint32 RoomNum)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << RoomNum;
+
+	header->size = bw.WriteSize();
+	header->id = C_JOIN_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_CREATEROOM(uint8 Dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << Dummy;
+
+	header->size = bw.WriteSize();
+	header->id = C_CREATE_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_EXITROOM(uint8 Dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << Dummy;
+
+	header->size = bw.WriteSize();
+	header->id = C_EXIT_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_CHANGE_INFO(Room_Ready_Data data)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	header->size = bw.WriteSize();
+	header->id = C_CHANGE_INFO;
+
+	bw << data.Team << data.Position << data.IsReady;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}

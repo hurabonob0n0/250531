@@ -19,6 +19,8 @@ public:
 		return false;
 	};
 
+	void InitBmps(HWND hand);
+
 private:
 	HDC			m_hDC;
 	HWND		m_hWnd;
