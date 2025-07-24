@@ -28,6 +28,9 @@ public:
 	void Set_Bone(const vector<class CBone*> Bones);
 
 public:
+	void Set_Team(int team);
+
+public:
 	void Update();
 	virtual HRESULT Render();
 

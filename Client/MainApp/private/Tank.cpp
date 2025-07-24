@@ -76,6 +76,8 @@ HRESULT CTank::Initialize(void* pArg)
 
 	m_VIBuffer->Set_MatOffsets(matindex);
 
+	m_VIBuffer->Set_Team(m_GameInstance->Get_RandomI(1, 3));
+
 	m_pPhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 
 	Initialize_For_PosinQuad();

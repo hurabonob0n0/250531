@@ -85,6 +85,11 @@ void CMesh::Set_Bone(const vector<class CBone*> Bones)
 	Safe_AddRef(m_Bone);
 }
 
+void CMesh::Set_Team(int team)
+{
+	m_CBBinding->Set_Pad2(team);
+}
+
 void CMesh::Update()
 {
 	m_CBBinding->Set_CBIndex();

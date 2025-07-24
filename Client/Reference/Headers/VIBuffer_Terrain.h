@@ -21,14 +21,20 @@ public:
 public:
     void Make_Buffer(const char* pHeightmapPath, float heightScale, float cellSpacing);
     void Make_Buffer(const char* filepath);
+    void Read_Map();
     XMFLOAT3 Add3(const XMFLOAT3& a, XMVECTOR b);
 
 public:
     void Save_TerrainMesh_ToFile(const std::string& filename, const std::vector<VTXMESH>& vertices, const std::vector<UINT32>& indices);
     HRESULT Render() override;
 
+    inline int Get_Index(int x, int z) const {
+        return z * 4096 + x;
+    }
+
 private:
     std::vector<VTXPOSNOR> m_vertices;
+    vector<float> m_heightMap;
 
 public:
     static CVIBuffer_Terrain* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, const char* pHeightmapPath);

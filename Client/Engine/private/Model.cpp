@@ -91,6 +91,15 @@ void CModel::Set_MatIndex(_uint MeshIndex, _uint MatIndex)
 	m_Meshes[MeshIndex]->Set_MaterialIndex(MatIndex);
 }
 
+void CModel::Set_Team(int redorblue)
+{
+	for (int i = 0; i < 55; ++i)
+	{
+		if (i != 24 || i != 26 || i != 28 || i != 30 || i != 32 || i != 34 || i != 36 || i != 46 || i != 37 || i != 35 || i != 33 || i != 44 || i != 48 || i != 42)
+			m_Meshes[i]->Set_Team(redorblue);
+	}
+}
+
 void CModel::Invalidate_Bones()
 {
 	for (auto& pBone : m_Bones)
