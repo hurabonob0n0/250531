@@ -2,6 +2,7 @@
 #include "GameLobby.h"
 #include "Bmp_Manager.h"
 #include "Level_Manager.h"
+#include "Network_Manager.h"
 
 GameLobby::GameLobby()
 {
@@ -22,6 +23,13 @@ void GameLobby::Initialize(HWND hand)
 
 void GameLobby::Update(void)
 {
+
+
+	if (Network_Manager::GetInstance()->isConnected())
+	{
+		Network_Manager::GetInstance()->Dispatch(PacketQueueType::LOBBY);
+	}
+	
 	Level_Manager::Get_Instance()->Update();
 
 }

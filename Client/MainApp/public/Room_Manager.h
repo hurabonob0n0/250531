@@ -49,9 +49,26 @@ public:
 
 	bool isChange = false;
 
+	void SetRoomPlayerStates(const std::vector<Room_Ready_Data>& playerStates) { vRoom_Player_Data = playerStates; }
+	void ClearRoomPlayerStates() { vRoom_Player_Data.clear(); }
+
+
+	const std::vector<Room_Ready_Data>& GetRoomPlayerStates() const
+	{
+		return vRoom_Player_Data;
+	}
+
+	void ChoiceRoom(int ID) { ChoiceRoomNum = ID; };
+
+	int GetChoiceRoom() { return ChoiceRoomNum; };
+
 private:
 	static	Room_Manager* m_pInstance;
 
 	std::vector<Room_Data> vRoom_List;
+	std::vector<Room_Ready_Data> vRoom_Player_Data;
+
+	int ChoiceRoomNum;
+
 };
 

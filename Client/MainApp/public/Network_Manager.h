@@ -1,5 +1,17 @@
 #pragma once
 
+enum class PacketQueueType
+{
+	LOBBY,
+	INGAME
+};
+
+struct QueuedPacket
+{
+	PacketQueueType type;
+	std::function<void()> handler;
+};
+
 class Network_Manager
 {
 public:
@@ -29,10 +41,14 @@ public:
 	bool Initialize(const std::wstring& ip, uint16 port);
 	void Update(); // 명령 큐 처리용
 
+	void PushPacket(PacketQueueType type, std::function<void()> handler);
+	void Dispatch(PacketQueueType type);
 
 	void Send(SendBufferRef sendBuffer);
-	void PushCommand(); 
 
+
+	void ClearPacketsByType(PacketQueueType type);
+	void ClearAllPackets();
 
 	bool isConnected() { return _connected; };
 
@@ -43,6 +59,9 @@ private:
 	ClientServiceRef _service;
 	bool _connected;
 	int MyClientID;
+
+	std::queue<QueuedPacket> _packetQueue;
+	std::mutex _mutex;
 
 public:
 	static	Network_Manager* m_pInstance;

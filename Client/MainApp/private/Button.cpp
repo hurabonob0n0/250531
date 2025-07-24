@@ -6,7 +6,8 @@
 #include "Level_Manager.h"
 #include "Object_Manager.h"
 #include "Network_Manager.h"
-#include  "ClientPacketHandler.h"
+#include "ClientPacketHandler.h"
+#include "Room_Manager.h"
 
 Button::Button()
 {
@@ -115,8 +116,8 @@ int Button::Update()
 		}
 			break;
 		case BUTTON_JOIN: {
-
-			auto sendBuffer = ClientPacketHandler::Make_C_JOINROOM(1);
+			
+			auto sendBuffer = ClientPacketHandler::Make_C_JOINROOM(Room_Manager::Get_Instance()->GetChoiceRoom());
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			isClick = false;
 
@@ -142,8 +143,10 @@ int Button::Update()
 		}
 						 break;
 		case BUTTON_EXIT:{
-
-
+			auto sendBuffer = ClientPacketHandler::Make_C_EXITROOM(0);
+			Network_Manager::GetInstance()->Send(sendBuffer);
+			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOMLIST);
+			isClick = false;
 		}
 		default:
 			break;

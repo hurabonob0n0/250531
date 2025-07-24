@@ -55,6 +55,7 @@ public:
 		ExitRoom = true;
 	}
 
+
 private:
 	static	Level_Manager*			m_pInstance;
 	Level*							m_pLevel = nullptr;

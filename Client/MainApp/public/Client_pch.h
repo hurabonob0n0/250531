@@ -21,6 +21,7 @@
 #include <map>
 #include <windows.h>
 #include <chrono>
+#include <functional>
 
 /*--------------------------
 	For Server Connection
@@ -33,6 +34,9 @@ using PlayerRef = shared_ptr<class Player>;
 
 #define LOBBY_WINCX  1024
 #define LOBBY_WINCY  880
+
+#define TEAM_BLUE	true
+#define TEAM_RED	false
 
 struct Room_Data {
 
@@ -58,8 +62,9 @@ struct Room_Data {
 
 struct Room_Ready_Data {
 
-	bool Team;
-	bool Position;
-	bool IsReady = false;
+	uint8	PlayerID;
+	uint8   Position;
+	bool	Team;
+	bool	IsReady = false;
 
 };

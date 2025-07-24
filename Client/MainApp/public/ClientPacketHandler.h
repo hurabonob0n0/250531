@@ -16,6 +16,7 @@ enum
 	S_WEAPON_HIT = 6,
 	S_ROOM_DATA = 7,
 	S_ROOM_ENTER = 8,
+	S_ROOM_PLAYER_STATES = 9,
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
@@ -30,6 +31,7 @@ enum
 
 
 
+
 class ClientPacketHandler
 {
 public:
@@ -41,6 +43,7 @@ public:
 	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 	static void Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_ENTER(BYTE* buffer, int32 len);
+	static void Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len);
 
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
 	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);

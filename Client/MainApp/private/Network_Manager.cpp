@@ -82,6 +82,37 @@ void Network_Manager::Update()
 {
 }
 
+void Network_Manager::PushPacket(PacketQueueType type, std::function<void()> handler)
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	_packetQueue.push({ type, handler });
+}
+
+void Network_Manager::Dispatch(PacketQueueType type)
+{
+	std::queue<QueuedPacket> localQueue;
+
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		size_t sz = _packetQueue.size();
+		for (size_t i = 0; i < sz; ++i)
+		{
+			auto& front = _packetQueue.front();
+			if (front.type == type)
+				localQueue.push(front);
+			else
+				_packetQueue.push(front);
+			_packetQueue.pop();
+		}
+	}
+
+	while (!localQueue.empty())
+	{
+		localQueue.front().handler();
+		localQueue.pop();
+	}
+}
+
 
 void Network_Manager::Send(SendBufferRef sendBuffer)
 {
@@ -91,3 +122,28 @@ void Network_Manager::Send(SendBufferRef sendBuffer)
 
 }
 
+
+
+void Network_Manager::ClearPacketsByType(PacketQueueType type)
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	std::queue<QueuedPacket> tempQueue;
+
+	while (!_packetQueue.empty())
+	{
+		auto& front = _packetQueue.front();
+		if (front.type != type)
+			tempQueue.push(front);  // 다른 타입만 유지
+		// 같은 타입이면 버림
+		_packetQueue.pop();
+	}
+
+	std::swap(_packetQueue, tempQueue);  // 필터링된 큐로 교체
+}
+
+void Network_Manager::ClearAllPackets()
+{
+	std::lock_guard<std::mutex> lock(_mutex);
+	while (!_packetQueue.empty())
+		_packetQueue.pop();
+}

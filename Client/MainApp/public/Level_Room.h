@@ -1,6 +1,12 @@
 #pragma once
 #include "Level.h"
 
+struct Slot {
+	RECT rect;
+	int position;
+	bool occupied;
+};
+
 class Level_Room : public Level
 {
 public:
@@ -14,8 +20,15 @@ public:
 	virtual void Late_Update() override;
 	virtual void Render(HDC hDC) override;
 	virtual void Release(void) override;
+public:
 
 private:
+	const int TEAM_SLOT_WIDTH = 350;
+	const int TEAM_SLOT_HEIGHT = 70;
 
+	std::vector<RECT> BlueTeamRects;
+	std::vector<RECT> RedTeamRects;
+	std::vector<Slot> Slots;
+	DWORD lastClickTime;
 };
 

@@ -27,5 +27,6 @@ private:
 
 	int Timer = 0;
 	bool		is_start = false;
+	bool		is_Connected = false;
 };
 

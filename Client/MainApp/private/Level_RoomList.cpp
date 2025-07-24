@@ -22,7 +22,6 @@ void Level_RoomList::Initialize()
 	if(!Network_Manager::GetInstance()->isConnected())
 		Network_Manager::GetInstance()->Initialize(L"127.0.0.1", 7777);
 
-
 	Object_Manager::Get_Instance()->LevelChange = true;
 
 	GameObject* Create_Button = CAbstractFactory<Button>::Create_Button(800, 400, BUTTON_CREATE);
@@ -37,6 +36,7 @@ void Level_RoomList::Initialize()
 
 int Level_RoomList::Update()
 {
+
 
 
 	if (Object_Manager::Get_Instance()->LevelChange)
@@ -63,7 +63,7 @@ int Level_RoomList::Update()
 			{
 
 				CurRoomData = &pair.second;
-
+				Room_Manager::Get_Instance()->ChoiceRoom(CurRoomData->RoomID);
 		
 			}
 		}
