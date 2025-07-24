@@ -61,10 +61,9 @@ int Level_RoomList::Update()
 		{
 			if (Key_Manager::Get_Instance()->Key_Down(VK_LBUTTON))
 			{
-
 				CurRoomData = &pair.second;
 				Room_Manager::Get_Instance()->ChoiceRoom(CurRoomData->RoomID);
-		
+				
 			}
 		}
 	}

@@ -38,6 +38,8 @@ using PlayerRef = shared_ptr<class Player>;
 #define TEAM_BLUE	true
 #define TEAM_RED	false
 
+#define ROBBY	999
+
 struct Room_Data {
 
 
@@ -68,3 +70,4 @@ struct Room_Ready_Data {
 	bool	IsReady = false;
 
 };
+

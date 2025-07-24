@@ -26,7 +26,9 @@ enum
 	C_CREATE_ROOM = 1007,
 	C_JOIN_ROOM = 1008,
 	C_EXIT_ROOM = 1009,
-	C_CHANGE_INFO = 1010
+	C_CHANGE_INFO = 1010,
+	C_READY = 1011,
+	C_START = 1012
 };
 
 
@@ -38,13 +40,17 @@ public:
 
 	static void HandlePacket(BYTE* buffer, int32 len);
 	static void Handle_S_TEST(BYTE* buffer, int32 len);
+	
+	
+	
 	static void Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len);
-	static void Handle_S_GAME_START(BYTE* buffer, int32 len);
-	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
+	
 	static void Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_ENTER(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len);
+	static void Handle_S_GAME_START(BYTE* buffer, int32 len);
 
+	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
 	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);
 
@@ -58,6 +64,9 @@ public:
 	static SendBufferRef Make_C_CREATEROOM(uint8 Dummy);
 	static SendBufferRef Make_C_EXITROOM(uint8 Dummy);
 	static SendBufferRef Make_C_CHANGE_INFO(Room_Ready_Data data);
+	static SendBufferRef Make_C_READY(uint8 dummy);
+	static SendBufferRef Make_C_START(uint8 dummy);
+
 	USE_LOCK;
 	
 	//static SendBufferRef Make_C_SHOT(uint, uint16 attack);

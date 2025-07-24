@@ -113,12 +113,24 @@ void ClientPacketHandler::Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len)
 
 void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
+	//BufferReader br(buffer, len);
 
-	PacketHeader header;
-	br >> header;
+	//PacketHeader header;
+	//br >> header;
 
-	g_GameStart.store(true);
+	//g_GameStart.store(true);
+
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		PacketHeader header;
+		br >> header;
+		uint16 ID;
+		br >> ID;
+
+		});
 
 }
 
@@ -138,26 +150,54 @@ void ClientPacketHandler::Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len)
 void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
 {
 
-	BufferReader br(buffer, len);
+	//BufferReader br(buffer, len);
 
-	PacketHeader header;
-	br >> header;
+	//PacketHeader header;
+	//br >> header;
 
-	uint32 roomCount;
-	br >> roomCount;
+	//uint32 roomCount;
+	//br >> roomCount;
 
-	std::vector<Room_Data> tempList;
-	tempList.reserve(roomCount);
+	//std::vector<Room_Data> tempList;
+	//tempList.reserve(roomCount);
 
-	for (uint32 i = 0; i < roomCount; ++i)
-	{
-		Room_Data data;
-		br >> data;
+	//for (uint32 i = 0; i < roomCount; ++i)
+	//{
+	//	Room_Data data;
+	//	br >> data;
 
-		tempList.push_back(data);
-		
-	}
-	Room_Manager::Get_Instance()->SetRoomList(tempList);
+	//	tempList.push_back(data);
+	//	
+	//}
+	//Room_Manager::Get_Instance()->SetRoomList(tempList);
+
+
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+
+
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+
+		uint32 roomCount;
+		br >> roomCount;
+
+		std::vector<Room_Data> tempList;
+		tempList.reserve(roomCount);
+
+		for (uint32 i = 0; i < roomCount; ++i)
+		{
+			Room_Data data;
+			br >> data;
+
+			tempList.push_back(data);
+
+		}
+		Room_Manager::Get_Instance()->SetRoomList(tempList);
+		});
 
 }
 
@@ -208,6 +248,7 @@ void ClientPacketHandler::Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len)
 		if (Level_Manager::Get_Instance()->GetSceneID() != LEVEL_ROOM)
 		{
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOM);
+			
 		}
 
 		Room_Manager::Get_Instance()->SetRoomPlayerStates(roomStates);
@@ -378,6 +419,37 @@ SendBufferRef ClientPacketHandler::Make_C_CHANGE_INFO(Room_Ready_Data data)
 	
 	header->size = bw.WriteSize();
 	header->id = C_CHANGE_INFO;
+
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_READY(uint8 dummy)
+{
+
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	header->size = bw.WriteSize();
+	header->id = C_READY;
+
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+
+	header->size = bw.WriteSize();
+	header->id = C_START;
 
 
 	sendBuffer->Close(bw.WriteSize());

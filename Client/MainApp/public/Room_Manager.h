@@ -62,6 +62,16 @@ public:
 
 	int GetChoiceRoom() { return ChoiceRoomNum; };
 
+	void	SetCurRoom(int RoomID) { CurRoom = RoomID; };
+	int		GetCurRoom() { return CurRoom; };
+
+	void    ClearCurRoom() { CurRoom = ROBBY; };
+
+
+	void SetMyPlayerData(const Room_Ready_Data& data) { myPlayerData = data; }
+
+	const Room_Ready_Data& GetMyPlayerData() const { return myPlayerData; }
+
 private:
 	static	Room_Manager* m_pInstance;
 
@@ -69,6 +79,9 @@ private:
 	std::vector<Room_Ready_Data> vRoom_Player_Data;
 
 	int ChoiceRoomNum;
+	int CurRoom;
+
+	Room_Ready_Data myPlayerData;
 
 };
 

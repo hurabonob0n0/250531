@@ -79,12 +79,6 @@
     <Filter Include="97.ForLobby\97-04.Collision_Manager">
       <UniqueIdentifier>{4c32c207-fe16-49cd-a6f9-7de8003439ca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\Level_Menu">
-      <UniqueIdentifier>{6d2020d3-0c70-4467-ae43-d5c2f7814d54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\Level_RoomList">
-      <UniqueIdentifier>{45028d51-f75b-48e8-835e-b1040d9922cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97.ForLobby\97-03.Object_Manager\GameObject\Button">
       <UniqueIdentifier>{b864821d-3027-424c-b408-077dc56f110f}</UniqueIdentifier>
     </Filter>
@@ -100,7 +94,13 @@
     <Filter Include="97.ForLobby\97-06.Room_Manager">
       <UniqueIdentifier>{1e7baa7d-dd60-4ad6-8bf9-f08fb43d09ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\Level_Room">
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu">
+      <UniqueIdentifier>{6d2020d3-0c70-4467-ae43-d5c2f7814d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList">
+      <UniqueIdentifier>{45028d51-f75b-48e8-835e-b1040d9922cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room">
       <UniqueIdentifier>{026de808-6b7f-4231-8d01-e7b8a35043c3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -178,7 +178,7 @@
       <Filter>97.ForLobby</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Menu.h">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Menu</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Button.h">
       <Filter>97.ForLobby\97-03.Object_Manager\GameObject\Button</Filter>
@@ -193,7 +193,7 @@
       <Filter>98.ForServer\Network_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_RoomList.h">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_RoomList</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RoomListBar.h">
       <Filter>97.ForLobby\97-03.Object_Manager\GameObject\RoomLIst</Filter>
@@ -202,7 +202,7 @@
       <Filter>97.ForLobby\97-06.Room_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Room.h">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Room</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -273,10 +273,10 @@
       <Filter>97.ForLobby\97-03.Object_Manager\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Menu.cpp">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Menu</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_RoomList.cpp">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_RoomList</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Button.cpp">
       <Filter>97.ForLobby\97-03.Object_Manager\GameObject\Button</Filter>
@@ -294,7 +294,7 @@
       <Filter>97.ForLobby\97-06.Room_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Room.cpp">
-      <Filter>97.ForLobby\97-01.Level_Manager\Levels\Level_Room</Filter>
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

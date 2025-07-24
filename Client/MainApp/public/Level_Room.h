@@ -23,8 +23,8 @@ public:
 public:
 
 private:
-	const int TEAM_SLOT_WIDTH = 350;
-	const int TEAM_SLOT_HEIGHT = 70;
+	const int TEAM_SLOT_WIDTH = 190;
+	const int TEAM_SLOT_HEIGHT = 115;
 
 	std::vector<RECT> BlueTeamRects;
 	std::vector<RECT> RedTeamRects;

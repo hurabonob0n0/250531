@@ -26,26 +26,50 @@ void Level_Room::Initialize()
 {
     Object_Manager::Get_Instance()->LevelChange = true;
 
-    GameObject* StartButton = CAbstractFactory<Button>::Create_Button(860, 787, BUTTON_START);
+    GameObject* StartButton = CAbstractFactory<Button>::Create_Button(860, 755, BUTTON_START);
     Object_Manager::Get_Instance()->Add_Object(OBJ_BUTTON, StartButton);
 
-    GameObject* ExitButton = CAbstractFactory<Button>::Create_Button(170, 787, BUTTON_EXIT);
+    GameObject* ExitButton = CAbstractFactory<Button>::Create_Button(170, 755, BUTTON_EXIT);
     Object_Manager::Get_Instance()->Add_Object(OBJ_BUTTON, ExitButton);
 
-    GameObject* ReadyButton = CAbstractFactory<Button>::Create_Button(630, 787, BUTTON_READY);
+    GameObject* ReadyButton = CAbstractFactory<Button>::Create_Button(630, 755, BUTTON_READY);
     Object_Manager::Get_Instance()->Add_Object(OBJ_BUTTON, ReadyButton);
 
     for (int i = 0; i < 8; ++i)
     {
-        RECT blueRect = { 100, 150 + i * 80, 100 + TEAM_SLOT_WIDTH, 150 + i * 80 + TEAM_SLOT_HEIGHT };
-        RECT redRect = { 550, 150 + i * 80, 550 + TEAM_SLOT_WIDTH, 150 + i * 80 + TEAM_SLOT_HEIGHT };
+        int row = i / 2; // 0~3
+        int col = i % 2; // 0 또는 1
 
-        BlueTeamRects.push_back(blueRect); // ← 이거 필요 없으면 생략 가능
+        // 각 슬롯의 간격
+        int slotGapX = 10;
+        int slotGapY = 26;
+
+        // 각 슬롯의 시작 위치
+        int blueStartX = 80;
+        int redStartX = 555;
+        int startY = 130;
+
+        int xOffset = col * (TEAM_SLOT_WIDTH + slotGapX);
+        int yOffset = row * (TEAM_SLOT_HEIGHT + slotGapY);
+
+        RECT blueRect = {
+            blueStartX + xOffset,
+            startY + yOffset,
+            blueStartX + xOffset + TEAM_SLOT_WIDTH,
+            startY + yOffset + TEAM_SLOT_HEIGHT
+        };
+
+        RECT redRect = {
+            redStartX + xOffset,
+            startY + yOffset,
+            redStartX + xOffset + TEAM_SLOT_WIDTH,
+            startY + yOffset + TEAM_SLOT_HEIGHT
+        };
+
+        BlueTeamRects.push_back(blueRect);
         RedTeamRects.push_back(redRect);
 
-        // 포지션 1~8: BLUE 팀
         Slot blueSlot = { blueRect, static_cast<uint8>(i + 1), false };
-        // 포지션 9~16: RED 팀
         Slot redSlot = { redRect, static_cast<uint8>(i + 9), false };
 
         Slots.push_back(blueSlot);
@@ -99,6 +123,7 @@ int Level_Room::Update()
                 myData.Team = (slot.position <= 8); // true: Blue, false: Red
                 myData.IsReady = false;
 
+                Room_Manager::Get_Instance()->SetMyPlayerData(myData);
                 auto sendBuffer = ClientPacketHandler::Make_C_CHANGE_INFO(myData);
                 Network_Manager::GetInstance()->Send(sendBuffer);
                 break;
@@ -141,8 +166,8 @@ void Level_Room::Render(HDC hDC)
     // 3. 슬롯 테두리와 텍스트 출력
     for (const auto& slot : Slots)
     {
-        // 테두리
-        Rectangle(hDC, slot.rect.left, slot.rect.top, slot.rect.right, slot.rect.bottom);
+        // 디버깅용임
+        //Rectangle(hDC, slot.rect.left, slot.rect.top, slot.rect.right, slot.rect.bottom);
 
         for (const auto& player : players)
         {
@@ -154,16 +179,15 @@ void Level_Room::Render(HDC hDC)
 
                 // --------------------
                 // 폰트 설정 (맑은 고딕, 크기 20, Bold)
-                HFONT hFont = CreateFont(
-                    20, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-                    HANGUL_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                    DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"맑은 고딕");
+                HFONT hFont = CreateFont(30, 0, 0, 0, FW_HEAVY, FALSE, FALSE, FALSE,
+                    ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                    DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Impact");
 
                 HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
 
                 // 배경 투명, 글자 검정색
                 SetBkMode(hDC, TRANSPARENT);
-                SetTextColor(hDC, RGB(0, 0, 0));
+                SetTextColor(hDC, RGB(200, 200, 200));
 
                 // 텍스트 출력
                 DrawText(hDC, text.c_str(), -1, const_cast<RECT*>(&slot.rect), DT_CENTER | DT_VCENTER | DT_SINGLELINE);

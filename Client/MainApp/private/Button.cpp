@@ -133,19 +133,25 @@ int Button::Update()
 			break;
 
 		case BUTTON_READY: {
-
+			auto sendBuffer = ClientPacketHandler::Make_C_READY(1);
+			Network_Manager::GetInstance()->Send(sendBuffer);
+			isClick = false;
 
 		}
 						 break;
 		case BUTTON_START: {
 
+			auto sendBuffer = ClientPacketHandler::Make_C_START(1);
+			Network_Manager::GetInstance()->Send(sendBuffer);
+			isClick = false;
 
 		}
 						 break;
 		case BUTTON_EXIT:{
-			auto sendBuffer = ClientPacketHandler::Make_C_EXITROOM(0);
+			auto sendBuffer = ClientPacketHandler::Make_C_EXITROOM(Room_Manager::Get_Instance()->GetChoiceRoom());
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOMLIST);
+			Room_Manager::Get_Instance()->ChoiceRoom(ROBBY);
 			isClick = false;
 		}
 		default:
