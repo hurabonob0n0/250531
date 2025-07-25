@@ -14,18 +14,29 @@ public:
 	virtual ~CTransform() = default;
 
 public:
+
 	void Identity() {
 		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	}
+
+	void Adjust_Axis(XMVECTOR Look);
+
+	_float3 Get_Scaled() const {
+		return _float3(XMVectorGetX(XMVector3Length(Get_State(STATE_RIGHT))),
+			XMVectorGetX(XMVector3Length(Get_State(STATE_UP))),
+			XMVectorGetX(XMVector3Length(Get_State(STATE_LOOK))));
 	}
 
 	XMVECTOR Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
+
 	XMFLOAT4X4 Get_WorldFloat4x4_Inverse() {
 		XMFLOAT4X4	WorldMatrixInverse;
 		XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 		return WorldMatrixInverse;
 	}
+
 	XMMATRIX Get_WorldMatrix() const {
 		return XMLoadFloat4x4(&m_WorldMatrix);
 	}
@@ -75,8 +86,9 @@ public:
 	/*HRESULT Go_Direction(XMFLOAT3 fDir, float fTimeDelta);
 	HRESULT Move_Dir_Length(XMFLOAT3 fDir, float fLength);*/
 
-	void Turn(XMVECTOR vAxis, float fTimeDelta);
+	void Turn(XMVECTOR vAxis, float fRadian);
 	void Rotation(XMVECTOR vAxis, float fRadian);
+	void Rotation1(XMVECTOR vAxis, float fRadian);
 	void Orbit_For_TPS(_fvector vCenter, float fYRot, float fXRot);
 	void Orbit_For_FPS(_fvector vCenter, float fYRot, float fXRot);
 	void Orbit(_fvector vCenter, float fYawDeg, float fPitchDeg, float fDistance, float fDeltaTime, float fLagSpeed = 6.f);
