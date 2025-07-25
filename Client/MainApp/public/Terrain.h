@@ -21,6 +21,9 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+	float Get_Terrain_Heights(float x, float z);
+
 private:
 	CVIBuffer_Terrain* m_VIBufferCom;
 	CBBinding* m_CBBindingCom;

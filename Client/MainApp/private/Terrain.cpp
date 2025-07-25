@@ -17,6 +17,11 @@ HRESULT CTerrain::Initialize_Prototype()
     return S_OK;
 }
 
+float CTerrain::Get_Terrain_Heights(float x, float z)
+{
+    return m_VIBufferCom->Get_Terrain_Heights(x, z);
+}
+
 HRESULT CTerrain::Initialize(void* pArg)
 {
     __super::Initialize(pArg);
@@ -25,7 +30,7 @@ HRESULT CTerrain::Initialize(void* pArg)
 
     m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);    
 
-    m_VIBufferCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom");
+    m_VIBufferCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom",this);
 
     MaterialData mat{};
     mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", CTexture::Create(L"../bin/Models/TerrainDDS/Diffuse.dds"));

@@ -46,6 +46,8 @@ private:
 	float		m_fYRot_FPS;
 	float		m_fXRot_FPS;
 	float		m_Distance_FPS;
+
+	class CTerrain* m_Terrain;
 	
 	PERSPECTIVE m_PS = TPS;
 public:

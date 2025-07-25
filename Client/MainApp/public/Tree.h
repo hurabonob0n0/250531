@@ -5,7 +5,6 @@
 BEGIN(Engine)
 class CMeshModel;
 class CBBinding;
-class CVIBuffer_Terrain;
 END
 
 BEGIN(Client)
@@ -13,6 +12,7 @@ BEGIN(Client)
 class CTree : public CRenderObject
 {
 	struct TreeInfo {
+		TreeInfo();
 		TreeInfo(_uint type, _float2 pos);
 		_uint TreeType;
 		_float3 Position;
@@ -46,13 +46,6 @@ private:
 	void Make_TransformMatrix(TreeInfo TI) {
 		m_TransformCom->Identity();
 		m_TransformCom->Set_Scale(0.01f * TI.fScale);
-		
-		//_vector Look = m_TransformCom->Get_State(CTransform::STATE_LOOK);
-		//_matrix rotY = XMMatrixRotationY(XMConvertToRadians(TI.fAngle));
-		//_vector fallAxis = XMVector4Normalize(XMVectorSet(1.f, 0.f, 1.f, 0.f));
-		//_matrix rotColl = XMMatrixRotationAxis(fallAxis, XMConvertToRadians(TI.ColTime) * 30.f);
-		//Look = XMVector3TransformNormal(Look, (rotY * rotColl));
-		//m_TransformCom->Adjust_Axis(Look);
 
 		m_TransformCom->Turn(m_TransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(TI.fAngle));
 
@@ -65,11 +58,12 @@ private:
 
 private:
 	void Save_TreeInfos();
+	void Load_TreeInfos();
 
 private:
 	vector< CMeshModel*> m_VIBuffers;
 
-	CVIBuffer_Terrain* m_TerrainCom;
+	class CTerrain* m_Terrain;
 
 	vector<TreeInfo> m_TreeInfos;
 

@@ -2,6 +2,7 @@
 #include "Camera_Free.h"
 #include "GameInstance.h"
 #include "Client_Globals.h"
+#include "Terrain.h"
 
 CCamera_Free::CCamera_Free() : CCamera()
 {
@@ -32,7 +33,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	/*m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
 	Safe_AddRef(m_TankTransform);
 
 	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
@@ -55,17 +56,21 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_fXRot_FPS = 0.f;
 
-	m_fYRot_FPS = 0.f;*/
+	m_fYRot_FPS = 0.f;
 
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 5.f, 1.f));
+
+	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
 
 	return S_OK;
 }
 
 void CCamera_Free::Tick(float fTimeDelta)
 {
+
+
 	//__super::Tick(fTimeDelta);
-	/*if (m_GameInstance->Key_Down(VK_PAUSE))
+	if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
@@ -91,7 +96,7 @@ void CCamera_Free::Tick(float fTimeDelta)
 			break;
 		}
 
-	}*/
+	}
 
 }
 
@@ -102,6 +107,16 @@ void CCamera_Free::LateTick(float fTimeDelta)
 	XMMATRIX world = XMMatrixScaling(5000.f, 5000.f, 5000.f);
 	_matrix textransform = m_TexCoordTransformCom->Get_WorldMatrix();
 
+	_float3 Pos;
+
+	XMStoreFloat3(&Pos, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+
+	float terrainY = m_Terrain->Get_Terrain_Heights(Pos.x, Pos.z);
+
+	if (Pos.y <= terrainY)
+		Pos.y = terrainY + 1.f;
+
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Pos.x, Pos.y, Pos.z, 1.f));
 
 	m_CBBindingCom->Set_CBIndex();
 	m_CBBindingCom->Set_WorldMatrix(world);
