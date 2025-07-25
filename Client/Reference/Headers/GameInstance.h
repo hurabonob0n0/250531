@@ -11,7 +11,6 @@
 #include "ObjectMgr.h"
 #include "TextureMgr.h"
 #include "MaterialMgr.h"
-#include "Random_Manager.h"
 
 BEGIN(Engine)
 
@@ -99,15 +98,7 @@ public: //For PSOMgr
 public: //For RSMgr
 	ID3D12RootSignature* GetRootSignature(const std::string& name) const { return m_RootSignatureMgr->Get(name); }
 
-public: //For RandomMgr
-	void Tick() { m_RandomMgr->Tick(); }
-	_int Get_RandomI(_int iStart, _int iEnd)
-	{
-		return m_RandomMgr->Get_RandomI(iStart, iEnd);
-	}
-	float Get_RandomF(float Start, float End) {
-		return m_RandomMgr->Get_RandomF(Start, End);
-	}
+
 
 public:
 	void Free();
@@ -128,7 +119,6 @@ private:
 	CObjectMgr*				m_ObjectMgr;
 	CMaterialMgr*			m_MaterialMgr;
 	CTextureMgr*			m_TextureMgr;
-	CRandom_Manager*		m_RandomMgr;
 };
 
 END

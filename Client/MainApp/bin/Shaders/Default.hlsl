@@ -126,14 +126,9 @@ float4 PS(VertexOut pin) : SV_Target
             litColor.rgb += float3(0.f, 0.f, 0.05f);
     }    
     
-    if(gObjPad2 == 1)
-        litColor.r += 0.2f;
-    
-    else if (gObjPad2 == 2)
-        litColor.b += 0.2f;
-    
-    else if (gObjPad2 == 3)
-        litColor.rgb -= 0.1f;
+    if (gObjPad0 == 2)
+        if (gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC).a <= 0.5f)
+            discard;
     
     return litColor;
 }

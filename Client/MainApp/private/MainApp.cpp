@@ -112,7 +112,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
 	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/HeightD.png", 1.f, 1.f);
-	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,40.f,0.f);
+	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(500.f,40.f,0.f);
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
@@ -120,12 +120,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("TreeModel1", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
-	m_GameInstance->AddPrototype("TreeModel2", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_2.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
-	m_GameInstance->AddPrototype("TreeModel3", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_3.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
-	m_GameInstance->AddPrototype("TreeModel4", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_4.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
-	m_GameInstance->AddPrototype("TreeModel5", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_5.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
-	m_GameInstance->AddPrototype("TreeModel6", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_6.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("MeshModelCom", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX"));
+	
 
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
@@ -152,19 +148,19 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat4);
 
 
-	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
-	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
+
+	m_GameInstance->AddObject("Camera", "Camera", nullptr);
 	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
 	m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 	//m_GameInstance->AddObject("UI", "UI", nullptr);
 
-	/*_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	m_GameInstance->AddObject("Tree", "Tree", &mat5);*/
 	//_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	m_GameInstance->AddObject("Tree", "Tree", nullptr);
+	//m_GameInstance->AddObject("Tree", "Tree", &mat5);
+	/*_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
+	m_GameInstance->AddObject("Tree", "Tree", nullptr);*/
 
 	m_GameInstance->Execute_CommandList();
 

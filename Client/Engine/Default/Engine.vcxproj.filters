@@ -118,9 +118,6 @@
     <Filter Include="02.Utilities\00.Component\00.VIBuffer\02.VIBuffer_Mesh">
       <UniqueIdentifier>{0cd79588-cec8-40f3-8934-48db86ef3c16}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.System\07.RandomMgr">
-      <UniqueIdentifier>{8ce46c69-c004-4086-b44b-23a2e7ac3de6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Engine_Defines.h">
@@ -261,9 +258,6 @@
     <ClInclude Include="..\public\VIBuffer_Mesh.h">
       <Filter>02.Utilities\00.Component\00.VIBuffer\02.VIBuffer_Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Random_Manager.h">
-      <Filter>01.System\07.RandomMgr</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -388,9 +382,6 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Mesh.cpp">
       <Filter>02.Utilities\00.Component\00.VIBuffer\02.VIBuffer_Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Random_Manager.cpp">
-      <Filter>01.System\07.RandomMgr</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

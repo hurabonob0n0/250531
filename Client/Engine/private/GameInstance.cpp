@@ -18,10 +18,6 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 
 	//GraphicDev
 	m_Graphic_Dev->Initialize(windowInfo);
-
-	//RandomMgr
-	m_RandomMgr = CRandom_Manager::Get_Instance();
-	m_RandomMgr->Tick();
 	
 	//FrameResourceMgr + GraphicDev
 	m_FrameResourceMgr->Initialize(m_Graphic_Dev->Get_Device(), m_Graphic_Dev->Get_CommandList(), m_Graphic_Dev->Get_CommandQueue(), g_NumFrameResources);
@@ -157,5 +153,4 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_Input_Dev);
 	Safe_Release(m_TextureMgr);
 	Safe_Release(m_MaterialMgr);
-	Safe_Release(m_RandomMgr);
 }

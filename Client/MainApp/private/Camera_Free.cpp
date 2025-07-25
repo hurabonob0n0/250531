@@ -32,18 +32,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	/*m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
-	Safe_AddRef(m_TankTransform);
-
-	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
-	Safe_AddRef(m_Tank);
-
 	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
 	Safe_AddRef(m_TankTransform);
 
 	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
-	Safe_AddRef(m_Tank);*/
-
+	Safe_AddRef(m_Tank);
 
 	m_Distance_TPS = 20.f;
 
@@ -65,9 +58,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 void CCamera_Free::Tick(float fTimeDelta)
 {
 
-	
 	//__super::Tick(fTimeDelta);
-	/*if (m_GameInstance->Key_Down(VK_PAUSE))
+	if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
@@ -93,35 +85,7 @@ void CCamera_Free::Tick(float fTimeDelta)
 			break;
 		}
 
-	}*/
-	__super::Tick(fTimeDelta);
-	/*if (m_GameInstance->Key_Down(VK_PAUSE))
-		m_isPaused = !m_isPaused;
-
-	if (!m_isPaused) {
-		if (m_GameInstance->Mouse_Down(1))
-		{
-			if (m_PS == FPS)
-				m_PS = TPS;
-
-			else if (m_PS == TPS)
-				m_PS = FPS;
-		}
-
-		switch (m_PS)
-		{
-		case Client::CCamera_Free::FPS:
-			Tick_For_FPS(fTimeDelta);
-			break;
-		case Client::CCamera_Free::TPS:
-			Tick_For_TPS(fTimeDelta);
-			break;
-
-		default:
-			break;
-		}
-
-	}*/
+	}
 
 }
 

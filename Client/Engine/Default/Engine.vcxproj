@@ -47,7 +47,6 @@
     <ClInclude Include="..\public\ObjectMgr.h" />
     <ClInclude Include="..\public\PSO.h" />
     <ClInclude Include="..\public\PSOMgr.h" />
-    <ClInclude Include="..\public\Random_Manager.h" />
     <ClInclude Include="..\public\RawInput.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\RenderObject.h" />
@@ -95,7 +94,6 @@
     <ClCompile Include="..\private\ObjectMgr.cpp" />
     <ClCompile Include="..\private\PSO.cpp" />
     <ClCompile Include="..\private\PSOMgr.cpp" />
-    <ClCompile Include="..\private\Random_Manager.cpp" />
     <ClCompile Include="..\private\RawInput.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\RenderObject.cpp" />

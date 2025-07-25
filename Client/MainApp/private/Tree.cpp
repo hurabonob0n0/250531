@@ -12,189 +12,96 @@ CTree::CTree(CTree& rhs) : CRenderObject(rhs)
 
 HRESULT CTree::Initialize_Prototype()
 {
-	__super::Initialize_Prototype();
+    __super::Initialize_Prototype();
 
-	return S_OK;
+    return S_OK;
 }
 
 HRESULT CTree::Initialize(void* pArg)
 {
-	m_RG = CRenderer::RG_NONBLEND;
+    m_RG = CRenderer::RG_NONBLEND;
 
-	__super::Initialize(pArg);
+    __super::Initialize(pArg);
+    
+    m_VIBuffer = (CMeshModel*)m_GameInstance->Get_Component("MeshModelCom");
 
-	/*m_VIBuffer1 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel1");
-	m_VIBuffer2 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel2");
-	m_VIBuffer3 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel3");
-	m_VIBuffer4 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel4");
-	m_VIBuffer5 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel5");
-	m_VIBuffer6 = (CMeshModel*)m_GameInstance->Get_Component("TreeModel6");*/
+    m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
+    m_CBBindingCom2 = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel1"));
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel2"));
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel3"));
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel4"));
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel5"));
-	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel6"));
+    MaterialData MD{};
 
-	m_TerrainCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom",this);
-	
-	for (int i = 0; i < 150; ++i)
-	{
-		m_TreeInfos.emplace_back(TreeInfo{ (_uint)m_GameInstance->Get_RandomI(0,5),_float2(m_GameInstance->Get_RandomF(-600.f,600.f),m_GameInstance->Get_RandomF(-600.f,600.f)) });
-		m_TreeInfos[i].fScale= m_GameInstance->Get_RandomF(0.5f, 1.f);
-		m_TreeInfos[i].Set_Y(m_TerrainCom->Get_Terrain_Heights(m_TreeInfos[i].Position.x, m_TreeInfos[i].Position.z) /*- m_TreeInfos[i].fScale * 2.f*/);
-		m_TreeInfos[i].fAngle = m_GameInstance->Get_RandomI(0, 360);
-	}
+    XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
+    MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
+    MD.NormalMapIndex = m_GameInstance->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
+    m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("BarkMat", MD));
+    
+    MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BranchD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Branch_Base_Color.dds"));
+    MD.NormalMapIndex = m_GameInstance->Add_Texture("BranchN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Branch_Normal.dds"));
+    m_CBBindingCom2->Set_MaterialIndex(m_GameInstance->Add_Material("BranchMat", MD));
+    m_CBBindingCom2->Set_Pad0(2);
 
-	for (int i = 0; i < 150; ++i)
-	{
-		m_TreeInfos[i].m_CBBindingCom = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
+    m_TransformCom->Rotation(m_TransformCom->Get_State(CTransform::STATE_RIGHT), XMConvertToRadians(-90.f));
+    m_TransformCom->Set_Scale(0.01f);
+    m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 40.f, 20.f,1.f));
+    //m_TransformCom->Set_Scale(300.f);
 
-		m_TreeInfos[i].m_CBBindingCom->Set_TexCoordMatrix(m_TexCoordTransformCom);
+    m_TexCoordTransformCom->Set_Scale(CTransform::STATE_RIGHT, 0.5f);
+    m_TexCoordTransformCom->Set_Scale(CTransform::STATE_UP, 0.5f);
 
-		MaterialData MD{};
-
-		XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
-		MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
-		MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
-		m_TreeInfos[i].m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("BarkMat", MD));
-	}
-
-	return S_OK;
+    return S_OK;
 }
 
 void CTree::Tick(float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+    __super::Tick(fTimeDelta);
 
-	//m_TransformCom->Rotation(m_TransformCom->Get_State(CTransform::STATE_UP), 31.4f * fTimeDelta);
+    //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 
-	/*if (m_GameInstance->Key_Down(VK_RIGHT))
-		++m_Test;
+    if (m_GameInstance->Key_Down(VK_RIGHT))
+        ++m_Test;
 
-	if (m_GameInstance->Key_Down(VK_LEFT))
-		--m_Test;*/
-
-	if (m_TreeInfos.size() == 0)
-		return;
-
-	if (m_GameInstance->Key_Down(VK_RETURN))
-		Save_TreeInfos();
-
-	/*for (int i = 0; i < 50; ++i)
-	{
-		Set_Col_Tree(i, _float2(-1, -1));
-	}*/
-
-	//Set_Col_Tree(0,_float2(-1,-1));
-	//Set_Col_Tree(1, _float2(-1, -1));
-	//Set_Col_Tree(2, _float2(-1, -1));
+    if (m_GameInstance->Key_Down(VK_LEFT))
+        --m_Test;
 }
 
 void CTree::LateTick(float fTimeDelta)
 {
-	__super::LateTick(fTimeDelta);
+    __super::LateTick(fTimeDelta);
 
-	if (m_TreeInfos.size() == 0)
-		return;
-
-	for (auto& Ti : m_TreeInfos)
-	{
-		if (Ti.isColl == true)
-			Ti.ColTime += fTimeDelta*0.5f;
-	}
-
-
-//	m_TreeInfos.erase(m_TreeInfos.begin() + i);
-
-	m_TreeInfos.erase(
-		std::remove_if(m_TreeInfos.begin(), m_TreeInfos.end(),
-			[](const TreeInfo& info) {
-				return info.ColTime >= 3.f;
-			}),
-		m_TreeInfos.end());
-	
+    m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
+    m_CBBindingCom2->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
 }
 
 void CTree::Render()
 {
+    m_CBBindingCom->Set_On_Shader();
 
-	if (m_TreeInfos.size() == 0)
-		return;
+    m_VIBuffer->Render(m_Test);
 
-	for (int i = 0; i < m_TreeInfos.size(); ++i)
-	{
-		TreeInfo TI = m_TreeInfos[i];
+    m_CBBindingCom2->Set_On_Shader();
 
-		TI.m_CBBindingCom->Set_CBIndex();
-
-		Make_TransformMatrix(TI);
-
-		TI.m_CBBindingCom->Set_WorldMatrix(m_TransformCom);
-		
-		TI.m_CBBindingCom->Update_CBView();
-
-		TI.m_CBBindingCom->Set_On_Shader();
-
-		if (TI.TreeType == 0 || TI.TreeType == 1)
-		{
-			m_VIBuffers[TI.TreeType]->Render(1);
-			m_VIBuffers[TI.TreeType]->Render(3);
-		}
-		else
-			m_VIBuffers[TI.TreeType]->Render(1);
-	}
-
-}
-
-void CTree::Set_Col_Tree(int index, _float2 ColPos)
-{
-	m_TreeInfos[index].isColl = true;
-	m_TreeInfos[index].ColPos = ColPos;
-}
-
-void CTree::Save_TreeInfos()
-{
-	struct SaveInfo {
-		_float2 Pos;
-		float Scale;
-	};
-	SaveInfo SI{};
-
-	std::ofstream fout("../bin/Models/Tree/TreeInfos", std::ios::binary);
-
-	for (auto& TI : m_TreeInfos)
-	{
-		SI.Pos = _float2(TI.Position.x, TI.Position.z);
-		SI.Scale = TI.fScale;
-		fout.write((const char*)&SI, sizeof(SaveInfo));
-	}
+    m_VIBuffer->Render(m_Test+2);
 }
 
 void CTree::Free()
 {
-	for (auto& VIBuffer : m_VIBuffers)
-		Safe_Release(VIBuffer);
+    Safe_Release(m_VIBuffer);
+    Safe_Release(m_CBBindingCom);
+    Safe_Release(m_CBBindingCom2);
 
-	__super::Free();
+    __super::Free();
 }
 
 CTree* CTree::Create()
 {
-	CTree* pInstance = new CTree;
-	pInstance->Initialize_Prototype();
-	return pInstance;
+    CTree* pInstance = new CTree;
+    pInstance->Initialize_Prototype();
+    return pInstance;
 }
 
 CRenderObject* CTree::Clone(void* pArg)
 {
-	CTree* pInstance = new CTree(*this);
-	pInstance->Initialize(pArg);
-	return pInstance;
-}
-
-CTree::TreeInfo::TreeInfo(_uint type, _float2 pos)
-{
-	TreeType = type; Position = _float3(pos.x,0.f,pos.y); 
+    CTree* pInstance = new CTree(*this);
+    pInstance->Initialize(pArg);
+    return pInstance;
 }

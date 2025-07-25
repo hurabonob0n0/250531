@@ -13,63 +13,31 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(CVIBuffer_Terrain& rhs): CVIBuffer(rhs), m_
 
 float CVIBuffer_Terrain::Get_Terrain_Heights(float x, float z)
 {
-    //int LX = int(x + NUMVERTERTICES/2.f);
-    //int DZ = int(z + NUMVERTERTICES / 2.f);
+    int LX = int(x + 4096.f);
+    int DZ = int(z + 4096.f);
 
-    //if (x < -NUMVERTERTICES / 2.f || z < -NUMVERTERTICES / 2.f || x > NUMVERTERTICES / 2.f || z > NUMVERTERTICES / 2.f)
-    //    return 0.f;
-
-    //_vector Positions[4];
-
-    ///*Positions[0] = XMLoadFloat3( &m_vertices[(DZ + 1) * NUMVERTERTICES + LX].vPosition);
-    //Positions[1] = XMLoadFloat3( &m_vertices[(DZ + 1) * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[2] = XMLoadFloat3( &m_vertices[DZ * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[3] = XMLoadFloat3( &m_vertices[DZ * NUMVERTERTICES + LX].vPosition);*/
-
-    //Positions[0] = XMVectorSet(m_heightMap[(DZ + 1) * NUMVERTERTICES + LX]);
-    //Positions[1] = XMLoadFloat3(&m_vertices[(DZ + 1) * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[2] = XMLoadFloat3(&m_vertices[DZ * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[3] = XMLoadFloat3(&m_vertices[DZ * NUMVERTERTICES + LX].vPosition);
-
-    //float DeltaX = x - float(LX) + NUMVERTERTICES / 2.f;
-    //float DeltaZ = z - float(DZ) + NUMVERTERTICES / 2.f;
-
-    //_vector PlaneNormal;
-
-    //if (DeltaX + DeltaZ <= 1)
-    //    PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[2], Positions[3]);
-
-    //if (DeltaX + DeltaZ > 1)
-    //    PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[1], Positions[2]);
-
-    //return -(XMVectorGetX(PlaneNormal) * x + XMVectorGetZ(PlaneNormal) * z + XMVectorGetW(PlaneNormal)) / XMVectorGetY(PlaneNormal);
-     float half = NUMVERTERTICES / 2.f;
-
-    int LX = int(x + half);
-    int DZ = int(z + half);
-
-    if (x < -half || z < -half || x > half || z > half)
+    if (x < -4096 || z < -4096 || x > 4096 || z > 4096)
         return 0.f;
 
-    //return m_heightMap[DZ * half + LX];
-
     _vector Positions[4];
-    Positions[0] = XMVectorSet(LX - half, m_heightMap[(DZ + 1) * NUMVERTERTICES + LX], DZ + 1 - half, 1.f);
-    Positions[1] = XMVectorSet(LX + 1 - half, m_heightMap[(DZ + 1) * NUMVERTERTICES + LX + 1], DZ + 1 - half, 1.f);
-    Positions[2] = XMVectorSet(LX + 1 - half, m_heightMap[DZ * NUMVERTERTICES + LX + 1], DZ - half, 1.f);
-    Positions[3] = XMVectorSet(LX - half, m_heightMap[DZ * NUMVERTERTICES + LX], DZ - half, 1.f);
 
-    float DeltaX = x - float(LX - half);
-    float DeltaZ = z - float(DZ - half);
+    Positions[0] = XMLoadFloat3( &m_vertices[(DZ + 1) * 8192 + LX].vPosition);
+    Positions[1] = XMLoadFloat3( &m_vertices[(DZ + 1) * 8192 + LX + 1].vPosition);
+    Positions[2] = XMLoadFloat3( &m_vertices[DZ * 8192 + LX + 1].vPosition);
+    Positions[3] = XMLoadFloat3( &m_vertices[DZ * 8192 + LX].vPosition);
+
+    float DeltaX = x - float(LX) + 4096.f;
+    float DeltaZ = z - float(DZ) + 4096.f;
 
     _vector PlaneNormal;
 
     if (DeltaX + DeltaZ <= 1)
         PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[2], Positions[3]);
-    else
+
+    if (DeltaX + DeltaZ > 1)
         PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[1], Positions[2]);
 
-    return -(XMVectorGetX(PlaneNormal) * x + XMVectorGetZ(PlaneNormal) * z + XMVectorGetW(PlaneNormal)) / XMVectorGetY(PlaneNormal);
+    return -(XMVectorGetX(PlaneNormal) * x + XMVectorGetZ(PlaneNormal) * z + XMVectorGetW(PlaneNormal)) / XMVectorGetY(PlaneNormal) + 0.5f;
 }
 
 HRESULT CVIBuffer_Terrain::Initialize_Prototype()
@@ -79,9 +47,6 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype()
 
 HRESULT CVIBuffer_Terrain::Initialize(void* pArg)
 {
-    if(pArg != nullptr)
-        Read_Map();
-
     return S_OK;
 }
 
@@ -320,32 +285,6 @@ void CVIBuffer_Terrain::Make_Buffer(const char* filepath)
 
     vertices.clear();
     indices.clear();
-}
-
-void CVIBuffer_Terrain::Read_Map()
-{
-    std::ifstream inFile("../bin/Models/Terrain/Terrain4096Map.bin", std::ios::binary);
-    if (!inFile.is_open())
-        return;
-
-    m_heightMap.resize(4096 * 4096);
-
-    float fx, y, fz;
-    for (int z = 0; z < 4096; ++z)
-    {
-        for (int x = 0; x < 4096; ++x)
-        {
-            inFile.read(reinterpret_cast<char*>(&fx), sizeof(float));
-            inFile.read(reinterpret_cast<char*>(&y), sizeof(float));
-            inFile.read(reinterpret_cast<char*>(&fz), sizeof(float));
-
-            int idx = z * 4096 + x;
-            m_heightMap[idx] = y;
-        }
-    }
-
-    inFile.close();
-    return;
 }
 
 XMFLOAT3 CVIBuffer_Terrain::Add3(const XMFLOAT3& a, XMVECTOR b)

@@ -13,7 +13,7 @@ void CFrameResource::Initialize(ID3D12Device* device)
         MSG_BOX("Failed to Create : CommandListAllocator");
 
     m_PassCB = CUploadBuffer<PassConstants>::Create(device, 1, true);
-    m_ObjectCB = CUploadBuffer<ObjectConstants>::Create(device, 4000, true);
+    m_ObjectCB = CUploadBuffer<ObjectConstants>::Create(device, 1000, true);
     m_MaterialCB = CUploadBuffer<MaterialData>::Create(device, 1000, false);
 }
 
