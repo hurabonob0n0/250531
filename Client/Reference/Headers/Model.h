@@ -29,6 +29,7 @@ public:
 
 public:
 	void Set_MatIndex(_uint MeshIndex, _uint MatIndex);
+	void Set_Team(int redorblue);
 
 public:
 	void Invalidate_Bones();

@@ -16,7 +16,7 @@ private:
 	virtual ~CVIBuffer_Mesh() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh);
+	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity());
 	virtual HRESULT Initialize(void* pArg);
 
 public:
@@ -24,11 +24,11 @@ public:
 	virtual HRESULT Render();
 
 private:
-	HRESULT Ready_Mesh(const aiMesh* pAIMesh);
+	HRESULT Ready_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity());
 
 
 public:
-	static CVIBuffer_Mesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext,  const aiMesh* pAIMesh);
+	static CVIBuffer_Mesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext,  const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity());
 	virtual CComponent* Clone(void* pArg);
 	virtual void Free() override;
 };
