@@ -34,9 +34,9 @@ HWND g_hWnd;
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// CreateWindow°¡ ¿Ï·áµÇ±â Àü¿¡´Â mhMainWnd´Â À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù.
-	// ÇÏÁö¸¸ CreateWindow°¡ ¿Ï·áµÇ±â Àü¿¡ ¸Ş¼¼Áö (¿¹¸¦ µé¾î WM_CREATE)¸¦
-	// ¹ŞÀ» ¼ö ÀÖ±â ¶§¹®¿¡ hwnd¸¦ Àü´ŞÇÕ´Ï´Ù.
+	// CreateWindowê°€ ì™„ë£Œë˜ê¸° ì „ì—ëŠ” mhMainWndëŠ” ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+	// í•˜ì§€ë§Œ CreateWindowê°€ ì™„ë£Œë˜ê¸° ì „ì— ë©”ì„¸ì§€ (ì˜ˆë¥¼ ë“¤ì–´ WM_CREATE)ë¥¼
+	// ë°›ì„ ìˆ˜ ìˆê¸° ë•Œë¬¸ì— hwndë¥¼ ì „ë‹¬í•©ë‹ˆë‹¤.
 	return CMainApp::Get_Instance()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
@@ -113,7 +113,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	//ConnectServer();
 
-#pragma endregion ¿©±â ÁÖ¼®Ã³¸®ÇÏ¸é ¼­¹ö ¿¬°á ¾øÀÌ µ¿ÀÛ °¡´É
+#pragma endregion ì—¬ê¸° ì£¼ì„ì²˜ë¦¬í•˜ë©´ ì„œë²„ ì—°ê²° ì—†ì´ ë™ì‘ ê°€ëŠ¥
 
 
 
@@ -123,7 +123,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	/*m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
 	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/HeightD.png", 1.f, 1.f);
-	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(500.f,40.f,0.f);*/
+
+	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,40.f,0.f);
+
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
@@ -131,8 +133,14 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	/*m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("MeshModelCom", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX"));*/
-	
+
+	m_GameInstance->AddPrototype("TreeModel1", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("TreeModel2", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_2.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("TreeModel3", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_3.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("TreeModel4", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_4.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("TreeModel5", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_5.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+	m_GameInstance->AddPrototype("TreeModel6", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_6.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
+
 
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	/*m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
@@ -158,20 +166,20 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);*/
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat4);
 
-
-
-	m_GameInstance->AddObject("Camera", "Camera", nullptr);
-	/*_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
-	m_GameInstance->AddObject("Effect", "Effect", &mat3);*/
+	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
+	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
+	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
+	m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
-	/*dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();*/
+	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+
 
 	//m_GameInstance->AddObject("UI", "UI", nullptr);
 
-	//_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	//m_GameInstance->AddObject("Tree", "Tree", &mat5);
 	/*_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	m_GameInstance->AddObject("Tree", "Tree", nullptr);*/
+	m_GameInstance->AddObject("Tree", "Tree", &mat5);*/
+	//_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
+	m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
 	m_GameInstance->Execute_CommandList();
 
@@ -191,13 +199,13 @@ int CMainApp::Run()
 
 	while (msg.message != WM_QUIT)
 	{
-		// Ã³¸®ÇØ¾ßÇÒ À©µµ¿ì ¸Ş¼¼ÁöµéÀÌ ÀÖ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+		// ì²˜ë¦¬í•´ì•¼í•  ìœˆë„ìš° ë©”ì„¸ì§€ë“¤ì´ ìˆëŠ”ì§€ í™•ì¸í•©ë‹ˆë‹¤.
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		// Ã³¸®ÇØ¾ßÇÒ ¸Ş¼¼Áö°¡ ¾ø´Â °æ¿ì, ¿¡´Ï¸ŞÀÌ¼Ç°ú °ÔÀÓÀ» Ã³¸®ÇÕ´Ï´Ù.
+		// ì²˜ë¦¬í•´ì•¼í•  ë©”ì„¸ì§€ê°€ ì—†ëŠ” ê²½ìš°, ì—ë‹ˆë©”ì´ì…˜ê³¼ ê²Œì„ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
 		else
 		{
 			m_Timer->Tick();
@@ -216,13 +224,13 @@ int CMainApp::Run()
 
 
 				//RECT rect;
-				//GetClientRect(m_hMainWnd, &rect);         // Å¬¶óÀÌ¾ğÆ® ¿µ¿ª ÁÂÇ¥
+				//GetClientRect(m_hMainWnd, &rect);         // í´ë¼ì´ì–¸íŠ¸ ì˜ì—­ ì¢Œí‘œ
 				//POINT center = {
 				//	(rect.right - rect.left) / 2,
 				//	(rect.bottom - rect.top) / 2
 				//};
 				// 
-				//// Å¬¶óÀÌ¾ğÆ® ÁÂÇ¥ ¡æ ½ºÅ©¸° ÁÂÇ¥·Î º¯È¯
+				//// í´ë¼ì´ì–¸íŠ¸ ì¢Œí‘œ â†’ ìŠ¤í¬ë¦° ì¢Œí‘œë¡œ ë³€í™˜
 				//ClientToScreen(m_hMainWnd, &center);
 
 				//SetCursorPos(center.x, center.y);
@@ -248,9 +256,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-		// WM_ACTIVATE´Â À©µµ¿ì°¡ È°¼ºÈ­ µÇ°Å³ª ºñÈ°¼ºÈ­ µÉ¶§ º¸³»Áı´Ï´Ù.
-		// À©µµ¿ì°¡ ºñÈ°¼ºÈ­ µÇ¾úÀ» ¶§´Â °ÔÀÓÀ» ÁßÁö½ÃÅ°°í
-		// ´Ù½Ã È°¼ºÈ­ µÇ¾úÀ» ¶§´Â °ÔÀÓÀ» ´Ù½Ã Àç°ÔÇÕ´Ï´Ù.
+		// WM_ACTIVATEëŠ” ìœˆë„ìš°ê°€ í™œì„±í™” ë˜ê±°ë‚˜ ë¹„í™œì„±í™” ë ë•Œ ë³´ë‚´ì§‘ë‹ˆë‹¤.
+		// ìœˆë„ìš°ê°€ ë¹„í™œì„±í™” ë˜ì—ˆì„ ë•ŒëŠ” ê²Œì„ì„ ì¤‘ì§€ì‹œí‚¤ê³ 
+		// ë‹¤ì‹œ í™œì„±í™” ë˜ì—ˆì„ ë•ŒëŠ” ê²Œì„ì„ ë‹¤ì‹œ ì¬ê²Œí•©ë‹ˆë‹¤.
 	case WM_ACTIVATE:
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
@@ -264,9 +272,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 
-		// WM_SIZE´Â »ç¿ëÀÚ°¡ À©µµ¿ì Å©±â¸¦ º¯°æÇÒ ¶§ º¸³»Áı´Ï´Ù.
+		// WM_SIZEëŠ” ì‚¬ìš©ìê°€ ìœˆë„ìš° í¬ê¸°ë¥¼ ë³€ê²½í•  ë•Œ ë³´ë‚´ì§‘ë‹ˆë‹¤.
 	case WM_SIZE:
-		// »õ·Î¿î À©µµ¿ì Å©±â¸¦ ÀúÀåÇÕ´Ï´Ù.
+		// ìƒˆë¡œìš´ ìœˆë„ìš° í¬ê¸°ë¥¼ ì €ì¥í•©ë‹ˆë‹¤.
 		m_ClientWidth = LOWORD(lParam);
 		m_ClientHeight = HIWORD(lParam);
 		//m_FullscreenState = !m_FullscreenState;
@@ -274,15 +282,15 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_GameInstance->OnResize();*/
 		return 0;
 
-		// À©µµ¿ì°¡ ÆÄ±«µÉ ¶§ WM_DESTORY°¡ º¸³»Áı´Ï´Ù.
+		// ìœˆë„ìš°ê°€ íŒŒê´´ë  ë•Œ WM_DESTORYê°€ ë³´ë‚´ì§‘ë‹ˆë‹¤.
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 
-		// WM_MENUCAR´Â ¸Ş´º°¡ È°¼ºÈ­ µÉ¶§ º¸³»Áı´Ï´Ù.
-		// »ç¿ëÀÚ°¡ ´Ï¸ğ´Ğ, °¡¼Ó±â Å°¿¡ ÇØ´çÇÏÁö ¾Ê´Â Å°¸¦ ´©¸¨´Ï´Ù.
+		// WM_MENUCARëŠ” ë©”ë‰´ê°€ í™œì„±í™” ë ë•Œ ë³´ë‚´ì§‘ë‹ˆë‹¤.
+		// ì‚¬ìš©ìê°€ ë‹ˆëª¨ë‹‰, ê°€ì†ê¸° í‚¤ì— í•´ë‹¹í•˜ì§€ ì•ŠëŠ” í‚¤ë¥¼ ëˆ„ë¦…ë‹ˆë‹¤.
 	case WM_MENUCHAR:
-		// ¾ËÆ® + ¿£ÅÍ¸¦ ÀÔ·Â½Ã ºñÇÁÀ½ÀÌ ¹ß»ıÇÏ´Â°ÍÀ» ¹æÁöÇÕ´Ï´Ù.
+		// ì•ŒíŠ¸ + ì—”í„°ë¥¼ ì…ë ¥ì‹œ ë¹„í”„ìŒì´ ë°œìƒí•˜ëŠ”ê²ƒì„ ë°©ì§€í•©ë‹ˆë‹¤.
 		return MAKELRESULT(0, MNC_CLOSE);
 
 	case WM_INPUT:
@@ -323,7 +331,7 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 		return false;
 	}
 
-	// Å¬¶óÀÌ¾ğÆ®ÀÇ Å©±â¸¦ ±â¹İÀ¸·Î À©µµ¿ì »ç°¢ÇüÀ» °è»êÇÕ´Ï´Ù.
+	// í´ë¼ì´ì–¸íŠ¸ì˜ í¬ê¸°ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ìœˆë„ìš° ì‚¬ê°í˜•ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
 	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
@@ -378,7 +386,7 @@ void CMainApp::CalculateFrameStats()
 
 	++frameCnt;
 
-	// 1ÃÊ µ¿¾ÈÀÇ Æò±ÕÀ» °è»êÇÕ´Ï´Ù.
+	// 1ì´ˆ ë™ì•ˆì˜ í‰ê· ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
 	if ((m_Timer->TotalTime() - timeElapsed >= 1.0f))
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1;
@@ -395,7 +403,7 @@ void CMainApp::CalculateFrameStats()
 
 		SetWindowText(m_hMainWnd, windowText.c_str());
 
-		// ´ÙÀ½ Æò±ÕÀ» À§ÇØ ÃÊ±âÈ­ ÇÕ´Ï´Ù.
+		// ë‹¤ìŒ í‰ê· ì„ ìœ„í•´ ì´ˆê¸°í™” í•©ë‹ˆë‹¤.
 		frameCnt = 0;
 		timeElapsed += 1.0f;
 	}
@@ -449,7 +457,7 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 	HWND hWnd;
 	MSG msg = { 0 };
 
-	// À©µµ¿ì Å¬·¡½º µî·Ï
+	// ìœˆë„ìš° í´ë˜ìŠ¤ ë“±ë¡
 	WNDCLASS wc = {};
 	wc.lpfnWndProc = LobbyWndProc;
 	wc.hInstance = hInstance;
@@ -458,7 +466,7 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 
 	RECT rc{ 0,0,LOBBY_WINCX,LOBBY_WINCY };
 
-	hWnd = CreateWindow(L"LobbyWnd", L"°ÔÀÓ ·Îºñ", WS_OVERLAPPEDWINDOW,
+	hWnd = CreateWindow(L"LobbyWnd", L"ê²Œì„ ë¡œë¹„", WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
 
 	ShowWindow(hWnd, showCmd);
