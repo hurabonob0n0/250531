@@ -55,7 +55,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_fXRot_FPS = 0.f;
 
-	m_fYRot_FPS = 0.f;
+	m_fYRot_FPS = 0.f;*/
 
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 5.f, 1.f));
 
@@ -64,37 +64,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 void CCamera_Free::Tick(float fTimeDelta)
 {
-
-	
 	//__super::Tick(fTimeDelta);
-	/*if (m_GameInstance->Key_Down(VK_PAUSE))
-		m_isPaused = !m_isPaused;
-
-	if (!m_isPaused) {
-		if (m_GameInstance->Mouse_Down(1))
-		{
-			if (m_PS == FPS)
-				m_PS = TPS;
-
-			else if (m_PS == TPS)
-				m_PS = FPS;
-		}
-
-		switch (m_PS)
-		{
-		case Client::CCamera_Free::FPS:
-			Tick_For_FPS(fTimeDelta);
-			break;
-		case Client::CCamera_Free::TPS:
-			Tick_For_TPS(fTimeDelta);
-			break;
-
-		default:
-			break;
-		}
-
-	}*/
-	__super::Tick(fTimeDelta);
 	/*if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
@@ -218,15 +188,15 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 	_vector camPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
 	_vector camLook = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));
 
-	// ÃÑ¾Ë ½ºÆù À§Ä¡: Ä«¸Þ¶ó ¹æÇâ ±âÁØ Á¤¸é 6.f ¾Õ
+	// ì´ì•Œ ìŠ¤í° ìœ„ì¹˜: ì¹´ë©”ë¼ ë°©í–¥ ê¸°ì¤€ ì •ë©´ 6.f ì•ž
 	_vector muzzlePos = camPos + camLook * 6.f;
 
-	// ÃÑ¾Ë¿ë Çà·Ä ±¸¼º
+	// ì´ì•Œìš© í–‰ë ¬ êµ¬ì„±
 	_matrix matforBox = XMMatrixIdentity();
-	matforBox.r[2] = camLook;       // Look ¹æÇâ
-	matforBox.r[3] = muzzlePos;     // À§Ä¡
+	matforBox.r[2] = camLook;       // Look ë°©í–¥
+	matforBox.r[3] = muzzlePos;     // ìœ„ì¹˜
 
-	// ¹ß»ç Á¤º¸ Àü´Þ
+	// ë°œì‚¬ ì •ë³´ ì „ë‹¬
 
 	m_Tank->Set_ShotMatrix(matforBox);
 	m_Tank->Set_PotapRotation(m_fYRot_FPS);

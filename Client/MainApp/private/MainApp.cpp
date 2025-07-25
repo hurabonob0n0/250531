@@ -17,18 +17,26 @@
 #include "ThreadManager.h"
 #include "Session.h"
 #include "BufferReader.h"
-#include "ClientPacketHandler.h"
-#include "ServiceManager.h"
+//#include "ClientPacketHandler.h"
+//#include "ServiceManager.h"
 
+/*----------------
+	For Lobby
+---------------*/
+#include "GameLobby.h"
 
 IMPLEMENT_SINGLETON(CMainApp)
+
+bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd);
+LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+HWND g_hWnd;
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// CreateWindow∞° øœ∑·µ«±‚ ¿¸ø°¥¬ mhMainWnd¥¬ ¿Ø»ø«œ¡ˆ æ Ω¿¥œ¥Ÿ.
-	// «œ¡ˆ∏∏ CreateWindow∞° øœ∑·µ«±‚ ¿¸ø° ∏ﬁºº¡ˆ (øπ∏¶ µÈæÓ WM_CREATE)∏¶
-	// πﬁ¿ª ºˆ ¿÷±‚ ∂ßπÆø° hwnd∏¶ ¿¸¥ﬁ«’¥œ¥Ÿ.
+	// CreateWindowÍ∞Ä ÏôÑÎ£åÎêòÍ∏∞ Ï†ÑÏóêÎäî mhMainWndÎäî Ïú†Ìö®ÌïòÏßÄ ÏïäÏäµÎãàÎã§.
+	// ÌïòÏßÄÎßå CreateWindowÍ∞Ä ÏôÑÎ£åÎêòÍ∏∞ Ï†ÑÏóê Î©îÏÑ∏ÏßÄ (ÏòàÎ•º Îì§Ïñ¥ WM_CREATE)Î•º
+	// Î∞õÏùÑ Ïàò ÏûàÍ∏∞ ÎïåÎ¨∏Ïóê hwndÎ•º Ï†ÑÎã¨Ìï©ÎãàÎã§.
 	return CMainApp::Get_Instance()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
@@ -36,6 +44,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
 {
 	//_CrtSetBreakAlloc(8420);
+
+	if (!RunLobbyWindowLoop(hInstance, showCmd))
+	return 0;
 
 	CMainApp* mainApp = CMainApp::Get_Instance();
 	if (FAILED(mainApp->Initialize(hInstance)))
@@ -47,38 +58,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CMainApp::CMainApp() : m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
 {
 }
-
-#pragma region ForServerSession
-
-class ServerSession : public PacketSession
-{
-public:
-	~ServerSession()
-	{
-	}
-
-	virtual void OnConnected() override
-	{
-		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
-		Send(sendBuffer);
-	}
-
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
-	{
-		ClientPacketHandler::HandlePacket(buffer, len);
-	}
-
-	virtual void OnSend(int32 len) override
-	{
-	}
-
-	virtual void OnDisconnected() override
-	{
-	}
-};
-
-
-#pragma endregion  Dont Touch
+//
+//#pragma region ForServerSession
+//
+//class ServerSession : public PacketSession
+//{
+//public:
+//	~ServerSession()
+//	{
+//	}
+//
+//	virtual void OnConnected() override
+//	{
+//		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
+//		Send(sendBuffer);
+//	}
+//
+//	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
+//	{
+//		ClientPacketHandler::HandlePacket(buffer, len);
+//	}
+//
+//	virtual void OnSend(int32 len) override
+//	{
+//	}
+//
+//	virtual void OnDisconnected() override
+//	{
+//	}
+//};
+//
+//
+//#pragma endregion  Dont Touch
 
 HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 {
@@ -102,24 +113,27 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	//ConnectServer();
 
-#pragma endregion ø©±‚ ¡÷ºÆ√≥∏Æ«œ∏È º≠πˆ ø¨∞· æ¯¿Ã µø¿€ ∞°¥…
+#pragma endregion Ïó¨Í∏∞ Ï£ºÏÑùÏ≤òÎ¶¨ÌïòÎ©¥ ÏÑúÎ≤Ñ Ïó∞Í≤∞ ÏóÜÏù¥ ÎèôÏûë Í∞ÄÎä•
 
 
 
 
 
 
-	m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
+	/*m_PhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 	m_PhysicsEngine->Initialize_PhysX();
 	m_PhysicsEngine->Add_Terrain_From_File("../bin/Models/Terrain/HeightD.png", 1.f, 1.f);
+
 	m_PhysicsEngine->MyPhysicsEngine::CMyPhysicsEngine::Add_Tank(0.f,40.f,0.f);
+
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE,GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
-	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
+	/*m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f,0.01f,0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
+
 	m_GameInstance->AddPrototype("TreeModel1", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_1.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 	m_GameInstance->AddPrototype("TreeModel2", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Trunk_2.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 	m_GameInstance->AddPrototype("TreeModel3", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_3.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
@@ -127,17 +141,18 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddPrototype("TreeModel5", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_5.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 	m_GameInstance->AddPrototype("TreeModel6", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_6.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 
+
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
-	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
+	/*m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
-	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
-	//m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
-	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
+	//m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
+	////m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
+	//m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
 	
-	_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
+	/*_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat1);
 	_matrix mat2 = XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(500.f, 40.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat2);
@@ -148,9 +163,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	_matrix mat6 = XMMatrixRotationY(XMConvertToRadians(200.f)) * XMMatrixTranslation(450.f, 40.f, -50.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat6);
 
-	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
+	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);*/
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat4);
-
 
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
@@ -158,6 +172,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 	//dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+
 
 	//m_GameInstance->AddObject("UI", "UI", nullptr);
 
@@ -184,13 +199,13 @@ int CMainApp::Run()
 
 	while (msg.message != WM_QUIT)
 	{
-		// √≥∏Æ«ÿæﬂ«“ ¿©µµøÏ ∏ﬁºº¡ˆµÈ¿Ã ¿÷¥¬¡ˆ »Æ¿Œ«’¥œ¥Ÿ.
+		// Ï≤òÎ¶¨Ìï¥ÏïºÌï† ÏúàÎèÑÏö∞ Î©îÏÑ∏ÏßÄÎì§Ïù¥ ÏûàÎäîÏßÄ ÌôïÏù∏Ìï©ÎãàÎã§.
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		// √≥∏Æ«ÿæﬂ«“ ∏ﬁºº¡ˆ∞° æ¯¥¬ ∞ÊøÏ, ø°¥œ∏ﬁ¿Ãº«∞˙ ∞‘¿”¿ª √≥∏Æ«’¥œ¥Ÿ.
+		// Ï≤òÎ¶¨Ìï¥ÏïºÌï† Î©îÏÑ∏ÏßÄÍ∞Ä ÏóÜÎäî Í≤ΩÏö∞, ÏóêÎãàÎ©îÏù¥ÏÖòÍ≥º Í≤åÏûÑÏùÑ Ï≤òÎ¶¨Ìï©ÎãàÎã§.
 		else
 		{
 			m_Timer->Tick();
@@ -200,7 +215,7 @@ int CMainApp::Run()
 
 				CalculateFrameStats();
 				Update(m_Timer);
-				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
+				//m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
 				Late_Update(m_Timer);
 				Draw();
 
@@ -208,17 +223,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				RECT rect;
-				GetClientRect(m_hMainWnd, &rect);         // ≈¨∂Û¿Ãæ∆Æ øµø™ ¡¬«•
-				POINT center = {
-					(rect.right - rect.left) / 2,
-					(rect.bottom - rect.top) / 2
-				};
-				 
-				// ≈¨∂Û¿Ãæ∆Æ ¡¬«• °Ê Ω∫≈©∏∞ ¡¬«•∑Œ ∫Ø»Ø
-				ClientToScreen(m_hMainWnd, &center);
+				//RECT rect;
+				//GetClientRect(m_hMainWnd, &rect);         // ÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏ ÏòÅÏó≠ Ï¢åÌëú
+				//POINT center = {
+				//	(rect.right - rect.left) / 2,
+				//	(rect.bottom - rect.top) / 2
+				//};
+				// 
+				//// ÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏ Ï¢åÌëú ‚Üí Ïä§ÌÅ¨Î¶∞ Ï¢åÌëúÎ°ú Î≥ÄÌôò
+				//ClientToScreen(m_hMainWnd, &center);
 
-				SetCursorPos(center.x, center.y);
+				//SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -241,9 +256,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-		// WM_ACTIVATE¥¬ ¿©µµøÏ∞° »∞º∫»≠ µ«∞≈≥™ ∫Ò»∞º∫»≠ µ…∂ß ∫∏≥ª¡˝¥œ¥Ÿ.
-		// ¿©µµøÏ∞° ∫Ò»∞º∫»≠ µ«æ˙¿ª ∂ß¥¬ ∞‘¿”¿ª ¡ﬂ¡ˆΩ√≈∞∞Ì
-		// ¥ŸΩ√ »∞º∫»≠ µ«æ˙¿ª ∂ß¥¬ ∞‘¿”¿ª ¥ŸΩ√ ¿Á∞‘«’¥œ¥Ÿ.
+		// WM_ACTIVATEÎäî ÏúàÎèÑÏö∞Í∞Ä ÌôúÏÑ±Ìôî ÎêòÍ±∞ÎÇò ÎπÑÌôúÏÑ±Ìôî Îê†Îïå Î≥¥ÎÇ¥ÏßëÎãàÎã§.
+		// ÏúàÎèÑÏö∞Í∞Ä ÎπÑÌôúÏÑ±Ìôî ÎêòÏóàÏùÑ ÎïåÎäî Í≤åÏûÑÏùÑ Ï§ëÏßÄÏãúÌÇ§Í≥†
+		// Îã§Ïãú ÌôúÏÑ±Ìôî ÎêòÏóàÏùÑ ÎïåÎäî Í≤åÏûÑÏùÑ Îã§Ïãú Ïû¨Í≤åÌï©ÎãàÎã§.
 	case WM_ACTIVATE:
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
@@ -257,9 +272,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 
-		// WM_SIZE¥¬ ªÁøÎ¿⁄∞° ¿©µµøÏ ≈©±‚∏¶ ∫Ø∞Ê«“ ∂ß ∫∏≥ª¡˝¥œ¥Ÿ.
+		// WM_SIZEÎäî ÏÇ¨Ïö©ÏûêÍ∞Ä ÏúàÎèÑÏö∞ ÌÅ¨Í∏∞Î•º Î≥ÄÍ≤ΩÌï† Îïå Î≥¥ÎÇ¥ÏßëÎãàÎã§.
 	case WM_SIZE:
-		// ªı∑ŒøÓ ¿©µµøÏ ≈©±‚∏¶ ¿˙¿Â«’¥œ¥Ÿ.
+		// ÏÉàÎ°úÏö¥ ÏúàÎèÑÏö∞ ÌÅ¨Í∏∞Î•º Ï†ÄÏû•Ìï©ÎãàÎã§.
 		m_ClientWidth = LOWORD(lParam);
 		m_ClientHeight = HIWORD(lParam);
 		//m_FullscreenState = !m_FullscreenState;
@@ -267,15 +282,15 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_GameInstance->OnResize();*/
 		return 0;
 
-		// ¿©µµøÏ∞° ∆ƒ±´µ… ∂ß WM_DESTORY∞° ∫∏≥ª¡˝¥œ¥Ÿ.
+		// ÏúàÎèÑÏö∞Í∞Ä ÌååÍ¥¥Îê† Îïå WM_DESTORYÍ∞Ä Î≥¥ÎÇ¥ÏßëÎãàÎã§.
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 
-		// WM_MENUCAR¥¬ ∏ﬁ¥∫∞° »∞º∫»≠ µ…∂ß ∫∏≥ª¡˝¥œ¥Ÿ.
-		// ªÁøÎ¿⁄∞° ¥œ∏¥–, ∞°º”±‚ ≈∞ø° «ÿ¥Á«œ¡ˆ æ ¥¬ ≈∞∏¶ ¥©∏®¥œ¥Ÿ.
+		// WM_MENUCARÎäî Î©îÎâ¥Í∞Ä ÌôúÏÑ±Ìôî Îê†Îïå Î≥¥ÎÇ¥ÏßëÎãàÎã§.
+		// ÏÇ¨Ïö©ÏûêÍ∞Ä ÎãàÎ™®Îãâ, Í∞ÄÏÜçÍ∏∞ ÌÇ§Ïóê Ìï¥ÎãπÌïòÏßÄ ÏïäÎäî ÌÇ§Î•º ÎàÑÎ¶ÖÎãàÎã§.
 	case WM_MENUCHAR:
-		// æÀ∆Æ + ø£≈Õ∏¶ ¿‘∑¬Ω√ ∫Ò«¡¿Ω¿Ã πﬂª˝«œ¥¬∞Õ¿ª πÊ¡ˆ«’¥œ¥Ÿ.
+		// ÏïåÌä∏ + ÏóîÌÑ∞Î•º ÏûÖÎ†•Ïãú ÎπÑÌîÑÏùåÏù¥ Î∞úÏÉùÌïòÎäîÍ≤ÉÏùÑ Î∞©ÏßÄÌï©ÎãàÎã§.
 		return MAKELRESULT(0, MNC_CLOSE);
 
 	case WM_INPUT:
@@ -316,7 +331,7 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 		return false;
 	}
 
-	// ≈¨∂Û¿Ãæ∆Æ¿« ≈©±‚∏¶ ±‚π›¿∏∑Œ ¿©µµøÏ ªÁ∞¢«¸¿ª ∞ËªÍ«’¥œ¥Ÿ.
+	// ÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏Ïùò ÌÅ¨Í∏∞Î•º Í∏∞Î∞òÏúºÎ°ú ÏúàÎèÑÏö∞ ÏÇ¨Í∞ÅÌòïÏùÑ Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
@@ -371,7 +386,7 @@ void CMainApp::CalculateFrameStats()
 
 	++frameCnt;
 
-	// 1√  µøæ»¿« ∆Ú±’¿ª ∞ËªÍ«’¥œ¥Ÿ.
+	// 1Ï¥à ÎèôÏïàÏùò ÌèâÍ∑†ÏùÑ Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 	if ((m_Timer->TotalTime() - timeElapsed >= 1.0f))
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1;
@@ -388,44 +403,44 @@ void CMainApp::CalculateFrameStats()
 
 		SetWindowText(m_hMainWnd, windowText.c_str());
 
-		// ¥Ÿ¿Ω ∆Ú±’¿ª ¿ß«ÿ √ ±‚»≠ «’¥œ¥Ÿ.
+		// Îã§Ïùå ÌèâÍ∑†ÏùÑ ÏúÑÌï¥ Ï¥àÍ∏∞Ìôî Ìï©ÎãàÎã§.
 		frameCnt = 0;
 		timeElapsed += 1.0f;
 	}
 }
 
 
-void CMainApp::ConnectServer()
-{
-
-	ClientServiceRef service = MakeShared<ClientService>(
-		NetAddress(L"10.20.11.29", 7777),
-		MakeShared<IocpCore>(),
-		MakeShared<ServerSession>,
-		1);
-
-	ASSERT_CRASH(service->Start());
-
-	ServiceManager::GetInstace().SetService(service);
-
-	int32 threadCount = std::thread::hardware_concurrency();
-	for (int32 i = 0; i < threadCount; i++)
-	{
-		GThreadManager->Launch([=]()
-			{
-				while (true)
-				{
-					service->GetIocpCore()->Dispatch();
-				}
-			});
-	}
-
-	while (!g_GameStart.load()) {
-
-		int a = 0;
-	}
-
-}
+//void CMainApp::ConnectServer()
+//{
+//
+//	ClientServiceRef service = MakeShared<ClientService>(
+//		NetAddress(L"10.20.11.29", 7777),
+//		MakeShared<IocpCore>(),
+//		MakeShared<ServerSession>,
+//		1);
+//
+//	ASSERT_CRASH(service->Start());
+//
+//	ServiceManager::GetInstace().SetService(service);
+//
+//	int32 threadCount = std::thread::hardware_concurrency();
+//	for (int32 i = 0; i < threadCount; i++)
+//	{
+//		GThreadManager->Launch([=]()
+//			{
+//				while (true)
+//				{
+//					service->GetIocpCore()->Dispatch();
+//				}
+//			});
+//	}
+//
+//	while (!g_GameStart.load()) {
+//
+//		int a = 0;
+//	}
+//
+//}
 
 void CMainApp::Free()
 {
@@ -437,3 +452,80 @@ void CMainApp::Free()
 	Safe_Release(m_GameInstance);
 }
 
+bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
+{
+	HWND hWnd;
+	MSG msg = { 0 };
+
+	// ÏúàÎèÑÏö∞ ÌÅ¥ÎûòÏä§ Îì±Î°ù
+	WNDCLASS wc = {};
+	wc.lpfnWndProc = LobbyWndProc;
+	wc.hInstance = hInstance;
+	wc.lpszClassName = L"LobbyWnd";
+	RegisterClass(&wc);
+
+	RECT rc{ 0,0,LOBBY_WINCX,LOBBY_WINCY };
+
+	hWnd = CreateWindow(L"LobbyWnd", L"Í≤åÏûÑ Î°úÎπÑ", WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
+
+	ShowWindow(hWnd, showCmd);
+	UpdateWindow(hWnd);
+
+	g_hWnd = hWnd;
+	
+	GameLobby Game_Lobby;
+
+	Game_Lobby.Initialize(hWnd);
+
+	constexpr double desiredFPS = 60.0;
+	constexpr double desiredFrameTime = 1000.0 / desiredFPS; // 16.66 ms
+
+	bool bStartGame = false;
+
+	while (true)
+	{
+		auto frameStart = chrono::high_resolution_clock::now();
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				break;
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			Game_Lobby.Update();
+			Game_Lobby.Late_Update();
+			Game_Lobby.Render();
+			if (Game_Lobby.GameStart())
+			{
+				DestroyWindow(hWnd);
+				bStartGame = true;
+				break;
+			}
+		}
+		//auto frameEnd = chrono::high_resolution_clock::now();
+		//auto elapsed = chrono::duration_cast<chrono::milliseconds>(frameEnd - frameStart).count();
+
+		//if (elapsed < desiredFrameTime)
+		//{
+		//	Sleep(static_cast<DWORD>(desiredFrameTime - elapsed));
+		//}
+	}
+
+	Game_Lobby.Release();
+	return bStartGame;
+}
+
+LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_DESTROY:
+		//PostQuitMessage(0);
+		break;
+	}
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}

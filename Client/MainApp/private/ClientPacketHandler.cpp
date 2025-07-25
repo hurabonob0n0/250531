@@ -6,7 +6,9 @@
 #include "BufferWriter.h"
 #include "ServiceManager.h"
 #include "GameInstance.h"
-
+#include "Room_Manager.h"
+#include "Level_Manager.h"
+#include "Network_Manager.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -25,10 +27,21 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		Handle_S_SUCCESS_LOGIN(buffer, len);
 		break;
 
+	case S_ROOM_DATA:
+		Handle_S_GET_ROOMDATA(buffer, len);
+		break;
+	
+	case S_ROOM_ENTER:
+		Handle_S_ROOM_ENTER(buffer, len);
+		break;
+
 	case S_SUCCESS_ENTER_ROOM:
 		Handle_S_SUCCESS_ENTER_ROOM(buffer, len);
 		break;
 
+	case S_ROOM_PLAYER_STATES:
+		Handle_S_ROOM_PLAYER_STATES(buffer, len);
+		break;
 	case S_GAME_START:
 		Handle_S_GAME_START(buffer, len);
 		break;
@@ -61,6 +74,9 @@ struct S_Pos {
 	float PosZ;
 };
 
+
+#pragma region ForLobby
+
 void ClientPacketHandler::Handle_S_TEST(BYTE* buffer, int32 len)
 {
 	BufferReader br(buffer, len);
@@ -78,30 +94,43 @@ void ClientPacketHandler::Handle_S_TEST(BYTE* buffer, int32 len)
 
 void ClientPacketHandler::Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
-	PacketHeader header;
 
-	br >> header;
-	uint16 ID;
+	std::vector<uint8_t> data(buffer, buffer + len);
 
-#pragma region ID값 객체에 넣어주기
 
-	br >> ID;
-	ServiceManager::GetInstace().SetMyID(ID);
-	g_PlayerID.store(ID);
-	g_ServerConnected.store(true);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		PacketHeader header;
+		br >> header;
+		uint16 ID;
+		br >> ID;
 
-#pragma endregion
+		ServiceManager::GetInstace().SetMyID(ID);
+		g_PlayerID.store(ID);
+		g_ServerConnected.store(true);
+		});
 }
 
 void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
+	//BufferReader br(buffer, len);
 
-	PacketHeader header;
-	br >> header;
+	//PacketHeader header;
+	//br >> header;
 
-	g_GameStart.store(true);
+	//g_GameStart.store(true);
+
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		PacketHeader header;
+		br >> header;
+		uint16 ID;
+		br >> ID;
+
+		});
 
 }
 
@@ -117,6 +146,128 @@ void ClientPacketHandler::Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len)
 
 
 }
+
+void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
+{
+
+	//BufferReader br(buffer, len);
+
+	//PacketHeader header;
+	//br >> header;
+
+	//uint32 roomCount;
+	//br >> roomCount;
+
+	//std::vector<Room_Data> tempList;
+	//tempList.reserve(roomCount);
+
+	//for (uint32 i = 0; i < roomCount; ++i)
+	//{
+	//	Room_Data data;
+	//	br >> data;
+
+	//	tempList.push_back(data);
+	//	
+	//}
+	//Room_Manager::Get_Instance()->SetRoomList(tempList);
+
+
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+
+
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+
+		uint32 roomCount;
+		br >> roomCount;
+
+		std::vector<Room_Data> tempList;
+		tempList.reserve(roomCount);
+
+		for (uint32 i = 0; i < roomCount; ++i)
+		{
+			Room_Data data;
+			br >> data;
+
+			tempList.push_back(data);
+
+		}
+		Room_Manager::Get_Instance()->SetRoomList(tempList);
+		});
+
+}
+
+void ClientPacketHandler::Handle_S_ROOM_ENTER(BYTE* buffer, int32 len)
+{
+
+	BufferReader br(buffer, len);
+
+	PacketHeader header;
+	br >> header;
+
+	Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOM);
+
+
+
+
+}
+
+void ClientPacketHandler::Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len)
+{
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+
+		uint16 playerCount = 0;
+		br >> playerCount;
+
+		std::vector<Room_Ready_Data> roomStates;
+		roomStates.reserve(playerCount);
+
+		for (uint16 i = 0; i < playerCount; ++i)
+		{
+			Room_Ready_Data temp;
+
+			br >> temp.PlayerID;
+			br >> temp.Position;
+			br >> temp.Team;
+			br >> temp.IsReady;
+
+			roomStates.push_back(temp);
+		}
+
+		if (Level_Manager::Get_Instance()->GetSceneID() != LEVEL_ROOM)
+		{
+			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOM);
+			
+		}
+
+		Room_Manager::Get_Instance()->SetRoomPlayerStates(roomStates);
+
+		});
+
+}
+
+
+#pragma endregion Packet_from_Server
+
+#pragma region ForIngame
+
+/*----------------------------
+* 
+*		For GamePlay
+* 
+-----------------------------*/
+
 
 void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 {
@@ -173,6 +324,11 @@ void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 }
 
 
+#pragma endregion Packet_from_Server
+
+
+#pragma region ForLobby
+
 
 SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 {
@@ -190,16 +346,17 @@ SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 	return sendBuffer;
 }
 
-SendBufferRef ClientPacketHandler::Make_C_FINISH_LOADING(uint64 id)
+
+SendBufferRef ClientPacketHandler::Make_C_SHOWROOM(uint8 Dummy)
 {
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
-
 	PacketHeader* header = bw.Reserve<PacketHeader>();
-	bw << id;
+
+	bw << Dummy;
 
 	header->size = bw.WriteSize();
-	header->id = C_FINISH_LOADING;
+	header->id = C_SHOW_ROOM;
 
 	sendBuffer->Close(bw.WriteSize());
 
@@ -207,22 +364,102 @@ SendBufferRef ClientPacketHandler::Make_C_FINISH_LOADING(uint64 id)
 
 }
 
-SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
+SendBufferRef ClientPacketHandler::Make_C_JOINROOM(uint32 RoomNum)
 {
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << RoomNum;
+
+	header->size = bw.WriteSize();
+	header->id = C_JOIN_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_CREATEROOM(uint8 Dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << Dummy;
+
+	header->size = bw.WriteSize();
+	header->id = C_CREATE_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_EXITROOM(uint8 Dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << Dummy;
+
+	header->size = bw.WriteSize();
+	header->id = C_EXIT_ROOM;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_CHANGE_INFO(Room_Ready_Data data)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << data.PlayerID << data.Position << data.Team << data.IsReady;
+	
+	header->size = bw.WriteSize();
+	header->id = C_CHANGE_INFO;
+
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_READY(uint8 dummy)
+{
+
 
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
-
 	PacketHeader* header = bw.Reserve<PacketHeader>();
-	bw << key;
 
 	header->size = bw.WriteSize();
-	header->id = C_KEYINPUT;
+	header->id = C_READY;
+
 
 	sendBuffer->Close(bw.WriteSize());
-
 	return sendBuffer;
 }
+
+SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+
+	header->size = bw.WriteSize();
+	header->id = C_START;
+
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+
+#pragma endregion Packet_to_Server
+
+#pragma region ForIngame
 
 SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation)
 {
@@ -250,6 +487,24 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float pot
 
 }
 
+SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
+{
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+	bw << key;
+
+	header->size = bw.WriteSize();
+	header->id = C_KEYINPUT;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+
 SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ)
 {
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
@@ -267,3 +522,24 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 
 }
 
+
+
+SendBufferRef ClientPacketHandler::Make_C_MOVE(float x, float y, float z)
+{
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << x << y << z;
+
+	header->size = bw.WriteSize();
+	header->id = C_MOVEMENT;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+
+}
+
+#pragma endregion Packet_to_Server

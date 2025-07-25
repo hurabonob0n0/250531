@@ -52,6 +52,57 @@
     <Filter Include="01.DefaultObj\Trees">
       <UniqueIdentifier>{c925d9d7-8430-4f6b-9e41-7610f533040b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97.ForLobby">
+      <UniqueIdentifier>{42dfef34-e2ef-4590-a791-06368658bfbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-00.GameLobby">
+      <UniqueIdentifier>{0085ea6f-40fe-41c0-8a45-8a97a488c99b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager">
+      <UniqueIdentifier>{ccf259fb-924f-4b8a-bc4f-f65491be11fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-02.Bmp_Manager">
+      <UniqueIdentifier>{703788e3-527e-41e2-a5b4-2622ba2790ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-03.Object_Manager">
+      <UniqueIdentifier>{cb149efe-af32-4209-94c8-ce76aa19f708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels">
+      <UniqueIdentifier>{f86ba70d-d07c-4204-bca6-130a649ca3e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-02.Bmp_Manager\MyBmp">
+      <UniqueIdentifier>{8905c854-3e3a-447b-b577-879c6640fff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-03.Object_Manager\GameObject">
+      <UniqueIdentifier>{f756aaa7-a504-4e86-b44e-864556f72cc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-04.Collision_Manager">
+      <UniqueIdentifier>{4c32c207-fe16-49cd-a6f9-7de8003439ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-03.Object_Manager\GameObject\Button">
+      <UniqueIdentifier>{b864821d-3027-424c-b408-077dc56f110f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-05.Key_Mananger">
+      <UniqueIdentifier>{eba23443-b629-4c03-83bd-cc78367855df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ForServer\Network_Manager">
+      <UniqueIdentifier>{964240b0-8df7-4974-bb2e-c6bb15770182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-03.Object_Manager\GameObject\RoomLIst">
+      <UniqueIdentifier>{1bd52ee8-43ea-4b28-a825-06a89219d3fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-06.Room_Manager">
+      <UniqueIdentifier>{1e7baa7d-dd60-4ad6-8bf9-f08fb43d09ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu">
+      <UniqueIdentifier>{6d2020d3-0c70-4467-ae43-d5c2f7814d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList">
+      <UniqueIdentifier>{45028d51-f75b-48e8-835e-b1040d9922cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room">
+      <UniqueIdentifier>{026de808-6b7f-4231-8d01-e7b8a35043c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -102,6 +153,57 @@
     <ClInclude Include="..\public\Tree.h">
       <Filter>01.DefaultObj\Trees</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GameLobby.h">
+      <Filter>97.ForLobby\97-00.GameLobby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Manager.h">
+      <Filter>97.ForLobby\97-01.Level_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Object_Manager.h">
+      <Filter>97.ForLobby\97-03.Object_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bmp_Manager.h">
+      <Filter>97.ForLobby\97-02.Bmp_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level.h">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MyBmp.h">
+      <Filter>97.ForLobby\97-02.Bmp_Manager\MyBmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GameObject.h">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Define.h">
+      <Filter>97.ForLobby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Menu.h">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Button.h">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AbstractFactory.h">
+      <Filter>97.ForLobby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Key_Manager.h">
+      <Filter>97.ForLobby\97-05.Key_Mananger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Network_Manager.h">
+      <Filter>98.ForServer\Network_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_RoomList.h">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RoomListBar.h">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject\RoomLIst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Room_Manager.h">
+      <Filter>97.ForLobby\97-06.Room_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Room.h">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -148,6 +250,51 @@
     </ClCompile>
     <ClCompile Include="..\private\Tree.cpp">
       <Filter>01.DefaultObj\Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameLobby.cpp">
+      <Filter>97.ForLobby\97-00.GameLobby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Manager.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Object_Manager.cpp">
+      <Filter>97.ForLobby\97-03.Object_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bmp_Manager.cpp">
+      <Filter>97.ForLobby\97-02.Bmp_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MyBmp.cpp">
+      <Filter>97.ForLobby\97-02.Bmp_Manager\MyBmp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameObject.cpp">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Menu.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\0.Level_Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_RoomList.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\1.Level_RoomList</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Button.cpp">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Key_Manager.cpp">
+      <Filter>97.ForLobby\97-05.Key_Mananger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Network_Manager.cpp">
+      <Filter>98.ForServer\Network_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RoomListBar.cpp">
+      <Filter>97.ForLobby\97-03.Object_Manager\GameObject\RoomLIst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Room_Manager.cpp">
+      <Filter>97.ForLobby\97-06.Room_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Room.cpp">
+      <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

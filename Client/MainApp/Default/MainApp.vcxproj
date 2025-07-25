@@ -166,15 +166,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\AbstractFactory.h" />
+    <ClInclude Include="..\public\Bmp_Manager.h" />
     <ClInclude Include="..\public\BoxObj.h" />
+    <ClInclude Include="..\public\Button.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\ClientPacketHandler.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\public\Client_Globals.h" />
     <ClInclude Include="..\public\Client_pch.h" />
     <ClInclude Include="..\public\DefaultObj.h" />
+    <ClInclude Include="..\public\Define.h" />
     <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\public\GameLobby.h" />
+    <ClInclude Include="..\public\GameObject.h" />
+    <ClInclude Include="..\public\Key_Manager.h" />
+    <ClInclude Include="..\public\Level.h" />
+    <ClInclude Include="..\public\Level_Manager.h" />
+    <ClInclude Include="..\public\Level_Menu.h" />
+    <ClInclude Include="..\public\Level_Room.h" />
+    <ClInclude Include="..\public\Level_RoomList.h" />
     <ClInclude Include="..\public\MainApp.h" />
+    <ClInclude Include="..\public\MyBmp.h" />
+    <ClInclude Include="..\public\Network_Manager.h" />
+    <ClInclude Include="..\public\Object_Manager.h" />
+    <ClInclude Include="..\public\RoomListBar.h" />
+    <ClInclude Include="..\public\Room_Manager.h" />
     <ClInclude Include="..\public\ServerSession.h" />
     <ClInclude Include="..\public\ServiceManager.h" />
     <ClInclude Include="..\public\Tank.h">
@@ -191,7 +208,9 @@
     <ClInclude Include="..\public\WinningTeam.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Bmp_Manager.cpp" />
     <ClCompile Include="..\private\BoxObj.cpp" />
+    <ClCompile Include="..\private\Button.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\ClientPacketHandler.cpp" />
     <ClCompile Include="..\private\Client_Globals.cpp" />
@@ -203,7 +222,20 @@
     </ClCompile>
     <ClCompile Include="..\private\DefaultObj.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\private\GameLobby.cpp" />
+    <ClCompile Include="..\private\GameObject.cpp" />
+    <ClCompile Include="..\private\Key_Manager.cpp" />
+    <ClCompile Include="..\private\Level.cpp" />
+    <ClCompile Include="..\private\Level_Manager.cpp" />
+    <ClCompile Include="..\private\Level_Menu.cpp" />
+    <ClCompile Include="..\private\Level_Room.cpp" />
+    <ClCompile Include="..\private\Level_RoomList.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
+    <ClCompile Include="..\private\MyBmp.cpp" />
+    <ClCompile Include="..\private\Network_Manager.cpp" />
+    <ClCompile Include="..\private\Object_Manager.cpp" />
+    <ClCompile Include="..\private\RoomListBar.cpp" />
+    <ClCompile Include="..\private\Room_Manager.cpp" />
     <ClCompile Include="..\private\ServerSession.cpp" />
     <ClCompile Include="..\private\ServiceManager.cpp" />
     <ClCompile Include="..\private\Tank.cpp">
