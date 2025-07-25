@@ -127,10 +127,10 @@ float4 PS(VertexOut pin) : SV_Target
     }    
     
     if(gObjPad2 == 1)
-        litColor.r += 0.2f;
+        litColor.r += 0.1f;
     
     else if (gObjPad2 == 2)
-        litColor.b += 0.2f;
+        litColor.b += 0.1f;
     
     else if (gObjPad2 == 3)
         litColor.rgb -= 0.1f;

@@ -22,6 +22,7 @@
 #include <windows.h>
 #include <chrono>
 #include <functional>
+#include <algorithm>
 
 /*--------------------------
 	For Server Connection

@@ -1,5 +1,6 @@
 #include "Client_pch.h"
 #include "Tree.h"
+#include "Terrain.h"
 #include "GameInstance.h"
 
 CTree::CTree() : CRenderObject()
@@ -37,29 +38,32 @@ HRESULT CTree::Initialize(void* pArg)
 	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel5"));
 	m_VIBuffers.push_back((CMeshModel*)m_GameInstance->Get_Component("TreeModel6"));
 
-	m_TerrainCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom",this);
+	//m_TerrainCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom",this);
+	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
 	
-	for (int i = 0; i < 150; ++i)
-	{
-		m_TreeInfos.emplace_back(TreeInfo{ (_uint)m_GameInstance->Get_RandomI(0,5),_float2(m_GameInstance->Get_RandomF(-600.f,600.f),m_GameInstance->Get_RandomF(-600.f,600.f)) });
-		m_TreeInfos[i].fScale= m_GameInstance->Get_RandomF(0.5f, 1.f);
-		m_TreeInfos[i].Set_Y(m_TerrainCom->Get_Terrain_Heights(m_TreeInfos[i].Position.x, m_TreeInfos[i].Position.z) /*- m_TreeInfos[i].fScale * 2.f*/);
-		m_TreeInfos[i].fAngle = m_GameInstance->Get_RandomI(0, 360);
-	}
+	//for (int i = 0; i < 150; ++i)
+	//{
+	//	m_TreeInfos.emplace_back(TreeInfo{ (_uint)m_GameInstance->Get_RandomI(0,5),_float2(m_GameInstance->Get_RandomF(-600.f,600.f),m_GameInstance->Get_RandomF(-600.f,600.f)) });
+	//	m_TreeInfos[i].fScale= m_GameInstance->Get_RandomF(0.5f, 1.f);
+	//	m_TreeInfos[i].Set_Y(m_Terrain->Get_Terrain_Heights(m_TreeInfos[i].Position.x, m_TreeInfos[i].Position.z) /*- m_TreeInfos[i].fScale * 2.f*/);
+	//	m_TreeInfos[i].fAngle = m_GameInstance->Get_RandomI(0, 360);
+	//}
 
-	for (int i = 0; i < 150; ++i)
-	{
-		m_TreeInfos[i].m_CBBindingCom = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
+	//for (int i = 0; i < 150; ++i)
+	//{
+	//	m_TreeInfos[i].m_CBBindingCom = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
 
-		m_TreeInfos[i].m_CBBindingCom->Set_TexCoordMatrix(m_TexCoordTransformCom);
+	//	m_TreeInfos[i].m_CBBindingCom->Set_TexCoordMatrix(m_TexCoordTransformCom);
 
-		MaterialData MD{};
+	//	MaterialData MD{};
 
-		XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
-		MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
-		MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
-		m_TreeInfos[i].m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("BarkMat", MD));
-	}
+	//	XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
+	//	MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
+	//	MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
+	//	m_TreeInfos[i].m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("BarkMat", MD));
+	//}
+
+	Load_TreeInfos();
 
 	return S_OK;
 }
@@ -79,8 +83,8 @@ void CTree::Tick(float fTimeDelta)
 	if (m_TreeInfos.size() == 0)
 		return;
 
-	if (m_GameInstance->Key_Down(VK_RETURN))
-		Save_TreeInfos();
+	/*if (m_GameInstance->Key_Down(VK_RETURN))
+		Save_TreeInfos();*/
 
 	/*for (int i = 0; i < 50; ++i)
 	{
@@ -157,8 +161,10 @@ void CTree::Set_Col_Tree(int index, _float2 ColPos)
 void CTree::Save_TreeInfos()
 {
 	struct SaveInfo {
-		_float2 Pos;
+		int TT;
+		_float3 Pos;
 		float Scale;
+		float Angle;
 	};
 	SaveInfo SI{};
 
@@ -166,9 +172,52 @@ void CTree::Save_TreeInfos()
 
 	for (auto& TI : m_TreeInfos)
 	{
-		SI.Pos = _float2(TI.Position.x, TI.Position.z);
+		SI.TT = TI.TreeType;
+		SI.Pos = _float3(TI.Position);
 		SI.Scale = TI.fScale;
+		SI.Angle = TI.fAngle;
 		fout.write((const char*)&SI, sizeof(SaveInfo));
+	}
+}
+
+void CTree::Load_TreeInfos()
+{
+	struct SaveInfo {
+		int TT;
+		_float3 Pos;
+		float Scale;
+		float Angle;
+	};
+	SaveInfo SI{};
+
+	std::ifstream fin("../bin/Models/Tree/TreeInfos", std::ios::binary);
+
+	m_TreeInfos.reserve(150);
+
+	TreeInfo ti;
+
+	for (int i = 0; i<150; ++i)
+	{
+		fin.read((char*)&SI, sizeof(SaveInfo));
+		ti.TreeType = SI.TT;
+		ti.Position.x = SI.Pos.x;
+		ti.Position.z = SI.Pos.z;
+		ti.Position.y = SI.Pos.y;
+		ti.fAngle = SI.Angle;
+		ti.fScale = SI.Scale;
+
+		ti.m_CBBindingCom = (CBBinding*)CGameInstance::Get_Instance()->Get_Component("CBBindingCom", nullptr);
+
+		ti.m_CBBindingCom->Set_TexCoordMatrix(m_TexCoordTransformCom);
+
+		MaterialData MD{};
+
+		XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
+		MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
+		MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
+		ti.m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("BarkMat", MD));
+		
+		m_TreeInfos.push_back(ti);
 	}
 }
 
@@ -192,6 +241,10 @@ CRenderObject* CTree::Clone(void* pArg)
 	CTree* pInstance = new CTree(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
+}
+
+CTree::TreeInfo::TreeInfo()
+{
 }
 
 CTree::TreeInfo::TreeInfo(_uint type, _float2 pos)
