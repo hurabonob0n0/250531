@@ -17,8 +17,8 @@
 #include "ThreadManager.h"
 #include "Session.h"
 #include "BufferReader.h"
-#include "ClientPacketHandler.h"
-#include "ServiceManager.h"
+//#include "ClientPacketHandler.h"
+//#include "ServiceManager.h"
 
 /*----------------
 	For Lobby
@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	//_CrtSetBreakAlloc(8420);
 
 	if (!RunLobbyWindowLoop(hInstance, showCmd))
-		return 0;
+	return 0;
 
 	CMainApp* mainApp = CMainApp::Get_Instance();
 	if (FAILED(mainApp->Initialize(hInstance)))
@@ -58,38 +58,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CMainApp::CMainApp() : m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
 {
 }
-
-#pragma region ForServerSession
-
-class ServerSession : public PacketSession
-{
-public:
-	~ServerSession()
-	{
-	}
-
-	virtual void OnConnected() override
-	{
-		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
-		Send(sendBuffer);
-	}
-
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
-	{
-		ClientPacketHandler::HandlePacket(buffer, len);
-	}
-
-	virtual void OnSend(int32 len) override
-	{
-	}
-
-	virtual void OnDisconnected() override
-	{
-	}
-};
-
-
-#pragma endregion  Dont Touch
+//
+//#pragma region ForServerSession
+//
+//class ServerSession : public PacketSession
+//{
+//public:
+//	~ServerSession()
+//	{
+//	}
+//
+//	virtual void OnConnected() override
+//	{
+//		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
+//		Send(sendBuffer);
+//	}
+//
+//	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
+//	{
+//		ClientPacketHandler::HandlePacket(buffer, len);
+//	}
+//
+//	virtual void OnSend(int32 len) override
+//	{
+//	}
+//
+//	virtual void OnDisconnected() override
+//	{
+//	}
+//};
+//
+//
+//#pragma endregion  Dont Touch
 
 HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 {
@@ -137,7 +137,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	/*m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
-	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());*/
+	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 	//m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
 	////m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
@@ -402,37 +402,37 @@ void CMainApp::CalculateFrameStats()
 }
 
 
-void CMainApp::ConnectServer()
-{
-
-	ClientServiceRef service = MakeShared<ClientService>(
-		NetAddress(L"10.20.11.29", 7777),
-		MakeShared<IocpCore>(),
-		MakeShared<ServerSession>,
-		1);
-
-	ASSERT_CRASH(service->Start());
-
-	ServiceManager::GetInstace().SetService(service);
-
-	int32 threadCount = std::thread::hardware_concurrency();
-	for (int32 i = 0; i < threadCount; i++)
-	{
-		GThreadManager->Launch([=]()
-			{
-				while (true)
-				{
-					service->GetIocpCore()->Dispatch();
-				}
-			});
-	}
-
-	while (!g_GameStart.load()) {
-
-		int a = 0;
-	}
-
-}
+//void CMainApp::ConnectServer()
+//{
+//
+//	ClientServiceRef service = MakeShared<ClientService>(
+//		NetAddress(L"10.20.11.29", 7777),
+//		MakeShared<IocpCore>(),
+//		MakeShared<ServerSession>,
+//		1);
+//
+//	ASSERT_CRASH(service->Start());
+//
+//	ServiceManager::GetInstace().SetService(service);
+//
+//	int32 threadCount = std::thread::hardware_concurrency();
+//	for (int32 i = 0; i < threadCount; i++)
+//	{
+//		GThreadManager->Launch([=]()
+//			{
+//				while (true)
+//				{
+//					service->GetIocpCore()->Dispatch();
+//				}
+//			});
+//	}
+//
+//	while (!g_GameStart.load()) {
+//
+//		int a = 0;
+//	}
+//
+//}
 
 void CMainApp::Free()
 {
@@ -498,13 +498,13 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 				break;
 			}
 		}
-		auto frameEnd = chrono::high_resolution_clock::now();
-		auto elapsed = chrono::duration_cast<chrono::milliseconds>(frameEnd - frameStart).count();
+		//auto frameEnd = chrono::high_resolution_clock::now();
+		//auto elapsed = chrono::duration_cast<chrono::milliseconds>(frameEnd - frameStart).count();
 
-		if (elapsed < desiredFrameTime)
-		{
-			Sleep(static_cast<DWORD>(desiredFrameTime - elapsed));
-		}
+		//if (elapsed < desiredFrameTime)
+		//{
+		//	Sleep(static_cast<DWORD>(desiredFrameTime - elapsed));
+		//}
 	}
 
 	Game_Lobby.Release();

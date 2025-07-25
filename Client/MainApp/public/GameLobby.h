@@ -19,11 +19,14 @@ public:
 		return false;
 	};
 
+	void InitBmps(HWND hand);
+
 private:
 	HDC			m_hDC;
 	HWND		m_hWnd;
 
 	int Timer = 0;
 	bool		is_start = false;
+	bool		is_Connected = false;
 };
 
