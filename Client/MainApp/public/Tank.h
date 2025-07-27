@@ -65,10 +65,14 @@ public:
 	void Set_MyTeam(bool isBlue) { _MyTeam = isBlue; };
 
 	void SendMyStateToServer();
+	void SendPosinData();
+	void SendPosData();
 	void SendShootDataToServer();
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 	void Set_Posin(float PotapRot, float PosinRot);
+
+	void Set_MyPos(_float4x4 mat);
 
 private:		//For PosinCrosshair
 	CBBinding*				m_CBBindingQuad;

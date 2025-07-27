@@ -113,6 +113,11 @@ public:
 
 	bool ReSpawnChoice = false;
 	int ReSpawnPos;
+	bool SingleMode = true;
+
+	int REDBAR = 0;
+	int BLUEBAR = 0;
+
 private:
 
 

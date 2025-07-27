@@ -220,9 +220,10 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Flush_CommandQueue();
 
 
-
-	auto sendBuffer = ClientPacketHandler::Make_C_LOADING_FINISH(1);
-	Network_Manager::GetInstance()->Send(sendBuffer);
+	if (Network_Manager::GetInstance()->isConnected()) {
+		auto sendBuffer = ClientPacketHandler::Make_C_LOADING_FINISH(1);
+		Network_Manager::GetInstance()->Send(sendBuffer);
+	}
 
 	return S_OK;
 }

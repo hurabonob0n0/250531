@@ -24,6 +24,7 @@ enum
 	S_TANK_KILL = 14,
 	S_GAME_WIN = 15,
 	S_GAME_LOSE = 16,
+	S_CAPTURE = 17,
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
@@ -36,7 +37,9 @@ enum
 	C_CHANGE_INFO = 1010,
 	C_READY = 1011,
 	C_START = 1012,
-	C_RESPAWN_TANK = 1013
+	C_RESPAWN_TANK = 1013,
+	C_MYPOS = 1014,
+	C_MYPOSIN = 1015
 };
 
 
@@ -68,6 +71,7 @@ public:
 	static void Handle_S_KILL_TANK(BYTE* buffer, int32 len);
 	static void Handle_S_GAME_WIN(BYTE* buffer, int32 len);
 	static void Handle_S_GAME_LOSE(BYTE* buffer, int32 len);
+	static void Handle_S_CAPTURE(BYTE* buffer, int32 len);
 
 
 	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation);
@@ -84,6 +88,9 @@ public:
 	static SendBufferRef Make_C_START(uint8 dummy);
 	static SendBufferRef Make_C_LOADING_FINISH(uint8 dummy);
 	static SendBufferRef Make_C_TANK_RESPAWN(_float4x4& worldMatrix, float potapRotation, float posinRotation);
+
+	static SendBufferRef Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation);
+	static SendBufferRef Make_C_TANK_POSMOVE(_float4x4& worldMatrix);
 
 	//For GamePlay
 

@@ -74,6 +74,8 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_GAME_LOSE:
 		Handle_S_GAME_LOSE(buffer, len);
 		break;
+	case S_CAPTURE:
+		Handle_S_CAPTURE(buffer, len);
 	default:
 		break;
 	}
@@ -389,6 +391,26 @@ void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
 		});
 }
 
+void ClientPacketHandler::Handle_S_CAPTURE(BYTE* buffer, int32 len)
+{
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+		
+		uint8 Blue, red;
+		br >> Blue >> red;
+		Network_Manager::GetInstance()->REDBAR = red;
+		Network_Manager::GetInstance()->BLUEBAR = Blue;
+
+	});
+}
+
+
 
 
 void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
@@ -439,13 +461,27 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 
 			uint8 myTankID = Network_Manager::GetInstance()->GetMyTankIndex();
 
+			Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", static_cast<int>(tankID)));
+
 			if (tankID != myTankID)
 			{
-				Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", static_cast<int>(tankID)));
+				
 				if (tank)
 				{
 					tank->Set_OtherPlayerState(mat, potapAngle, posinAngle);
 				}
+			}
+			else {
+
+				if (Network_Manager::GetInstance()->GetInstance()->ImPosu) {
+				
+					tank->Set_MyPos(mat);
+				}
+				else {
+					
+					tank->Set_Posin(potapAngle, posinAngle);
+				}
+
 			}
 
 		}
@@ -628,6 +664,47 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_RESPAWN(_float4x4& worldMatrix, f
 	return sendBuffer;
 }
 
+SendBufferRef ClientPacketHandler::Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << potapRotation;
+	bw << posinRotation;
+
+	header->size = bw.WriteSize();
+	header->id = C_MYPOSIN;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	for (int i = 0; i < 4; ++i)
+	{
+		bw << worldMatrix.m[i][0];  // row i, col 0
+		bw << worldMatrix.m[i][1];  // row i, col 1
+		bw << worldMatrix.m[i][2];  // row i, col 2
+		bw << worldMatrix.m[i][3];  // row i, col 3
+	}
+
+	header->size = bw.WriteSize();
+	header->id = C_MYPOS;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
 
 #pragma endregion Packet_to_Server
 
@@ -685,8 +762,8 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
-
-	bw << PosX << PosY << PosZ
+	uint8 TankIndex = Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << TankIndex <<PosX << PosY << PosZ
 		<< nDirX << nDirY << nDirZ;
 
 	header->size = bw.WriteSize();
