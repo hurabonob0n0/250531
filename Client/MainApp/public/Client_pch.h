@@ -22,7 +22,6 @@
 #include <windows.h>
 #include <chrono>
 #include <functional>
-#include <algorithm>
 
 /*--------------------------
 	For Server Connection
@@ -40,6 +39,24 @@ using PlayerRef = shared_ptr<class Player>;
 #define TEAM_RED	false
 
 #define ROBBY	999
+
+
+#define RESPAWNPOS_0 0.f, 40.f, 0.f
+#define RESPAWNPOS_1 1127.f, 40.f, 410.f
+#define RESPAWNPOS_2 507.f, 40.f, 1084.f
+#define RESPAWNPOS_3 -410.f, 40.f, 1127.f
+#define RESPAWNPOS_4 -1084.f, 40.f, 507.f
+#define RESPAWNPOS_5 -1127.f, 40.f, -410.f
+#define RESPAWNPOS_6 -507.f, 40.f, -1084.f
+#define RESPAWNPOS_7 410.f, 40.f, -1127.f
+#define RESPAWNPOS_8 1084.f, 40.f, -507.f
+
+struct Vec3 {
+	float x;
+	float y;
+	float z;
+
+};
 
 struct Room_Data {
 

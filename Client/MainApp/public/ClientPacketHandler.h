@@ -12,11 +12,18 @@ enum
 	S_SUCCESS_LOGIN = 2,
 	S_SUCCESS_ENTER_ROOM = 3,
 	S_GAME_START = 4,
-	S_PLAYER_MOVE = 5,
+	S_ALL_TANK_STATE = 5,
 	S_WEAPON_HIT = 6,
 	S_ROOM_DATA = 7,
 	S_ROOM_ENTER = 8,
 	S_ROOM_PLAYER_STATES = 9,
+	S_ROOM_ALL_PLAYER_FINISH_LOADING = 10,
+	S_TANK_HIT = 11,
+	S_TANK_DAMAGED = 12,
+	S_TANK_DEAD = 13,
+	S_TANK_KILL = 14,
+	S_GAME_WIN = 15,
+	S_GAME_LOSE = 16,
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
@@ -28,10 +35,9 @@ enum
 	C_EXIT_ROOM = 1009,
 	C_CHANGE_INFO = 1010,
 	C_READY = 1011,
-	C_START = 1012
+	C_START = 1012,
+	C_RESPAWN_TANK = 1013
 };
-
-
 
 
 class ClientPacketHandler
@@ -40,19 +46,29 @@ public:
 
 	static void HandlePacket(BYTE* buffer, int32 len);
 	static void Handle_S_TEST(BYTE* buffer, int32 len);
-	
-	
-	
+
+
+
 	static void Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len);
-	
+
 	static void Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_ENTER(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len);
 	static void Handle_S_GAME_START(BYTE* buffer, int32 len);
 
-	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
+
+	static void Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len);
+	static void Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len);
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
 	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);
+
+	static void Handle_S_HIT_TANK(BYTE* buffer, int32 len);
+	static void Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len);
+	static void Handle_S_DEAD_TANK(BYTE* buffer, int32 len);
+	static void Handle_S_KILL_TANK(BYTE* buffer, int32 len);
+	static void Handle_S_GAME_WIN(BYTE* buffer, int32 len);
+	static void Handle_S_GAME_LOSE(BYTE* buffer, int32 len);
+
 
 	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation);
 	static SendBufferRef Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ);
@@ -66,9 +82,13 @@ public:
 	static SendBufferRef Make_C_CHANGE_INFO(Room_Ready_Data data);
 	static SendBufferRef Make_C_READY(uint8 dummy);
 	static SendBufferRef Make_C_START(uint8 dummy);
+	static SendBufferRef Make_C_LOADING_FINISH(uint8 dummy);
+	static SendBufferRef Make_C_TANK_RESPAWN(_float4x4& worldMatrix, float potapRotation, float posinRotation);
+
+	//For GamePlay
 
 	USE_LOCK;
-	
+
 	//static SendBufferRef Make_C_SHOT(uint, uint16 attack);
 
 
