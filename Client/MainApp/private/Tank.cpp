@@ -15,6 +15,11 @@ CTank::CTank(CTank& rhs) : CRenderObject(rhs)
 {
 }
 
+void CTank::Set_Team(int Team)
+{
+	m_VIBuffer->Set_Team(Team);
+}
+
 HRESULT CTank::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
@@ -76,9 +81,9 @@ HRESULT CTank::Initialize(void* pArg)
 
 	m_VIBuffer->Set_MatOffsets(matindex);
 
-	m_VIBuffer->Set_Team(m_GameInstance->Get_RandomI(1, 3));
-
 	m_pPhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
+
+	Set_Team(1);
 
 	Initialize_For_PosinQuad();
 
@@ -137,7 +142,7 @@ void CTank::Tick(float fTimeDelta)
 
 		if (m_GameInstance->Mouse_Down(0)) {
 			//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-			SendShootDataToServer();
+			//SendShootDataToServer();
 		}
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
@@ -456,7 +461,7 @@ void CTank::LateTick(float fTimeDelta)
 
 void CTank::Render()
 {
-	if (!m_isQuadTurn)
+	/*if (!m_isQuadTurn)
 	{
 		for (int i = 0; i < 55; ++i)
 			m_VIBuffer->Render(i);
@@ -473,7 +478,24 @@ void CTank::Render()
 	}
 
 	else if (!_myPlayer)
-		m_isQuadTurn = false;
+		m_isQuadTurn = false;*/
+
+	if (_myPlayer)
+	{
+		if (m_isFPS) {
+			Render_For_Posin_Image();
+		}
+		else
+		{
+			for (int i = 0; i < 55; ++i)
+				m_VIBuffer->Render(i);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 55; ++i)
+			m_VIBuffer->Render(i);
+	}
 }
 
 void CTank::Set_PotapRotation(float fDegree)

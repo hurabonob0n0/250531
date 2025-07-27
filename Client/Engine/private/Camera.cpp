@@ -61,7 +61,7 @@ void CCamera::LateTick(float fTimeDelta)
 		XMConvertToRadians(60.0f), // Field of View (radian ´ÜÀ§)
 		1.7777,               // Aspect ratio = width / height
 		1.f,                     // Near clipping plane
-		1000.f                       // Far clipping plane
+		10000.f                       // Far clipping plane
 	);
 
 	PassConstants pc{};
@@ -80,8 +80,8 @@ void CCamera::LateTick(float fTimeDelta)
 	XMStoreFloat4x4(&pc.ViewProj, XMMatrixTranspose(viewProj));
 	XMVECTOR vec = m_TransformCom->Get_State(CTransform::STATE_POSITION);
 	XMStoreFloat3(&pc.EyePosW, m_TransformCom->Get_State(CTransform::STATE_POSITION));
-	pc.EyePosW;
-	pc.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
+	XMStoreFloat4x4(&pc.ShadowTransform, m_GameInstance->m_ShadowMap->S);
+	pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
 	pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
 	pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
 	pc.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };

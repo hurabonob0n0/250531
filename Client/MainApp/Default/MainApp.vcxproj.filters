@@ -328,5 +328,8 @@
     <FxCompile Include="..\bin\Shaders\UI.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\bin\Shaders\Shadows.hlsl">
+      <Filter>ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

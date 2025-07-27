@@ -16,7 +16,14 @@ public:
 	ID3D12CommandQueue*			Get_CommandQueue() { return m_CommandQueue; }
 	ID3D12Device*				Get_Device() { return m_Device; }
 	UINT						Get_CBVUAVSRVHeapSize() { return m_CbvSrvUavDescriptorSize; }
+	UINT						Get_DSVSize() { return m_DsvDescriptorSize; }
 	void Execute_CommandList();
+
+public:
+	void Set_ViewPort_and_ScissorRect() {
+		m_CommandList->RSSetViewports(1, &m_ScreenViewport);
+		m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
+	}
 
 #pragma region Initialize GraphicDev
 public:

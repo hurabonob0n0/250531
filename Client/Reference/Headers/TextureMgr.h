@@ -7,7 +7,7 @@ BEGIN(Engine)
 class ENGINE_DLL CTextureMgr : public CBase
 {
 public:
-	enum TEXTURETYPE{TT_TEXTURE2D,TT_TEXTURECUBE,TT_END};
+	enum TEXTURETYPE{TT_TEXTURE2D,TT_TEXTURECUBE,TT_SHADOWMAP, TT_END};
 
 	DECLARE_SINGLETON(CTextureMgr)
 private:
@@ -16,6 +16,7 @@ private:
 
 public:
 	int Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT = TT_TEXTURE2D);
+	void Add_ShadowMap(ID3D12Resource** Resource);
 	ID3D12Resource* Get_Texture(string texname) { return m_TexMap[texname]->Get_Texture(); }
 	void Make_DescriptorHeap();
 	void Set_DescriptorHeap();
@@ -24,6 +25,7 @@ public:
 
 public:
 	ID3D12DescriptorHeap* Get_DescriptorHeap() { return srvDescriptorHeap; }
+	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_CPUSRVDescriptorHeap() { return hDescriptor; }
 
 private:
 	ID3D12DescriptorHeap* srvDescriptorHeap;

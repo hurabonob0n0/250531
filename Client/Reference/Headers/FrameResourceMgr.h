@@ -26,7 +26,7 @@ public:
 	void Set_ObjectConstantBufferIndex(_uint& CBIndex);
 
 public:
-	void Set_CurrentFramePBMats();
+	void Set_CurrentFramePBMats(_uint index);
 
 public:
 	void Flush_CommandQueue();

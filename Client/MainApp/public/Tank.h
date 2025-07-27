@@ -27,10 +27,14 @@ public:
 	virtual void Render();
 
 public:
+	void Set_Team(int Team);
+
+public:
 	void Set_PotapRotation(float fDegree);
 	void Set_PoSinpRotation(float fDegree);
 	void Set_ShotDir(XMVECTOR Vec);
 	void Set_ShotMatrix(_matrix mat);
+
 private:
 	CModel* m_VIBuffer;
 	
@@ -53,6 +57,7 @@ private:
 public:
 	void set_MyPlayer() {
 		_myPlayer = true;
+		Set_Team(3);
 	}
 	void SendMyStateToServer();
 	void SendShootDataToServer();
@@ -66,7 +71,7 @@ private:		//For PosinCrosshair
 	CRenderer::RENDERGROUP	m_RGQuad = CRenderer::RENDERGROUP::RG_UI;
 	CTransform*				m_QuadWorldTransform;
 	CTransform*				m_QuadTexTransform;
-	bool					m_isQuadTurn = false;
+	//bool					m_isQuadTurn = false;
 	float					m_fSameTime = 0.f;
 	bool					m_isFPS = false;
 

@@ -5,7 +5,7 @@ IMPLEMENT_SINGLETON(CTextureMgr);
 
 int CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT) 
 {
-    int index = 0;
+    int index = 1;
     for (auto it = m_TexMap.begin(); it != m_TexMap.end(); ++it, ++index)
     {
         if (it->first == texname)
@@ -34,8 +34,8 @@ int CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE 
         srvDesc.Texture2D.MostDetailedMip = 0;
         srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
         GETDEVICE->CreateShaderResourceView(texInstance->Get_Texture(), &srvDesc, hDescriptor);
-        
         break;
+
     case Engine::CTextureMgr::TT_TEXTURECUBE:
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
         srvDesc.TextureCube.MostDetailedMip = 0;
@@ -44,6 +44,7 @@ int CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE 
         srvDesc.Format = texInstance->Get_Texture()->GetDesc().Format;
         GETDEVICE->CreateShaderResourceView(texInstance->Get_Texture(), &srvDesc, hDescriptor);
         break;
+
     case Engine::CTextureMgr::TT_END:
         break;
     default:
@@ -53,6 +54,21 @@ int CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE 
     //hDescriptor = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
     return index;
+}
+
+void CTextureMgr::Add_ShadowMap(ID3D12Resource** Resource)
+{
+    hDescriptor = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    srvDesc.Texture2D.PlaneSlice = 0;
+    GETDEVICE->CreateShaderResourceView(*Resource, &srvDesc, hDescriptor);
 }
 
 void CTextureMgr::Make_DescriptorHeap()

@@ -54,6 +54,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("UIVS", CShader::ST_VS, L"../bin/Shaders/UI.hlsl", nullptr);
 	m_ShaderMgr->AddShader("UIPS", CShader::ST_PS, L"../bin/Shaders/UI.hlsl", nullptr);
 
+	m_ShaderMgr->AddShader("ShadowVS", CShader::ST_VS, L"../bin/Shaders/Shadows.hlsl", nullptr);
 
 	//PSOMgr
 	m_PSOMgr = CPSOMgr::Get_Instance();
@@ -89,6 +90,14 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetPS(m_ShaderMgr->GetShaderObj("UIPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
 
+	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_MESH)->
+		SetVS(m_ShaderMgr->GetShaderObj("ShadowVS"))->
+		SetPS(nullptr)->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		setForShadow()->
+		Create_PSO());
+
 	//Renderer
 	m_MainRenderer = CRenderer::Create(Get_Device(),Get_CommandList(),this);
 	m_ComponentMgr->AddPrototype("RendererCom", m_MainRenderer);
@@ -104,6 +113,9 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_TextureMgr = CTextureMgr::Get_Instance();
 	m_TextureMgr->Resize_TexMap();
 	m_TextureMgr->Make_DescriptorHeap();
+	
+	m_ShadowMap = CShadowMap::Get_Instance();
+	m_ShadowMap->Initialize();
 	
 	m_Graphic_Dev->Execute_CommandList();
 
@@ -122,6 +134,8 @@ void CGameInstance::Update(CTimer* pTimer)
 
 void CGameInstance::Late_Update(CTimer* pTimer)
 {
+	m_ShadowMap->Late_Update();
+	
 	m_ObjectMgr->LateUpdate(pTimer->DeltaTime());
 
 	m_MaterialMgr->Update_Mats();

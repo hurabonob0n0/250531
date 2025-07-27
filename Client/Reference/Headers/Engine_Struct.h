@@ -41,6 +41,7 @@ namespace Engine
 		DirectX::XMFLOAT4X4 InvProj = XMFLOAT4X4{};
 		DirectX::XMFLOAT4X4 ViewProj = XMFLOAT4X4{};
 		DirectX::XMFLOAT4X4 InvViewProj = XMFLOAT4X4{};
+		DirectX::XMFLOAT4X4 ShadowTransform = XMFLOAT4X4{};
 		DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
 		float cbPerObjectPad1 = 0.0f;
 		DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };

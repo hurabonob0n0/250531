@@ -109,11 +109,11 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 
 
-#pragma region For Server
-
-	//ConnectServer();
-
-#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
+//#pragma region For Server
+//
+//	//ConnectServer();
+//
+//#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
 
 
 
@@ -153,37 +153,18 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 	m_GameInstance->AddObject("Tank", "Tank", &mat1);
-	_matrix mat2 = XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(500.f, 40.f, 10.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat2);
-	_matrix mat5 = XMMatrixRotationY(XMConvertToRadians(190.f)) * XMMatrixTranslation(495.f, 40.f, 20.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat5);
-
-
-	_matrix mat6 = XMMatrixRotationY(XMConvertToRadians(200.f)) * XMMatrixTranslation(450.f, 40.f, -50.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat6);
-
-	_matrix mat4 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
-	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat4);
-
 	
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
+
 	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
 
+	/*_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
+	m_GameInstance->AddObject("Effect", "Effect", &mat3);*/
 
-
-	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
-	m_GameInstance->AddObject("Effect", "Effect", &mat3);
-
-
-	//m_GameInstance->AddObject("UI", "UI", nullptr);
-
-	/*_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	m_GameInstance->AddObject("Tree", "Tree", &mat5);*/
-	//_matrix mat5 = XMMatrixScaling(30.f, 30.f, 30.f) * XMMatrixTranslation(0.f, 30.f, 10.f);
-	m_GameInstance->AddObject("Tree", "Tree", nullptr);
+	//m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
 	m_GameInstance->Execute_CommandList();
 
@@ -213,6 +194,9 @@ int CMainApp::Run()
 		else
 		{
 			m_Timer->Tick();
+
+			/*if (m_Timer->DeltaTime() < 1.f)
+				continue;*/
 
 			if (!m_AppPaused)
 			{

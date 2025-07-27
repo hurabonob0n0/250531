@@ -121,6 +121,9 @@
     <Filter Include="01.System\07.RandomMgr">
       <UniqueIdentifier>{8ce46c69-c004-4086-b44b-23a2e7ac3de6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.System\08.ShadowMap">
+      <UniqueIdentifier>{be84958a-cb29-4089-b17b-625d4398437d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Engine_Defines.h">
@@ -264,6 +267,9 @@
     <ClInclude Include="..\public\Random_Manager.h">
       <Filter>01.System\07.RandomMgr</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ShadowMap.h">
+      <Filter>01.System\08.ShadowMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -391,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Random_Manager.cpp">
       <Filter>01.System\07.RandomMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ShadowMap.cpp">
+      <Filter>01.System\08.ShadowMap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
