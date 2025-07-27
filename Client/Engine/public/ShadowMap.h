@@ -21,6 +21,9 @@ public:
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhGpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCpuDsv;
 
+	D3D12_VIEWPORT mViewport;
+	D3D12_RECT mScissorRect;
+
 	XMMATRIX S;
 
 public:

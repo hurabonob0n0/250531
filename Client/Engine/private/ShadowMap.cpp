@@ -52,6 +52,8 @@ void CShadowMap::Initialize()
 	dsvDesc.Texture2D.MipSlice = 0;
 	m_Device->CreateDepthStencilView(m_Resource, &dsvDesc, mhCpuDsv);
 
+	mViewport = { 0.0f, 0.0f, (float)4096, (float)4096, 0.0f, 1.0f };
+	mScissorRect = { 0, 0, (int)4096, (int)4096 };
 
 }
 
@@ -62,7 +64,7 @@ void CShadowMap::Late_Update()
 	_float3 ld = _float3(0.57735f, -0.57735f, 0.57735f);
 
 	XMVECTOR lightDir = XMVectorSet(0.57735f, -0.57735f, 0.57735f, 0.f);
-	XMVECTOR lightPos = -2.0f * 5792.62f * lightDir;
+	XMVECTOR lightPos = -2.0f * 2896.31f * lightDir;
 	XMVECTOR targetPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
@@ -74,12 +76,12 @@ void CShadowMap::Late_Update()
 	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, lightView));
 
 	// Ortho frustum in light space encloses scene.
-	float l = sphereCenterLS.x - 5792.62f;
-	float b = sphereCenterLS.y - 5792.62f;
-	float n = sphereCenterLS.z - 5792.62f;
-	float r = sphereCenterLS.x + 5792.62f;
-	float t = sphereCenterLS.y + 5792.62f;
-	float f = sphereCenterLS.z + 5792.62f;
+	float l = sphereCenterLS.x - 2896.31f;
+	float b = sphereCenterLS.y - 2896.31f;
+	float n = sphereCenterLS.z - 2896.31f;
+	float r = sphereCenterLS.x + 2896.31f;
+	float t = sphereCenterLS.y + 2896.31f;
+	float f = sphereCenterLS.z + 2896.31f;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 

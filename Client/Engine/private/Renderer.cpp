@@ -77,7 +77,9 @@ void CRenderer::Render()
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
     m_GameInstance->Set_CurrentFramePBMats(1);
     m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-    m_GameInstance->Set_ViewPort_and_ScissorRect();
+    //m_GameInstance->Set_ViewPort_and_ScissorRect();
+    m_CommandList->RSSetViewports(1, &m_GameInstance->m_ShadowMap->mViewport);
+    m_CommandList->RSSetScissorRects(1, &m_GameInstance->m_ShadowMap->mScissorRect);
     m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GameInstance->m_ShadowMap->m_Resource,
         D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
     m_CommandList->ClearDepthStencilView(m_GameInstance->m_ShadowMap->mhCpuDsv,
