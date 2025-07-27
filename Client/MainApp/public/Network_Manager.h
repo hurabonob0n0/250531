@@ -53,8 +53,7 @@ public:
 	bool isConnected() { return _connected; };
 
 public:
-	int GetMyClientID() { return MyClientID; };
-
+	int GetMyClientID() {
 
 		return MyClientID;
 	};
@@ -120,15 +119,29 @@ public:
 	int BLUEBAR = 0;
 
 
+
 private:
+
 	ClientServiceRef _service;
-	bool _connected;
+	bool _connected = false;
 	int MyClientID;
+
+	bool GameStart;
+
+	Room_Ready_Data myData;
+
+	std::vector<Room_Ready_Data> _RoomPlayers;
 
 	std::queue<QueuedPacket> _packetQueue;
 	std::mutex _mutex;
 
+	int MyTankIndex;
+
+
+	int MyHp;
+	int MyKillCount = 0;
+	USE_LOCK;
+
 public:
 	static	Network_Manager* m_pInstance;
 };
-

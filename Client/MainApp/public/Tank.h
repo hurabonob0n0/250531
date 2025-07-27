@@ -59,6 +59,8 @@ public:
 		_myPlayer = true;
 		Set_Team(3);
 	}
+	void Set_POSU() { _ImPosu = true; };
+	void Set_MyTeam(bool isBlue) { _MyTeam = isBlue; };
 	void SendMyStateToServer();
 	void SendPosinData();
 	void SendPosData();
@@ -67,7 +69,9 @@ public:
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 
 
-	void Set_MyPos(_float4x4 mat);
+	void Set_Posin(float PotapRot, float PosinRot);
+
+	void Set_MyPos(float x, float y, float z);
 
 private:		//For PosinCrosshair
 	CBBinding*				m_CBBindingQuad;
@@ -75,11 +79,10 @@ private:		//For PosinCrosshair
 	CRenderer::RENDERGROUP	m_RGQuad = CRenderer::RENDERGROUP::RG_UI;
 	CTransform*				m_QuadWorldTransform;
 	CTransform*				m_QuadTexTransform;
-	//bool					m_isQuadTurn = false;
+	bool					m_isQuadTurn = false;
 	float					m_fSameTime = 0.f;
 	bool					m_isFPS = false;
-	int						TPSQuadIndex;
-	int						FPSQuadIndex;
+
 
 private:		//For PosinCrosshair
 	void Initialize_For_PosinQuad();
@@ -89,7 +92,12 @@ private:		//For PosinCrosshair
 
 public:
 	bool _myPlayer = false;
+	bool _MyTeam;
+	int  _ImPosu;
 
+	bool _isSpawn;
+	void set_Spawn(bool torf) { _isSpawn = torf; };
+	float _respawnTimer = 0.0f;
 private:
 	MyPhysicsEngine::CMyPhysicsEngine* m_pPhysicsEngine = nullptr;
 	MyPhysicsEngine::CMyPhysicsEngine::TankControlState m_TankConsrolState{};

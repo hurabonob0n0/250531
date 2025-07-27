@@ -4,15 +4,17 @@
 #include "GameInstance.h"
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
-
+#include "Network_Manager.h"
 
 
 CTank::CTank() : CRenderObject()
 {
+	_isSpawn = true;
 }
 
 CTank::CTank(CTank& rhs) : CRenderObject(rhs)
 {
+	_isSpawn = true;
 }
 
 void CTank::Set_Team(int Team)
@@ -818,7 +820,7 @@ void CTank::LateTick(float fTimeDelta)
 			m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
 			m_VIBuffer->Update();
-			Network_Manager::GetInstance()->isConnected();
+			if(Network_Manager::GetInstance()->isConnected());
 				SendPosData();
 
 		}
@@ -1113,12 +1115,17 @@ void CTank::Set_Posin(float PotapRot, float PosinRot)
 
 }
 
-void CTank::Set_MyPos(_float4x4 mat)
+
+
+void CTank::Set_MyPos(float x, float y, float z)
 {
+	m_pPhysicsEngine->Set_Pos(x, y, z);
 
-	m_TransformCom->Set_WorldMatrix(mat);
+	_vector safePos = XMVectorSet(x, y, z, 1.0f);
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, safePos);
+
+
 }
-
 
 
 void CTank::Tick_For_Posin_Image(float fTimeDelta)

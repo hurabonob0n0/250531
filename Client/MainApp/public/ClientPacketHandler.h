@@ -12,12 +12,11 @@ enum
 	S_SUCCESS_LOGIN = 2,
 	S_SUCCESS_ENTER_ROOM = 3,
 	S_GAME_START = 4,
-	S_PLAYER_MOVE = 5,
+	S_ALL_TANK_STATE = 5,
 	S_WEAPON_HIT = 6,
 	S_ROOM_DATA = 7,
 	S_ROOM_ENTER = 8,
 	S_ROOM_PLAYER_STATES = 9,
-
 	S_ROOM_ALL_PLAYER_FINISH_LOADING = 10,
 	S_TANK_HIT = 11,
 	S_TANK_DAMAGED = 12,
@@ -26,7 +25,6 @@ enum
 	S_GAME_WIN = 15,
 	S_GAME_LOSE = 16,
 	S_CAPTURE = 17,
-
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
@@ -63,11 +61,12 @@ public:
 	static void Handle_S_ROOM_ENTER(BYTE* buffer, int32 len);
 	static void Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len);
 	static void Handle_S_GAME_START(BYTE* buffer, int32 len);
-
-	static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
+	
+	
+	static void Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len);
+	static void Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len);
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
 	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);
-
 
 	static void Handle_S_HIT_TANK(BYTE* buffer, int32 len);
 	static void Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len);
@@ -76,6 +75,10 @@ public:
 	static void Handle_S_GAME_WIN(BYTE* buffer, int32 len);
 	static void Handle_S_GAME_LOSE(BYTE* buffer, int32 len);
 	static void Handle_S_CAPTURE(BYTE* buffer, int32 len);
+	
+	
+	
+	//static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 
 
 

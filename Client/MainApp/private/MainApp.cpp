@@ -20,8 +20,9 @@
 #include "ThreadManager.h"
 #include "Session.h"
 #include "BufferReader.h"
-//#include "ClientPacketHandler.h"
-//#include "ServiceManager.h"
+#include "ClientPacketHandler.h"
+#include "Network_Manager.h"
+#include "ServiceManager.h"
 
 /*----------------
 	For Lobby
@@ -61,6 +62,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CMainApp::CMainApp() : m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
 {
 }
+
+static const XMFLOAT3 g_RespawnPositions[8] =
+{
+	XMFLOAT3(RESPAWNPOS_1),
+	XMFLOAT3(RESPAWNPOS_2),
+	XMFLOAT3(RESPAWNPOS_3),
+	XMFLOAT3(RESPAWNPOS_4),
+	XMFLOAT3(RESPAWNPOS_5),
+	XMFLOAT3(RESPAWNPOS_6),
+	XMFLOAT3(RESPAWNPOS_7),
+	XMFLOAT3(RESPAWNPOS_8),
+};
 
 
 HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
@@ -112,13 +125,80 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
-
-	_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
-	m_GameInstance->AddObject("Tank", "Tank", &mat1);
 	
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 
-	dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	if (Network_Manager::GetInstance()->isConnected()) {
+
+		const auto& roomPlayers = Network_Manager::GetInstance()->GetRoomPlayers();
+		int myPos = Network_Manager::GetInstance()->GetMyInGame_Data().Position; // 내 포지션
+
+		// map<조종수 포지션, 해당 탱크에 탑승할 플레이어들>
+		std::map<int, std::vector<Room_Ready_Data>> tankSlotMap;
+
+		for (size_t i = 0; i < roomPlayers.size(); ++i)
+		{
+			const Room_Ready_Data& player = roomPlayers[i];
+
+			int pos = player.Position;
+			int keyPos = (pos % 2 == 0) ? pos - 1 : pos; // 짝수는 조종수 포지션으로 매핑
+			tankSlotMap[keyPos].push_back(player);
+		}
+
+		int tankIndex = 0;
+		for (std::map<int, std::vector<Room_Ready_Data>>::iterator it = tankSlotMap.begin(); it != tankSlotMap.end(); ++it)
+		{
+			int driverPosition = it->first;
+			const std::vector<Room_Ready_Data>& playerList = it->second;
+
+			// 팀 구분
+			bool isBlue = (driverPosition <= 8);
+
+			// 탱크 위치 설정
+			float x = 50.f * tankIndex;
+			float y = 40.f;
+			float z = isBlue ? 50.f : 150.f;
+
+			_matrix tankMat = XMMatrixTranslation(x, y, z);
+			m_GameInstance->AddObject("Tank", "Tank", &tankMat);
+
+			CTank* tank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", tankIndex));
+			if (tank)
+			{
+				tank->Set_Team(isBlue + 1);
+
+				// 탑승자 중 내 플레이어 포지션 확인
+				for (size_t j = 0; j < playerList.size(); ++j)
+				{
+					const Room_Ready_Data& player = playerList[j];
+					if (player.Position == myPos)  // <-- ID 대신 포지션 비교
+					{
+						tank->set_MyPlayer();
+						tank->Set_Team(3);
+						if (player.Position % 2 == 0) {
+
+							tank->Set_POSU();
+							Network_Manager::GetInstance()->ImPosu = true;
+						}
+
+						Network_Manager::GetInstance()->SetMyTankIndex(tankIndex);
+						if (tankIndex >= 0 && tankIndex < 8)
+						{
+							const XMFLOAT3& pos = g_RespawnPositions[tankIndex];
+							tank->Set_MyPos(pos.x, pos.y, pos.z);
+						}
+					}
+				}
+			}
+
+			++tankIndex;
+		}
+	}
+	else {
+		_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
+		m_GameInstance->AddObject("Tank", "Tank", &mat1);
+		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+	}
 
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
@@ -168,13 +248,17 @@ int CMainApp::Run()
 		{
 			m_Timer->Tick();
 
-			/*if (m_Timer->DeltaTime() < 1.f)
-				continue;*/
-
-			if (!m_AppPaused)
+			bool isConnected = Network_Manager::GetInstance()->isConnected();
+			bool isGameStart = Network_Manager::GetInstance()->GetGameStart();
+			if (!m_AppPaused && (!isConnected || (isConnected && isGameStart)))
 			{
-
 				CalculateFrameStats();
+
+				if (isConnected)
+				{
+					Network_Manager::GetInstance()->Dispatch(PacketQueueType::INGAME);
+				}
+
 				Update(m_Timer);
 				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
 				Late_Update(m_Timer);
@@ -202,8 +286,8 @@ int CMainApp::Run()
 			}
 		}
 	}
-
 	RELEASE_INSTANCE(CMainApp);
+
 
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)

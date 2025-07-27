@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Client_Globals.h"
 #include "Terrain.h"
+#include "Network_Manager.h"
 
 CCamera_Free::CCamera_Free() : CCamera()
 {
