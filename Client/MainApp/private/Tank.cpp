@@ -4,15 +4,16 @@
 #include "GameInstance.h"
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
-
-
+#include "NetWork_Manager.h"
 
 CTank::CTank() : CRenderObject()
 {
+	_isSpawn = true;
 }
 
 CTank::CTank(CTank& rhs) : CRenderObject(rhs)
 {
+	_isSpawn = true;
 }
 
 void CTank::Set_Team(int Team)
@@ -108,6 +109,51 @@ void CTank::Initialize_For_PosinQuad()
 
 void CTank::Tick(float fTimeDelta)
 {
+
+	if (!_isSpawn)
+	{
+		_respawnTimer += fTimeDelta;
+		if (_respawnTimer >= 5.f && Network_Manager::GetInstance()->ReSpawnChoice)
+		{
+			_isSpawn = true;
+			_respawnTimer = 0.f;
+
+			Network_Manager::GetInstance()->ReSpawnChoice = false;
+
+
+			XMFLOAT3 respawnPosVec;
+
+			switch (Network_Manager::GetInstance()->ReSpawnPos)
+			{
+			case 1: respawnPosVec = XMFLOAT3(RESPAWNPOS_1); break;
+			case 2: respawnPosVec = XMFLOAT3(RESPAWNPOS_2); break;
+			case 3: respawnPosVec = XMFLOAT3(RESPAWNPOS_3); break;
+			case 4: respawnPosVec = XMFLOAT3(RESPAWNPOS_4); break;
+			case 5: respawnPosVec = XMFLOAT3(RESPAWNPOS_5); break;
+			case 6: respawnPosVec = XMFLOAT3(RESPAWNPOS_6); break;
+			case 7: respawnPosVec = XMFLOAT3(RESPAWNPOS_7); break;
+			case 8: respawnPosVec = XMFLOAT3(RESPAWNPOS_8); break;
+			default: respawnPosVec = XMFLOAT3(0.f, 25.f, 0.f); break;
+			}
+
+			// 물리엔진 위치 설정
+			m_pPhysicsEngine->Set_Pos(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z);
+
+			// Transform도 이동
+			_vector respawnPos = XMVectorSet(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z, 1.f);
+			m_TransformCom->Set_State(CTransform::STATE_POSITION, respawnPos);
+
+			_float4x4 TempMat;
+			XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
+
+			auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
+			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
+		}
+		return; // 입력 처리 및 움직임 차단
+	}
+
+
 	if (_myPlayer)
 	{
 
@@ -147,31 +193,6 @@ void CTank::Tick(float fTimeDelta)
 
 		m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 	}
-
-	else
-	{
-
-		if (m_GameInstance->Key_Pressing('W'))
-			m_TransformCom->Go_Straight(fTimeDelta * 10.f);
-
-		if (m_GameInstance->Key_Pressing('A'))
-			m_TransformCom->Go_Left(fTimeDelta * 10.f);
-
-		if (m_GameInstance->Key_Pressing('S'))
-			m_TransformCom->Go_Backward(fTimeDelta * 10.f);
-
-		if (m_GameInstance->Key_Pressing('D'))
-			m_TransformCom->Go_Right(fTimeDelta * 10.f);
-
-		//if (m_GameInstance->Key_Pressing(VK_SPACE))
-		//	m_TransformCom->Go_Right(fTimeDelta * 10.f);
-
-		//if (m_GameInstance->Key_Pressing(VK_LCONTROL))
-		//	m_TransformCom->Go_Right(fTimeDelta * 10.f);
-
-
-	}
-
 
 }
 
@@ -385,8 +406,7 @@ void CTank::LateTick(float fTimeDelta)
 
 		m_VIBuffer->Update();
 
-		//for server
-		//SendMyStateToServer();
+		SendMyStateToServer();
 
 	}
 
@@ -457,6 +477,28 @@ void CTank::LateTick(float fTimeDelta)
 
 	if (m_GameInstance->Mouse_Down(1))
 		m_isFPS = !m_isFPS;
+
+	if (_myPlayer)
+	{
+		_vector vCurPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+		float y = XMVectorGetY(vCurPos);
+
+		if (y < -60.f)
+		{
+			float safeX = XMVectorGetX(vCurPos);
+			float safeZ = XMVectorGetZ(vCurPos);
+			float safeY = 40.0f; // 안전한 높이
+
+			// 물리 위치 재설정
+			m_pPhysicsEngine->Set_Pos(safeX, safeY, safeZ);
+
+			// Transform 동기화 (옵션, 프레임에 따라 자동 동기화 될 수도 있음)
+			_vector safePos = XMVectorSet(safeX, safeY, safeZ, 1.0f);
+			m_TransformCom->Set_State(CTransform::STATE_POSITION, safePos);
+
+
+		}
+	}
 }
 
 void CTank::Render()
@@ -497,6 +539,16 @@ void CTank::Set_ShotDir(XMVECTOR Vec)
 void CTank::Set_ShotMatrix(_matrix mat)
 {
 	ShotMatrix = mat;
+}
+
+void CTank::Set_MyPos(float x, float y, float z)
+{
+
+	m_pPhysicsEngine->Set_Pos(x, y, z);
+
+
+	_vector safePos = XMVectorSet(x, y, z, 1.0f);
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, safePos);
 }
 
 void CTank::Free()
@@ -595,6 +647,14 @@ void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
 {
 
 	m_TransformCom->Set_WorldMatrix(mat);
+	Set_PotapRotation(PotapRot);
+	Set_PoSinpRotation(PosinRot);
+
+}
+
+void CTank::Set_Posin(float PotapRot, float PosinRot)
+{
+
 	Set_PotapRotation(PotapRot);
 	Set_PoSinpRotation(PosinRot);
 
