@@ -35,9 +35,10 @@ public:
 	void Set_ShotDir(XMVECTOR Vec);
 	void Set_ShotMatrix(_matrix mat);
 
+	void Respawn();
 private:
 	CModel* m_VIBuffer;
-	
+
 	_matrix ShotMatrix;
 	XMVECTOR vShotDir;
 	float   m_fPotapRotation = 0.f;			//이게 카메라가 주는 회전값
@@ -49,7 +50,7 @@ private:
 	float	m_TestX = -512.f;
 	bool	KeyInput = false;
 
-	_uint matindex= 0;
+	_uint matindex = 0;
 
 private:
 	void RotPotap_And_Posin(float fTimeDelta);
@@ -74,11 +75,11 @@ public:
 	void Set_MyPos(float x, float y, float z);
 
 private:		//For PosinCrosshair
-	CBBinding*				m_CBBindingQuad;
-	CVIBuffer_Quad*			m_VIBufferQuad;
+	CBBinding* m_CBBindingQuad;
+	CVIBuffer_Quad* m_VIBufferQuad;
 	CRenderer::RENDERGROUP	m_RGQuad = CRenderer::RENDERGROUP::RG_UI;
-	CTransform*				m_QuadWorldTransform;
-	CTransform*				m_QuadTexTransform;
+	CTransform* m_QuadWorldTransform;
+	CTransform* m_QuadTexTransform;
 	bool					m_isQuadTurn = false;
 	float					m_fSameTime = 0.f;
 	bool					m_isFPS = false;
@@ -89,12 +90,20 @@ private:		//For PosinCrosshair
 	void Tick_For_Posin_Image(float fTimeDelta);
 	void Render_For_Posin_Image();
 
+	void CheckRespawnKeyInput();
+
+	void setRespawn();
+private:
+	float _shootTimer = 0.f;  // 누적 슈팅 시간
+	const float SHOOT_INTERVAL = 4.f; // 4초 주기
 
 public:
 	bool _myPlayer = false;
 	bool _MyTeam;
 	int  _ImPosu;
+	bool is_choiced;
 
+	int Choiced_Pos;
 	bool _isSpawn;
 	void set_Spawn(bool torf) { _isSpawn = torf; };
 	float _respawnTimer = 0.0f;
