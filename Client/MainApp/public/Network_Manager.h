@@ -39,7 +39,7 @@ public:
 
 public:
 	bool Initialize(const std::wstring& ip, uint16 port);
-	void Update(); // ¸í·É Å¥ Ã³¸®¿ë
+	void Update(); // Â¸Ã­Â·Ã‰ Ã…Â¥ ÃƒÂ³Â¸Â®Â¿Ã«
 
 	void PushPacket(PacketQueueType type, std::function<void()> handler);
 	void Dispatch(PacketQueueType type);
@@ -54,6 +54,71 @@ public:
 
 public:
 	int GetMyClientID() { return MyClientID; };
+
+
+		return MyClientID;
+	};
+	void SetMyClientID(int id) {
+
+		MyClientID = id;
+
+	};
+
+
+	Room_Ready_Data GetMyInGame_Data() {
+
+		for (const auto& data : _RoomPlayers)
+		{
+			if (data.PlayerID == MyClientID)
+				return data;
+		}
+		return Room_Ready_Data{};
+
+	};
+
+	void SetRoomPlayers(const std::vector<Room_Ready_Data>& players) {
+
+		_RoomPlayers = players;
+	}
+
+	const std::vector<Room_Ready_Data>& GetRoomPlayers() const {
+		return _RoomPlayers;
+	}
+
+
+	void SetGamstart() { WRITE_LOCK; GameStart = true; };
+
+	bool GetGameStart() {
+		READ_LOCK;
+		return GameStart;
+
+	}
+	void SetMyTankIndex(int TankIndex) { MyTankIndex = TankIndex; };
+	int  GetMyTankIndex() { return MyTankIndex; };
+
+	void Im_damaged() {
+		MyHp -= 25;
+		if (MyHp <= 0) {
+			MyHp = 0;
+		}
+
+	};
+	void ReSpawn() { MyHp = 100; };
+
+	void add_MyKillCount() {
+		++MyKillCount;
+	};
+
+	bool ImPosu = false;
+	int myPosition;
+
+	bool ReSpawnChoice = false;
+	int ReSpawnPos;
+	bool SingleMode = true;
+
+	int REDBAR = 0;
+	int BLUEBAR = 0;
+
 
 private:
 	ClientServiceRef _service;

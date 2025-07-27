@@ -33,13 +33,22 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	//m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
-	//Safe_AddRef(m_TankTransform);
 
-	//m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
-	//Safe_AddRef(m_Tank);
+	if (Network_Manager::GetInstance()->isConnected()) {
+		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", Network_Manager::GetInstance()->GetMyTankIndex(), "TransformCom");
+		Safe_AddRef(m_TankTransform);
 
+		m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", Network_Manager::GetInstance()->GetMyTankIndex());
+		Safe_AddRef(m_Tank);
+	}
+	else {
+		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+		Safe_AddRef(m_TankTransform);
 
+		m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
+		Safe_AddRef(m_Tank);
+
+	}
 	m_Distance_TPS = 20.f;
 
 	m_fYRot_TPS = 0.f;
@@ -56,6 +65,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
 
+	if (Network_Manager::GetInstance()->ImPosu)
+		m_PS = FPS;
 	return S_OK;
 }
 

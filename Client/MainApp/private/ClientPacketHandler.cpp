@@ -54,6 +54,29 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		Handle_S_WEAPON_HIT(buffer, len);
 		break;
 
+	case S_ROOM_ALL_PLAYER_FINISH_LOADING:
+		Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(buffer, len);
+		break;
+	case S_TANK_DAMAGED:
+		Handle_S_DAMAGED_TANK(buffer, len);
+	case S_TANK_DEAD:
+		Handle_S_DEAD_TANK(buffer, len);
+		break;
+	case S_TANK_HIT:
+		Handle_S_HIT_TANK(buffer, len);
+		break;
+	case S_TANK_KILL:
+		Handle_S_KILL_TANK(buffer, len);
+		break;
+	case S_GAME_WIN:
+		Handle_S_GAME_WIN(buffer, len);
+		break;
+	case S_GAME_LOSE:
+		Handle_S_GAME_LOSE(buffer, len);
+		break;
+	case S_CAPTURE:
+		Handle_S_CAPTURE(buffer, len);
+
 	default:
 		break;
 	}
@@ -286,7 +309,7 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 
 	_vector hitPos = XMVectorSet(X, Y, Z, 1.f);
 
-	// 2. ø˘µÂ «‡∑ƒ ª˝º∫ (±‚∫ª ¥‹¿ß «‡∑ƒø°º≠ ¿ßƒ°∏∏ º≥¡§)
+	// 2. ÏõîÎìú ÌñâÎ†¨ ÏÉùÏÑ± (Í∏∞Î≥∏ Îã®ÏúÑ ÌñâÎ†¨ÏóêÏÑú ÏúÑÏπòÎßå ÏÑ§Ï†ï)
 	_matrix Hit_Matrix = XMMatrixIdentity();
 	Hit_Matrix.r[3] = hitPos;
 
@@ -298,6 +321,41 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 
 void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 {
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		//Ï°åÏùÑ Îïå Ï≤òÎ¶¨
+		});
+}
+
+void ClientPacketHandler::Handle_S_CAPTURE(BYTE* buffer, int32 len)
+{
+
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+		
+		uint8 Blue, red;
+		br >> Blue >> red;
+		Network_Manager::GetInstance()->REDBAR = red;
+		Network_Manager::GetInstance()->BLUEBAR = Blue;
+
+	});
+}
+
+
+
+
+void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
+{
+
+
 	BufferReader br(buffer, len);
 
 	PacketHeader header;
@@ -314,7 +372,50 @@ void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
+
+			uint8 tankID;
+			br >> tankID;
+
+			_float4x4 mat = {};
+
+			for (int row = 0; row < 4; ++row)
+				for (int col = 0; col < 4; ++col)
+					br >> mat.m[row][col];
+
+			float potapAngle = 0.f;
+			float posinAngle = 0.f;
+			uint8 tankHP = 0;
+
+			br >> potapAngle >> posinAngle >> tankHP;
+
+			uint8 myTankID = Network_Manager::GetInstance()->GetMyTankIndex();
+
+			Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", static_cast<int>(tankID)));
+
+			if (tankID != myTankID)
+			{
+				
+				if (tank)
+				{
+					tank->Set_OtherPlayerState(mat, potapAngle, posinAngle);
+				}
+			}
+			else {
+
+				if (Network_Manager::GetInstance()->GetInstance()->ImPosu) {
+				
+					tank->Set_MyPos(mat);
+				}
+				else {
+					
+					tank->Set_Posin(potapAngle, posinAngle);
+				}
+
+			}
+
+
 			br >> mat.m[i][j];
+
 		}
 	}
 
@@ -457,6 +558,90 @@ SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
 }
 
 
+SendBufferRef ClientPacketHandler::Make_C_LOADING_FINISH(uint8 dummy)
+{
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+
+	header->size = bw.WriteSize();
+	header->id = C_FINISH_LOADING;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_TANK_RESPAWN(_float4x4& worldMatrix, float potapRotation, float posinRotation)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	for (int i = 0; i < 4; ++i)
+	{
+		bw << worldMatrix.m[i][0];  // row i, col 0
+		bw << worldMatrix.m[i][1];  // row i, col 1
+		bw << worldMatrix.m[i][2];  // row i, col 2
+		bw << worldMatrix.m[i][3];  // row i, col 3
+	}
+	bw << potapRotation;
+	bw << posinRotation;
+
+
+	header->size = bw.WriteSize();
+	header->id = C_RESPAWN_TANK;
+
+	sendBuffer->Close(bw.WriteSize());
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << potapRotation;
+	bw << posinRotation;
+
+	header->size = bw.WriteSize();
+	header->id = C_MYPOSIN;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	for (int i = 0; i < 4; ++i)
+	{
+		bw << worldMatrix.m[i][0];  // row i, col 0
+		bw << worldMatrix.m[i][1];  // row i, col 1
+		bw << worldMatrix.m[i][2];  // row i, col 2
+		bw << worldMatrix.m[i][3];  // row i, col 3
+	}
+
+	header->size = bw.WriteSize();
+	header->id = C_MYPOS;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+
+
 #pragma endregion Packet_to_Server
 
 #pragma region ForIngame
@@ -511,8 +696,8 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
-	bw << PosX << PosY << PosZ 
-		<< nDirX << nDirY << nDirZ;
+	uint8 TankIndex = Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << TankIndex <<PosX << PosY << PosZ	<< nDirX << nDirY << nDirZ;
 
 	header->size = bw.WriteSize();
 	header->id = C_SHOT;

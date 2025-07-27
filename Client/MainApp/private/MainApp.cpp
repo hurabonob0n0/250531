@@ -61,38 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CMainApp::CMainApp() : m_Timer(CTimer::Get_Instance()), m_Input_Dev(CRawInput::Get_Instance())
 {
 }
-//
-//#pragma region ForServerSession
-//
-//class ServerSession : public PacketSession
-//{
-//public:
-//	~ServerSession()
-//	{
-//	}
-//
-//	virtual void OnConnected() override
-//	{
-//		SendBufferRef sendBuffer = ClientPacketHandler::Make_C_LOGIN(1001);
-//		Send(sendBuffer);
-//	}
-//
-//	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
-//	{
-//		ClientPacketHandler::HandlePacket(buffer, len);
-//	}
-//
-//	virtual void OnSend(int32 len) override
-//	{
-//	}
-//
-//	virtual void OnDisconnected() override
-//	{
-//	}
-//};
-//
-//
-//#pragma endregion  Dont Touch
+
 
 HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 {
@@ -107,19 +76,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	WI.isFullScreen = m_FullscreenState;
 
 	m_GameInstance->Initialize(WI, m_Input_Dev);
-
-
-
-
-
-//#pragma region For Server
-//
-//	//ConnectServer();
-//
-//#pragma endregion 여기 주석처리하면 서버 연결 없이 동작 가능
-
-
-
 
 
 
@@ -183,8 +139,12 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->Flush_CommandQueue();
 
-	/*SendBufferRef sendBuffer = ClientPacketHandler::Make_C_FINISH_LOADING(1001);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);*/
+
+	if (Network_Manager::GetInstance()->isConnected()) {
+		auto sendBuffer = ClientPacketHandler::Make_C_LOADING_FINISH(1);
+		Network_Manager::GetInstance()->Send(sendBuffer);
+	}
+
 
 	return S_OK;
 }
@@ -411,37 +371,6 @@ void CMainApp::CalculateFrameStats()
 }
 
 
-//void CMainApp::ConnectServer()
-//{
-//
-//	ClientServiceRef service = MakeShared<ClientService>(
-//		NetAddress(L"10.20.11.29", 7777),
-//		MakeShared<IocpCore>(),
-//		MakeShared<ServerSession>,
-//		1);
-//
-//	ASSERT_CRASH(service->Start());
-//
-//	ServiceManager::GetInstace().SetService(service);
-//
-//	int32 threadCount = std::thread::hardware_concurrency();
-//	for (int32 i = 0; i < threadCount; i++)
-//	{
-//		GThreadManager->Launch([=]()
-//			{
-//				while (true)
-//				{
-//					service->GetIocpCore()->Dispatch();
-//				}
-//			});
-//	}
-//
-//	while (!g_GameStart.load()) {
-//
-//		int a = 0;
-//	}
-//
-//}
 
 void CMainApp::Free()
 {
