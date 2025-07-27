@@ -30,7 +30,7 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_ROOM_DATA:
 		Handle_S_GET_ROOMDATA(buffer, len);
 		break;
-
+	
 	case S_ROOM_ENTER:
 		Handle_S_ROOM_ENTER(buffer, len);
 		break;
@@ -46,8 +46,8 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		Handle_S_GAME_START(buffer, len);
 		break;
 
-	case S_ALL_TANK_STATE:
-		Handle_S_ALL_TANK_STATE(buffer, len);
+	case S_PLAYER_MOVE:
+		Handle_S_PLAYER_MOVE(buffer, len);
 		break;
 
 	case S_WEAPON_HIT:
@@ -76,6 +76,7 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		break;
 	case S_CAPTURE:
 		Handle_S_CAPTURE(buffer, len);
+
 	default:
 		break;
 	}
@@ -128,12 +129,21 @@ void ClientPacketHandler::Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len)
 		br >> ID;
 
 		ServiceManager::GetInstace().SetMyID(ID);
-		Network_Manager::GetInstance()->SetMyClientID(ID);
+		g_PlayerID.store(ID);
+		g_ServerConnected.store(true);
 		});
 }
 
 void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 {
+	//BufferReader br(buffer, len);
+
+	//PacketHeader header;
+	//br >> header;
+
+	//g_GameStart.store(true);
+
+
 	std::vector<uint8_t> data(buffer, buffer + len);
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
@@ -143,7 +153,6 @@ void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 		uint16 ID;
 		br >> ID;
 
-		Level_Manager::Get_Instance()->SetGamePlayMode();
 		});
 
 }
@@ -262,11 +271,10 @@ void ClientPacketHandler::Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len)
 		if (Level_Manager::Get_Instance()->GetSceneID() != LEVEL_ROOM)
 		{
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOM);
-
+			
 		}
 
 		Room_Manager::Get_Instance()->SetRoomPlayerStates(roomStates);
-		Network_Manager::GetInstance()->SetRoomPlayers(roomStates);
 
 		});
 
@@ -278,116 +286,47 @@ void ClientPacketHandler::Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len)
 #pragma region ForIngame
 
 /*----------------------------
-*
+* 
 *		For GamePlay
-*
+* 
 -----------------------------*/
 
 
 void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 {
+	BufferReader br(buffer, len);
 
-	std::vector<uint8_t> data(buffer, buffer + len);
+	PacketHeader header;
+	br >> header;
 
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+	float X;
+	float Y;
+	float Z;
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+	br >> X >> Y >> Z;
 
-		PacketHeader header;
-		br >> header;
+	//typedef XMMATRIX					_matrix;
 
-		float X;
-		float Y;
-		float Z;
+	_vector hitPos = XMVectorSet(X, Y, Z, 1.f);
 
-		br >> X >> Y >> Z;
+	// 2. ÏõîÎìú ÌñâÎ†¨ ÏÉùÏÑ± (Í∏∞Î≥∏ Îã®ÏúÑ ÌñâÎ†¨ÏóêÏÑú ÏúÑÏπòÎßå ÏÑ§Ï†ï)
+	_matrix Hit_Matrix = XMMatrixIdentity();
+	Hit_Matrix.r[3] = hitPos;
 
-		//typedef XMMATRIX					_matrix;
-
-		_vector hitPos = XMVectorSet(X, Y, Z, 1.f);
-
-		// 2. ø˘µÂ «‡∑ƒ ª˝º∫ (±‚∫ª ¥‹¿ß «‡∑ƒø°º≠ ¿ßƒ°∏∏ º≥¡§)
-		_matrix Hit_Matrix = XMMatrixIdentity();
-		Hit_Matrix.r[3] = hitPos;
-
-		CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
-		});
-
+	//dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", g_PlayerID.load()))->PushBulletMatrix(Hit_Matrix);
+	CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
 }
 
-void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
-{
-	std::vector<uint8_t> data(buffer, buffer + len);
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		//add Hit UI
-		});
 
-}
-
-void ClientPacketHandler::Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len)
-{
-	std::vector<uint8_t> data(buffer, buffer + len);
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		//add Damaged UI
-		Network_Manager::GetInstance()->Im_damaged();
-		});
-
-}
-
-void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
-{
-
-	std::vector<uint8_t> data(buffer, buffer + len);
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		PacketHeader header;
-		br >> header;
-		uint8 index;
-		br >> index;
-
-		Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", index));
-		if (index == Network_Manager::GetInstance()->GetMyTankIndex()) {
-			tank->set_Spawn(false);
-			tank->_respawnTimer = 0.f;
-		}
-		});
-}
-
-void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
-{
-
-	std::vector<uint8_t> data(buffer, buffer + len);
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		Network_Manager::GetInstance()->add_MyKillCount();
-		});
-}
-
-void ClientPacketHandler::Handle_S_GAME_WIN(BYTE* buffer, int32 len)
+void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
 {
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
-		//¿Ã∞Â¿ª ∂ß √≥∏Æ
-		});
-}
-
-void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
-{
-	std::vector<uint8_t> data(buffer, buffer + len);
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-
-		//¡≥¿ª ∂ß √≥∏Æ
+		//Ï°åÏùÑ Îïå Ï≤òÎ¶¨
 		});
 }
 
@@ -417,33 +356,23 @@ void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, 
 {
 
 
-
 	BufferReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
 
 
-	Network_Manager::GetInstance()->SetGamstart();
+	uint8 playerID;
+	_float4x4 mat{};
+	float potapRot = 0.0f;
+	float posinRot = 0.0f;
 
-}
-
-void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
-{
-	std::vector<uint8_t> data(buffer, buffer + len);
-
-	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-
-		PacketHeader header;
-		br >> header;
-
-		uint16 tankCount = 0;
-		br >> tankCount;
-
-		for (uint16 i = 0; i < tankCount; ++i)
+	br >> playerID;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
 		{
+
 			uint8 tankID;
 			br >> tankID;
 
@@ -484,8 +413,15 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 
 			}
 
+
+			br >> mat.m[i][j];
+
 		}
-		});
+	}
+
+	br >> potapRot;
+	br >> posinRot;
+	dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", playerID))->Set_OtherPlayerState(mat, potapRot, posinRot);
 }
 
 
@@ -581,7 +517,7 @@ SendBufferRef ClientPacketHandler::Make_C_CHANGE_INFO(Room_Ready_Data data)
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << data.PlayerID << data.Position << data.Team << data.IsReady;
-
+	
 	header->size = bw.WriteSize();
 	header->id = C_CHANGE_INFO;
 
@@ -613,8 +549,6 @@ SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
-
-
 	header->size = bw.WriteSize();
 	header->id = C_START;
 
@@ -622,6 +556,7 @@ SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
 	sendBuffer->Close(bw.WriteSize());
 	return sendBuffer;
 }
+
 
 SendBufferRef ClientPacketHandler::Make_C_LOADING_FINISH(uint8 dummy)
 {
@@ -706,6 +641,7 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
 }
 
 
+
 #pragma endregion Packet_to_Server
 
 #pragma region ForIngame
@@ -717,9 +653,6 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float pot
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
-
-
-	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
 	for (int i = 0; i < 4; ++i)
 	{
 		bw << worldMatrix.m[i][0];  // row i, col 0
@@ -762,9 +695,9 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
+
 	uint8 TankIndex = Network_Manager::GetInstance()->GetMyTankIndex();
-	bw << TankIndex <<PosX << PosY << PosZ
-		<< nDirX << nDirY << nDirZ;
+	bw << TankIndex <<PosX << PosY << PosZ	<< nDirX << nDirY << nDirZ;
 
 	header->size = bw.WriteSize();
 	header->id = C_SHOT;

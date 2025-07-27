@@ -79,7 +79,7 @@ int Button::Update()
 			auto now = std::chrono::steady_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - _lastClickTime);
 
-			if (duration.count() >= 1000)
+			if (duration.count() >= 1000) 
 			{
 				isClick = true;
 				_lastClickTime = now;
@@ -105,7 +105,7 @@ int Button::Update()
 		case BUTTON_MULTIPLAY:
 			m_bDead = true;
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOMLIST);
-
+		
 			MultiPlay = true;
 			isClick = false;
 			break;
@@ -114,23 +114,23 @@ int Button::Update()
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			isClick = false;
 		}
-						  break;
+			break;
 		case BUTTON_JOIN: {
-
+			
 			auto sendBuffer = ClientPacketHandler::Make_C_JOINROOM(Room_Manager::Get_Instance()->GetChoiceRoom());
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			isClick = false;
 
 		}
 
-						break;
+			break;
 		case BUTTON_REFRESH:
 		{
 			auto sendBuffer = ClientPacketHandler::Make_C_SHOWROOM(1);
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			isClick = false;
 		}
-		break;
+			break;
 
 		case BUTTON_READY: {
 			auto sendBuffer = ClientPacketHandler::Make_C_READY(1);
@@ -147,7 +147,7 @@ int Button::Update()
 
 		}
 						 break;
-		case BUTTON_EXIT: {
+		case BUTTON_EXIT:{
 			auto sendBuffer = ClientPacketHandler::Make_C_EXITROOM(Room_Manager::Get_Instance()->GetChoiceRoom());
 			Network_Manager::GetInstance()->Send(sendBuffer);
 			Level_Manager::Get_Instance()->Level_Change(LEVEL_ROOMLIST);
@@ -173,7 +173,7 @@ void Button::Late_Update()
 
 
 
-
+	
 }
 
 void Button::Render(HDC hDC)

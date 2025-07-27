@@ -115,6 +115,9 @@
     <Filter Include="01.DefaultObj\UI\UISelectPos">
       <UniqueIdentifier>{5f21ce70-a44e-4944-8de2-a739ccb4aeb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{2aace5ba-6af6-4e50-904c-d294195dd2ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -366,6 +369,24 @@
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Shadows.hlsl">
       <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Common.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Default.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\LightingUtil.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\ShadowDebug.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Shadows.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Sky.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

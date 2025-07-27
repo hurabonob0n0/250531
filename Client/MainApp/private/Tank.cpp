@@ -4,16 +4,15 @@
 #include "GameInstance.h"
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
-#include "NetWork_Manager.h"
+
+
 
 CTank::CTank() : CRenderObject()
 {
-	_isSpawn = true;
 }
 
 CTank::CTank(CTank& rhs) : CRenderObject(rhs)
 {
-	_isSpawn = true;
 }
 
 void CTank::Set_Team(int Team)
@@ -113,6 +112,7 @@ void CTank::Initialize_For_PosinQuad()
 void CTank::Tick(float fTimeDelta)
 {
 
+
 	if (Network_Manager::GetInstance()->SingleMode) {
 		if (!_isSpawn)
 		{
@@ -205,6 +205,7 @@ void CTank::Tick(float fTimeDelta)
 	}
 	else {
 
+
 		if (!_isSpawn)
 		{
 			_respawnTimer += fTimeDelta;
@@ -295,8 +296,6 @@ void CTank::Tick(float fTimeDelta)
 			}
 		}
 	}
-
-
 }
 
 void CTank::LateTick(float fTimeDelta)
@@ -512,14 +511,9 @@ void CTank::LateTick(float fTimeDelta)
 			m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
 			m_VIBuffer->Update();
-
-
-
 			//for server
 			if (Network_Manager::GetInstance()->isConnected())
 				SendMyStateToServer();
-
-
 		}
 		else
 		{
@@ -631,6 +625,7 @@ void CTank::LateTick(float fTimeDelta)
 				XMVectorSet(pxMat.column2.x, pxMat.column2.y, pxMat.column2.z, pxMat.column2.w),
 				XMVectorSet(pxMat.column3.x, pxMat.column3.y, pxMat.column3.z, pxMat.column3.w)
 			);
+
 
 			_float4x4 matworld;
 			XMStoreFloat4x4(&matworld, mat);
@@ -919,6 +914,7 @@ void CTank::LateTick(float fTimeDelta)
 	}
 
 	
+
 }
 
 void CTank::Render()
@@ -989,16 +985,6 @@ void CTank::Set_ShotDir(XMVECTOR Vec)
 void CTank::Set_ShotMatrix(_matrix mat)
 {
 	ShotMatrix = mat;
-}
-
-void CTank::Set_MyPos(float x, float y, float z)
-{
-
-	m_pPhysicsEngine->Set_Pos(x, y, z);
-
-
-	_vector safePos = XMVectorSet(x, y, z, 1.0f);
-	m_TransformCom->Set_State(CTransform::STATE_POSITION, safePos);
 }
 
 void CTank::Free()
@@ -1118,6 +1104,7 @@ void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
 
 }
 
+
 void CTank::Set_Posin(float PotapRot, float PosinRot)
 {
 
@@ -1131,6 +1118,7 @@ void CTank::Set_MyPos(_float4x4 mat)
 
 	m_TransformCom->Set_WorldMatrix(mat);
 }
+
 
 
 void CTank::Tick_For_Posin_Image(float fTimeDelta)

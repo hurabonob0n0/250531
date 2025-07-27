@@ -39,7 +39,7 @@ public:
 
 public:
 	bool Initialize(const std::wstring& ip, uint16 port);
-	void Update(); // ¸í·É Å¥ Ã³¸®¿ë
+	void Update(); // Â¸Ã­Â·Ã‰ Ã…Â¥ ÃƒÂ³Â¸Â®Â¿Ã«
 
 	void PushPacket(PacketQueueType type, std::function<void()> handler);
 	void Dispatch(PacketQueueType type);
@@ -53,7 +53,8 @@ public:
 	bool isConnected() { return _connected; };
 
 public:
-	int GetMyClientID() {
+	int GetMyClientID() { return MyClientID; };
+
 
 		return MyClientID;
 	};
@@ -118,28 +119,14 @@ public:
 	int REDBAR = 0;
 	int BLUEBAR = 0;
 
+
 private:
-
-
 	ClientServiceRef _service;
-	bool _connected = false;
+	bool _connected;
 	int MyClientID;
-
-	bool GameStart;
-
-	Room_Ready_Data myData;
-
-	std::vector<Room_Ready_Data> _RoomPlayers;
 
 	std::queue<QueuedPacket> _packetQueue;
 	std::mutex _mutex;
-
-	int MyTankIndex;
-
-
-	int MyHp;
-	int MyKillCount = 0;
-	USE_LOCK;
 
 public:
 	static	Network_Manager* m_pInstance;

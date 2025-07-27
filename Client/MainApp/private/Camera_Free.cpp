@@ -3,7 +3,6 @@
 #include "GameInstance.h"
 #include "Client_Globals.h"
 #include "Terrain.h"
-#include "Network_Manager.h"
 
 CCamera_Free::CCamera_Free() : CCamera()
 {
@@ -34,13 +33,13 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
+
 	if (Network_Manager::GetInstance()->isConnected()) {
 		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", Network_Manager::GetInstance()->GetMyTankIndex(), "TransformCom");
 		Safe_AddRef(m_TankTransform);
 
 		m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", Network_Manager::GetInstance()->GetMyTankIndex());
 		Safe_AddRef(m_Tank);
-
 	}
 	else {
 		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
