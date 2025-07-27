@@ -31,7 +31,6 @@ struct MaterialData
 };
 
 TextureCube gCubeMap : register(t0);
-
 Texture2D gShadowMap : register(t1);
 
 // An array of textures, which is only supported in shader model 5.1+.  Unlike Texture2DArray, the textures
@@ -62,7 +61,6 @@ cbuffer cbPerObject : register(b0)
 	uint gObjPad2;
 };
 
-// Constant data that varies per material.
 cbuffer cbPass : register(b1)
 {
     float4x4 gView;
@@ -110,6 +108,9 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
 	return bumpedNormalW;
 }
 
+//---------------------------------------------------------------------------------------
+// PCF for shadow mapping.
+//---------------------------------------------------------------------------------------
 
 float CalcShadowFactor(float4 shadowPosH)
 {
@@ -141,6 +142,15 @@ float CalcShadowFactor(float4 shadowPosH)
     }
     
     return percentLit / 9.0f;
-    //return 0.f;
+    
+    //// Complete projection by doing division by w.
+    //shadowPosH.xyz /= shadowPosH.w;
+
+    //float depth = shadowPosH.z;
+
+    //// Sample only once, no filtering
+    //float shadow = gShadowMap.SampleCmpLevelZero(gsamShadow, shadowPosH.xy, depth).r;
+
+    //return shadow;
 }
 

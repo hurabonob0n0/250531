@@ -35,8 +35,6 @@ public:
 	void Set_ShotDir(XMVECTOR Vec);
 	void Set_ShotMatrix(_matrix mat);
 
-
-	void Set_MyPos(float x, float y, float z);
 private:
 	CModel* m_VIBuffer;
 	
@@ -61,14 +59,11 @@ public:
 		_myPlayer = true;
 		Set_Team(3);
 	}
-	void Set_POSU() { _ImPosu = true; };
-	void Set_MyTeam(bool isBlue) { _MyTeam = isBlue; };
-
 	void SendMyStateToServer();
 	void SendShootDataToServer();
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
-	void Set_Posin(float PotapRot, float PosinRot);
+
 
 private:		//For PosinCrosshair
 	CBBinding*				m_CBBindingQuad;
@@ -90,11 +85,7 @@ private:		//For PosinCrosshair
 
 public:
 	bool _myPlayer = false;
-	bool _MyTeam;
-	bool _isSpawn;
-	void set_Spawn(bool torf) { _isSpawn = torf; };
-	float _respawnTimer = 0.0f;
-	int  _ImPosu;
+
 private:
 	MyPhysicsEngine::CMyPhysicsEngine* m_pPhysicsEngine = nullptr;
 	MyPhysicsEngine::CMyPhysicsEngine::TankControlState m_TankConsrolState{};

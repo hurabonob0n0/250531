@@ -19,7 +19,7 @@ HRESULT CWinningTeam::Initialize_Prototype()
 
 HRESULT CWinningTeam::Initialize(void* pArg)
 {
-    m_RG = CRenderer::RG_NONLIGHT;
+    m_RG = CRenderer::RG_NONBLEND;
 
     __super::Initialize(pArg);
 

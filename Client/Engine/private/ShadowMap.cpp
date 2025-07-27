@@ -13,15 +13,15 @@ void CShadowMap::Initialize()
 	m_Device = pGameInstance->Get_Device();
 
 	mhGpuSrv = pGameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-	//mhCpuDsv = pGameInstance->DepthStencilView(). + pGameInstance->Get_DSVSize();
+	
 	mhCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(pGameInstance->DepthStencilView(), pGameInstance->Get_DSVSize());
 
 	D3D12_RESOURCE_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Alignment = 0;
-	texDesc.Width = 2048;
-	texDesc.Height = 2048;
+	texDesc.Width = 4096*2;
+	texDesc.Height = 4096 * 2;
 	texDesc.DepthOrArraySize = 1;
 	texDesc.MipLevels = 1;
 	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -52,8 +52,9 @@ void CShadowMap::Initialize()
 	dsvDesc.Texture2D.MipSlice = 0;
 	m_Device->CreateDepthStencilView(m_Resource, &dsvDesc, mhCpuDsv);
 
-	mViewport = { 0.0f, 0.0f, (float)2048, (float)2048, 0.0f, 1.0f };
-	mScissorRect = { 0, 0, (int)2048, (int)2048 };
+	mViewport = { 0.0f, 0.0f, (float)4096 * 2, (float)4096 * 2, 0.0f, 1.0f };
+	mScissorRect = { 0, 0, (int)4096 * 2, (int)4096 * 2 };
+
 
 }
 
@@ -61,11 +62,14 @@ void CShadowMap::Late_Update()
 {
 #pragma region Light행렬처리
 
-	_float3 ld = _float3(0.57735f, -0.57735f, 0.57735f);
+	//2896.31f
+
+	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
+	m_TankTransform = (CTransform*)pGameInstance->Get_Object_Component("Tank", 0, "TransformCom");
 
 	XMVECTOR lightDir = XMVectorSet(0.57735f, -0.57735f, 0.57735f, 0.f);
-	XMVECTOR lightPos = -2.0f * 2896.31f * lightDir;
-	XMVECTOR targetPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	XMVECTOR lightPos = -2.0f * 500.f* lightDir;
+	XMVECTOR targetPos = m_TankTransform->Get_State(CTransform::STATE_POSITION);//XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
 
@@ -76,12 +80,12 @@ void CShadowMap::Late_Update()
 	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, lightView));
 
 	// Ortho frustum in light space encloses scene.
-	float l = sphereCenterLS.x - 2896.31f;
-	float b = sphereCenterLS.y - 2896.31f;
-	float n = sphereCenterLS.z - 2896.31f;
-	float r = sphereCenterLS.x + 2896.31f;
-	float t = sphereCenterLS.y + 2896.31f;
-	float f = sphereCenterLS.z + 2896.31f;
+	float l = sphereCenterLS.x - 500.f;
+	float b = sphereCenterLS.y - 500.f;
+	float n = sphereCenterLS.z - 500.f;
+	float r = sphereCenterLS.x + 500.f;
+	float t = sphereCenterLS.y + 500.f;
+	float f = sphereCenterLS.z + 500.f;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 
@@ -102,8 +106,8 @@ void CShadowMap::Late_Update()
 	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(lightProj), lightProj);
 	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
-	UINT w = 2048;
-	UINT h = 2048;
+	UINT w = 4096 * 2;
+	UINT h = 4096 * 2;
 
 	PassConstants pc;
 
