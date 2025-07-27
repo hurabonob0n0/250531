@@ -26,17 +26,21 @@ HRESULT CUI::Initialize(void* pArg)
 
     MaterialData mat{};
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Crosshair", CTexture::Create(L"../bin/Models/Crosshair/Crosshair1.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UITPS", CTexture::Create(L"../bin/Models/UI/3.dds"));
 
-    m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIMat", mat));
+    TPSMatIndex = m_GameInstance->Add_Material("UITPS", mat);
+
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIFPS", CTexture::Create(L"../bin/Models/UI/7.dds"));
+
+    FPSMatIndex = m_GameInstance->Add_Material("UIFPS", mat);
 
     m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
     m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.77f);
 
-    m_TransformCom->Set_Scale(2.f);
+    m_TransformCom->Set_Scale(1.f);
 
-    m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
+    //m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
 
     m_CBBinding->Set_Pad0(1);
 
@@ -54,16 +58,18 @@ void CUI::Tick(float fTimeDelta)
 
 void CUI::LateTick(float fTimeDelta)
 {
-    if(m_isFPS)
-        __super::LateTick(fTimeDelta);
+    if (m_isFPS)
+        m_CBBinding->Set_MaterialIndex(FPSMatIndex);
+    else
+        m_CBBinding->Set_MaterialIndex(TPSMatIndex);
+
+    __super::LateTick(fTimeDelta);
 }
 
 void CUI::Render()
 {
-    if (m_isFPS)
     __super::Render();
-    if (m_isFPS)
-        m_VIBuffer->Render();
+    m_VIBuffer->Render();
 }
 
 void CUI::Free()

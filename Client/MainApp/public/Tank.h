@@ -74,6 +74,8 @@ private:		//For PosinCrosshair
 	//bool					m_isQuadTurn = false;
 	float					m_fSameTime = 0.f;
 	bool					m_isFPS = false;
+	int						TPSQuadIndex;
+	int						FPSQuadIndex;
 
 private:		//For PosinCrosshair
 	void Initialize_For_PosinQuad();

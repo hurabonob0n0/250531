@@ -74,12 +74,34 @@ void CCamera::LateTick(float fTimeDelta)
 	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
 	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
+	//XMStoreFloat4x4(&pc.View, XMMatrixTranspose(view));
+	//XMStoreFloat4x4(&pc.InvView, XMMatrixTranspose(invView));
+	//XMStoreFloat4x4(&pc.Proj, XMMatrixTranspose(proj));
+	//XMStoreFloat4x4(&pc.InvProj, XMMatrixTranspose(invProj));
+	//XMStoreFloat4x4(&pc.ViewProj, XMMatrixTranspose(viewProj));
+	//XMStoreFloat4x4(&pc.InvViewProj, XMMatrixTranspose(invViewProj));
+	////XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
+	//XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
+	//XMStoreFloat3(&pc.EyePosW, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	//pc.RenderTargetSize = XMFLOAT2((float)1920, (float)1080);
+	//pc.InvRenderTargetSize = XMFLOAT2(1.0f / 1920, 1.0f / 1080);
+	//pc.NearZ = 1.0f;
+	//pc.FarZ = 1000.0f;
+	//pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
+	//pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
+	//pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	//pc.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
+	//pc.Lights[1].Strength = { 0.3f, 0.3f, 0.3f };
+	//pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
+	//pc.Lights[2].Strength = { 0.15f, 0.15f, 0.15f };
+
 	XMStoreFloat4x4(&pc.View, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&pc.InvView, XMMatrixTranspose(invView));
 	XMStoreFloat4x4(&pc.Proj, XMMatrixTranspose(proj));
 	XMStoreFloat4x4(&pc.ViewProj, XMMatrixTranspose(viewProj));
 	XMVECTOR vec = m_TransformCom->Get_State(CTransform::STATE_POSITION);
 	XMStoreFloat3(&pc.EyePosW, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	//XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
 	XMStoreFloat4x4(&pc.ShadowTransform, m_GameInstance->m_ShadowMap->S);
 	pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
 	pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };

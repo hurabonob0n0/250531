@@ -461,25 +461,6 @@ void CTank::LateTick(float fTimeDelta)
 
 void CTank::Render()
 {
-	/*if (!m_isQuadTurn)
-	{
-		for (int i = 0; i < 55; ++i)
-			m_VIBuffer->Render(i);
-		m_isQuadTurn = true;
-	}
-
-	else if (_myPlayer)
-	{
-		if (m_isFPS) {
-			Render_For_Posin_Image();
-		}
-
-		m_isQuadTurn = false;
-	}
-
-	else if (!_myPlayer)
-		m_isQuadTurn = false;*/
-
 	if (_myPlayer)
 	{
 		if (m_isFPS) {

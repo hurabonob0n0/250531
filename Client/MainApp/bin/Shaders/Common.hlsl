@@ -140,6 +140,7 @@ float CalcShadowFactor(float4 shadowPosH)
             shadowPosH.xy + offsets[i], depth).r;
     }
     
-    return percentLit / 9.0f;
+    //return percentLit / 9.0f;
+    return 0.f;
 }
 

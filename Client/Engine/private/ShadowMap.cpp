@@ -20,8 +20,8 @@ void CShadowMap::Initialize()
 	ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Alignment = 0;
-	texDesc.Width = 4096;
-	texDesc.Height = 4096;
+	texDesc.Width = 2048;
+	texDesc.Height = 2048;
 	texDesc.DepthOrArraySize = 1;
 	texDesc.MipLevels = 1;
 	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -52,8 +52,8 @@ void CShadowMap::Initialize()
 	dsvDesc.Texture2D.MipSlice = 0;
 	m_Device->CreateDepthStencilView(m_Resource, &dsvDesc, mhCpuDsv);
 
-	mViewport = { 0.0f, 0.0f, (float)4096, (float)4096, 0.0f, 1.0f };
-	mScissorRect = { 0, 0, (int)4096, (int)4096 };
+	mViewport = { 0.0f, 0.0f, (float)2048, (float)2048, 0.0f, 1.0f };
+	mScissorRect = { 0, 0, (int)2048, (int)2048 };
 
 }
 
@@ -102,8 +102,8 @@ void CShadowMap::Late_Update()
 	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(lightProj), lightProj);
 	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
-	UINT w = 4096;
-	UINT h = 4096;
+	UINT w = 2048;
+	UINT h = 2048;
 
 	PassConstants pc;
 

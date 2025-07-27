@@ -9,6 +9,9 @@
 #include "UI.h"
 #include "WinningTeam.h"
 #include "Tree.h"
+#include "UIHP.h"
+#include "UIReloading.h"
+#include "UISelectPos.h"
 
 /*-----------------
 	For Server
@@ -147,6 +150,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
+	m_GameInstance->Add_PrototypeObject("UIHP", CUIHP::Create());
+	m_GameInstance->Add_PrototypeObject("UIReloading", CUIReloading::Create());
+	m_GameInstance->Add_PrototypeObject("UISelectPos", CUISelectPos::Create());
 	//m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
@@ -160,6 +166,11 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
+
+	m_GameInstance->AddObject("UI", "UI", nullptr);
+	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);
+	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
+	//m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
 	/*_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
 	m_GameInstance->AddObject("Effect", "Effect", &mat3);*/

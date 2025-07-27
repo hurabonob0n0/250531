@@ -116,23 +116,23 @@ float4 PS(VertexOut pin) : SV_Target
     // Common convention to take alpha from diffuse albedo.
     litColor.a = diffuseAlbedo.a;
 	
-    if(gObjPad0 == 1)
-    {
-        float dist = length(pin.PosW.xz);
-        float radius = 500.f;
+    //if(gObjPad0 == 1)
+    //{
+    //    float dist = length(pin.PosW.xz);
+    //    float radius = 500.f;
 	
-        //if (dist < radius)
-        //{
-        //    float factor = saturate(0.1f - (dist / radius) * 0.1f);
-        //    litColor.rgb = lerp(litColor.rgb, float3(0, 0, 1.f), factor);
-        //}
+    //    //if (dist < radius)
+    //    //{
+    //    //    float factor = saturate(0.1f - (dist / radius) * 0.1f);
+    //    //    litColor.rgb = lerp(litColor.rgb, float3(0, 0, 1.f), factor);
+    //    //}
         
-        if( dist >= radius - 5.f && dist <= radius)
-            litColor.rgb = float3(0.f, 0.f, 1.f);
+    //    if( dist >= radius - 5.f && dist <= radius)
+    //        litColor.rgb = float3(0.f, 0.f, 1.f);
 
-        if(dist < radius - 5.f)
-            litColor.rgb += float3(0.f, 0.f, 0.05f);
-    }    
+    //    if(dist < radius - 5.f)
+    //        litColor.rgb += float3(0.f, 0.f, 0.05f);
+    //}    
     
     if(gObjPad2 == 1)
         litColor.r += 0.1f;
