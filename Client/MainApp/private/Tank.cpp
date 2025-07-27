@@ -89,7 +89,8 @@ HRESULT CTank::Initialize(void* pArg)
 	m_pPhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 
 	Set_Team(1);
-
+	//set_Spawn(false);
+	is_choiced = false;
 	Initialize_For_PosinQuad();
 
 	return S_OK;
@@ -116,45 +117,21 @@ void CTank::Tick(float fTimeDelta)
 
 
 	if (Network_Manager::GetInstance()->SingleMode) {
+
+
+		if (m_GameInstance->Key_Down('9')) {
+
+			_respawnTimer = 0.f;
+			_isSpawn = false;
+
+		}
+
 		if (!_isSpawn)
 		{
 			_respawnTimer += fTimeDelta;
-			if (_respawnTimer >= 5.f && Network_Manager::GetInstance()->ReSpawnChoice)
+			if (_respawnTimer >= 5.f)
 			{
-				_isSpawn = true;
-				_respawnTimer = 0.f;
-
-				Network_Manager::GetInstance()->ReSpawnChoice = false;
-
-
-				XMFLOAT3 respawnPosVec;
-
-				switch (Network_Manager::GetInstance()->ReSpawnPos)
-				{
-				case 1: respawnPosVec = XMFLOAT3(RESPAWNPOS_1); break;
-				case 2: respawnPosVec = XMFLOAT3(RESPAWNPOS_2); break;
-				case 3: respawnPosVec = XMFLOAT3(RESPAWNPOS_3); break;
-				case 4: respawnPosVec = XMFLOAT3(RESPAWNPOS_4); break;
-				case 5: respawnPosVec = XMFLOAT3(RESPAWNPOS_5); break;
-				case 6: respawnPosVec = XMFLOAT3(RESPAWNPOS_6); break;
-				case 7: respawnPosVec = XMFLOAT3(RESPAWNPOS_7); break;
-				case 8: respawnPosVec = XMFLOAT3(RESPAWNPOS_8); break;
-				default: respawnPosVec = XMFLOAT3(0.f, 25.f, 0.f); break;
-				}
-
-				// 물리엔진 위치 설정
-				m_pPhysicsEngine->Set_Pos(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z);
-
-				// Transform도 이동
-				_vector respawnPos = XMVectorSet(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z, 1.f);
-				m_TransformCom->Set_State(CTransform::STATE_POSITION, respawnPos);
-
-				_float4x4 TempMat;
-				XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
-				if (Network_Manager::GetInstance()->isConnected()) {
-					auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
-					ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-				}
+				setRespawn();
 			}
 			return; // 입력 처리 및 움직임 차단
 		}
@@ -167,7 +144,7 @@ void CTank::Tick(float fTimeDelta)
 				_matrix tempMat = mat;
 				CGameInstance::Get_Instance()->AddObject("DefaultObject", "BulletObj", &tempMat);
 				});*/
-
+			_shootTimer += fTimeDelta;
 
 			if (m_GameInstance->Key_Down('W'))
 				m_TankConsrolState.leftThrust = true;
@@ -205,11 +182,16 @@ void CTank::Tick(float fTimeDelta)
 			if (m_GameInstance->Key_Up('V'))
 				m_TankConsrolState.rightReverse = false;
 
-
 			if (m_GameInstance->Mouse_Down(0)) {
 				//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-				if (Network_Manager::GetInstance()->isConnected())
-					SendShootDataToServer();
+
+				if (_shootTimer >= SHOOT_INTERVAL)
+				{
+					if (Network_Manager::GetInstance()->isConnected())
+						SendShootDataToServer(); // 실제 슈팅
+
+					_shootTimer = 0.f; // 타이머 초기화
+				}
 
 			}
 
@@ -218,61 +200,35 @@ void CTank::Tick(float fTimeDelta)
 
 
 	}
-	else {
-
-
+	else
+	{
 		if (!_isSpawn)
 		{
 			_respawnTimer += fTimeDelta;
-			if (_respawnTimer >= 5.f && Network_Manager::GetInstance()->ReSpawnChoice)
+			if (_respawnTimer >= 5.f)
 			{
-				_isSpawn = true;
-				_respawnTimer = 0.f;
-
-				Network_Manager::GetInstance()->ReSpawnChoice = false;
-
-
-				XMFLOAT3 respawnPosVec;
-
-				switch (Network_Manager::GetInstance()->ReSpawnPos)
-				{
-				case 1: respawnPosVec = XMFLOAT3(RESPAWNPOS_1); break;
-				case 2: respawnPosVec = XMFLOAT3(RESPAWNPOS_2); break;
-				case 3: respawnPosVec = XMFLOAT3(RESPAWNPOS_3); break;
-				case 4: respawnPosVec = XMFLOAT3(RESPAWNPOS_4); break;
-				case 5: respawnPosVec = XMFLOAT3(RESPAWNPOS_5); break;
-				case 6: respawnPosVec = XMFLOAT3(RESPAWNPOS_6); break;
-				case 7: respawnPosVec = XMFLOAT3(RESPAWNPOS_7); break;
-				case 8: respawnPosVec = XMFLOAT3(RESPAWNPOS_8); break;
-				default: respawnPosVec = XMFLOAT3(0.f, 25.f, 0.f); break;
-				}
-
-				// 물리엔진 위치 설정
-				m_pPhysicsEngine->Set_Pos(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z);
-
-				// Transform도 이동
-				_vector respawnPos = XMVectorSet(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z, 1.f);
-				m_TransformCom->Set_State(CTransform::STATE_POSITION, respawnPos);
-
-				_float4x4 TempMat;
-				XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
-				if (Network_Manager::GetInstance()->isConnected()) {
-
-					auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
-					ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-				}
-
+				setRespawn();
 			}
 			return; // 입력 처리 및 움직임 차단
 		}
+
 		if (_myPlayer)
 		{
+			_shootTimer += fTimeDelta;
+
 			if (Network_Manager::GetInstance()->ImPosu) {
 
 				if (m_GameInstance->Mouse_Down(0)) {
 					//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
-					if(Network_Manager::GetInstance()->isConnected())
-						SendShootDataToServer();
+					if (_shootTimer >= SHOOT_INTERVAL)
+					{
+
+						if (Network_Manager::GetInstance()->isConnected())
+							SendShootDataToServer(); // 실제 슈팅
+
+						_shootTimer = 0.f; // 타이머 초기화
+					}
+
 				}
 
 			}
@@ -319,12 +275,12 @@ void CTank::Tick(float fTimeDelta)
 					m_TankConsrolState.rightReverse = false;
 
 
-
 				m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 			}
 		}
 	}
 }
+
 
 void CTank::LateTick(float fTimeDelta)
 {
@@ -639,7 +595,7 @@ void CTank::LateTick(float fTimeDelta)
 
 		if (_myPlayer && Network_Manager::GetInstance()->ImPosu) {
 			Network_Manager::GetInstance()->isConnected();
-				SendPosinData();
+			SendPosinData();
 
 		}
 		else if (_myPlayer && !Network_Manager::GetInstance()->ImPosu)
@@ -846,8 +802,8 @@ void CTank::LateTick(float fTimeDelta)
 			m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
 			m_VIBuffer->Update();
-			if(Network_Manager::GetInstance()->isConnected());
-				SendPosData();
+			if (Network_Manager::GetInstance()->isConnected());
+			SendPosData();
 
 		}
 		else
@@ -941,14 +897,14 @@ void CTank::LateTick(float fTimeDelta)
 		}
 	}
 
-	
+
 
 }
 
 void CTank::Render()
 {
 
-	if(Network_Manager::GetInstance()->SingleMode) {
+	if (Network_Manager::GetInstance()->SingleMode) {
 		if (_myPlayer)
 		{
 			if (m_isFPS) {
@@ -992,7 +948,7 @@ void CTank::Render()
 		}
 	}
 
-	
+
 }
 
 void CTank::Set_PotapRotation(float fDegree)
@@ -1013,6 +969,16 @@ void CTank::Set_ShotDir(XMVECTOR Vec)
 void CTank::Set_ShotMatrix(_matrix mat)
 {
 	ShotMatrix = mat;
+}
+
+void CTank::Respawn()
+{
+	if (_respawnTimer >= 5.f) {
+		_respawnTimer = 0.f;
+
+		_isSpawn = true;
+	}
+
 }
 
 void CTank::Free()
@@ -1165,7 +1131,7 @@ void CTank::Tick_For_Posin_Image(float fTimeDelta)
 	// 여기까지는 기본으로 해줘야 하는 것.
 
 	float angleDiffX = m_fPotapRotation - m_fCamPotapRot;
-	float angleDiffY = m_fCamPosinRot- m_fPosinRotation;
+	float angleDiffY = m_fCamPosinRot - m_fPosinRotation;
 
 	// 스케일링.
 	if (angleDiffX == 0.f && angleDiffY == 0.f) {
@@ -1199,4 +1165,62 @@ void CTank::Render_For_Posin_Image()
 	m_CBBindingQuad->Set_On_Shader();
 
 	m_VIBufferQuad->Render();
+}
+
+void CTank::CheckRespawnKeyInput()
+{
+	if (m_GameInstance->Key_Down('1')) Choiced_Pos = 1;
+	else if (m_GameInstance->Key_Down('2')) Choiced_Pos = 2;
+	else if (m_GameInstance->Key_Down('3')) Choiced_Pos = 3;
+	else if (m_GameInstance->Key_Down('4')) Choiced_Pos = 4;
+	else if (m_GameInstance->Key_Down('5')) Choiced_Pos = 5;
+	else if (m_GameInstance->Key_Down('6')) Choiced_Pos = 6;
+	else if (m_GameInstance->Key_Down('7')) Choiced_Pos = 7;
+	else if (m_GameInstance->Key_Down('8')) Choiced_Pos = 8;
+}
+
+void CTank::setRespawn() {
+	if (!is_choiced) {
+		CheckRespawnKeyInput();
+
+		if (Choiced_Pos != 0)
+		{
+
+			is_choiced = true;
+		}
+	}
+	else {
+		_isSpawn = true;
+		_respawnTimer = 0.f;
+		is_choiced = false;
+		XMFLOAT3 respawnPosVec;
+
+		switch (Choiced_Pos)
+		{
+		case 1: respawnPosVec = XMFLOAT3(RESPAWNPOS_1); break;
+		case 2: respawnPosVec = XMFLOAT3(RESPAWNPOS_2); break;
+		case 3: respawnPosVec = XMFLOAT3(RESPAWNPOS_3); break;
+		case 4: respawnPosVec = XMFLOAT3(RESPAWNPOS_4); break;
+		case 5: respawnPosVec = XMFLOAT3(RESPAWNPOS_5); break;
+		case 6: respawnPosVec = XMFLOAT3(RESPAWNPOS_6); break;
+		case 7: respawnPosVec = XMFLOAT3(RESPAWNPOS_7); break;
+		case 8: respawnPosVec = XMFLOAT3(RESPAWNPOS_8); break;
+		default: respawnPosVec = XMFLOAT3(0.f, 40.f, 0.f); break;
+		}
+
+		// 물리엔진 위치 설정
+		m_pPhysicsEngine->Set_Pos(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z);
+
+		// Transform도 이동
+		_vector respawnPos = XMVectorSet(respawnPosVec.x, respawnPosVec.y, respawnPosVec.z, 1.f);
+		m_TransformCom->Set_State(CTransform::STATE_POSITION, respawnPos);
+
+		_float4x4 TempMat;
+		XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
+		if (Network_Manager::GetInstance()->isConnected()) {
+			auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
+			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+		}
+		Choiced_Pos = 0;
+	}
 }
