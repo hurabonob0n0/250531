@@ -18,7 +18,7 @@ public:
     void                    Set_Fence_Value(UINT64 fenceValue) { m_Fence = fenceValue; }
 
 public:
-    void Set_PassConstants();
+    void Set_PassConstants(_uint index);
     void Set_Materials();
 
 public:

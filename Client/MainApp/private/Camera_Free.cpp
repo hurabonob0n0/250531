@@ -39,12 +39,6 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
 	Safe_AddRef(m_Tank);
 
-	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
-	Safe_AddRef(m_TankTransform);
-
-	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
-	Safe_AddRef(m_Tank);*/
-
 
 	m_Distance_TPS = 20.f;
 
@@ -58,7 +52,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_fYRot_FPS = 0.f;
 
-	m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 5.f, 1.f));
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, -15.f, 1.f));
 
 	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
 

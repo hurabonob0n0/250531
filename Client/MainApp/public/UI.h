@@ -28,6 +28,10 @@ private:
 	
 private:
 	_bool			m_isFPS;
+
+private:
+	int TPSMatIndex;
+	int FPSMatIndex;
 	
 
 public:

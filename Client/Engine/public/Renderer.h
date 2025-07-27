@@ -29,6 +29,7 @@ public:
 
 private:
 	vector<CRenderObject*> m_vRenderObjects[RG_END];
+	int PassNum = 2;
 
 private:
 	class CGameInstance* m_GameInstance;

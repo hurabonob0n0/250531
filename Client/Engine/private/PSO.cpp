@@ -81,6 +81,11 @@ CPSO* CPSO::SetVS(CShader* VS)
 
 CPSO* CPSO::SetPS(CShader* PS)
 {
+    if (PS == nullptr)
+    {
+        m_PsoDesc.PS = { nullptr };
+        return this;
+    }
     m_PsoDesc.PS = { reinterpret_cast<BYTE*>(PS->Get()), PS->Get_Buffer_Size() };
     return this;
 }
@@ -122,6 +127,17 @@ CPSO* CPSO::Create_PSO() {
 CPSO* CPSO::setForBlending()
 {
     return nullptr;
+}
+
+CPSO* CPSO::setForShadow()
+{
+    m_PsoDesc.RasterizerState.DepthBias = 100000;
+    m_PsoDesc.RasterizerState.DepthBiasClamp = 100.0f;
+    m_PsoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+    m_PsoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+    m_PsoDesc.NumRenderTargets = 0;
+
+    return this;
 }
 
 CPSO* CPSO::Create()

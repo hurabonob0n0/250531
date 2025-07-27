@@ -1,6 +1,7 @@
 #include "..\Public\Random_Manager.h"
 #include <chrono>
 
+
 IMPLEMENT_SINGLETON(CRandom_Manager)
 
 CRandom_Manager::CRandom_Manager()
@@ -19,11 +20,6 @@ float CRandom_Manager::Get_RandomF(float Start, float End)
 	uniform_real_distribution<_float> m_iDistribution(Start, End);
 
 	return m_iDistribution(m_Generator);
-}
-
-HRESULT CRandom_Manager::Initialize()
-{
-	return S_OK;
 }
 
 void CRandom_Manager::Tick()

@@ -43,7 +43,7 @@ float CVIBuffer_Terrain::Get_Terrain_Heights(float x, float z)
     //    PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[1], Positions[2]);
 
     //return -(XMVectorGetX(PlaneNormal) * x + XMVectorGetZ(PlaneNormal) * z + XMVectorGetW(PlaneNormal)) / XMVectorGetY(PlaneNormal);
-     float half = NUMVERTERTICES / 2.f;
+    float half = NUMVERTERTICES / 2.f;
 
     int LX = int(x + half);
     int DZ = int(z + half);

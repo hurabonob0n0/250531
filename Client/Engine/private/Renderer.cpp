@@ -71,12 +71,36 @@ HRESULT CRenderer::Initialize(void* pArg)
 
 void CRenderer::Render()
 {
-    m_GameInstance->Reset_CommandList_and_Allocator(m_GameInstance->GetPSO("SkyPSO"));
+#pragma region ShadowPass
+    m_GameInstance->Reset_CommandList_and_Allocator(m_GameInstance->GetPSO("ShadowPSO"));
+    m_GameInstance->Set_DescriptorHeap();
+    m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
+    m_GameInstance->Set_CurrentFramePBMats(1);
+    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    //m_GameInstance->Set_ViewPort_and_ScissorRect();
+    m_CommandList->RSSetViewports(1, &m_GameInstance->m_ShadowMap->mViewport);
+    m_CommandList->RSSetScissorRects(1, &m_GameInstance->m_ShadowMap->mScissorRect);
+    m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GameInstance->m_ShadowMap->m_Resource,
+        D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    m_CommandList->ClearDepthStencilView(m_GameInstance->m_ShadowMap->mhCpuDsv,
+        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    m_CommandList->OMSetRenderTargets(0, nullptr, false, &m_GameInstance->m_ShadowMap->mhCpuDsv);
+    Render_NonBlend();
+    m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GameInstance->m_ShadowMap->m_Resource,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+#pragma endregion ShadowPass
+
+    --PassNum;
+
+#pragma region Normal Pass
+    //m_GameInstance->Reset_CommandList_and_Allocator(m_GameInstance->GetPSO("SkyPSO"));
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("SkyPSO"));
     m_GameInstance->Set_BackBuffer_and_DSV();
     m_GameInstance->Set_DescriptorHeap();
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
-    m_GameInstance->Set_CurrentFramePBMats();
-    m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    m_GameInstance->Set_CurrentFramePBMats(0);
+    m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);
+    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
     Render_Priority();
     
@@ -95,6 +119,10 @@ void CRenderer::Render()
     Render_UI();
     
     m_GameInstance->Present();
+
+    PassNum = 2;
+
+#pragma endregion Normal Pass
 }
 
 void CRenderer::Render_Priority()
@@ -125,10 +153,14 @@ void CRenderer::Render_NonBlend()
     for (auto& pGameObject : m_vRenderObjects[RG_NONBLEND])
     {
         pGameObject->Render();
-
-        Safe_Release(pGameObject);
+        //Safe_Release(pGameObject);
+        if (PassNum == 1)
+        {
+            Safe_Release(pGameObject);
+        }
     }
-    m_vRenderObjects[RG_NONBLEND].clear();
+    if(PassNum == 1)
+        m_vRenderObjects[RG_NONBLEND].clear();
 }
 
 void CRenderer::Render_Blend()

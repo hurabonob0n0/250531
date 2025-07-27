@@ -55,6 +55,7 @@
     <ClInclude Include="..\public\RootSignatureMgr.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\Shader_Mgr.h" />
+    <ClInclude Include="..\public\ShadowMap.h" />
     <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\TextureMgr.h" />
     <ClInclude Include="..\public\Timer.h" />
@@ -103,6 +104,7 @@
     <ClCompile Include="..\private\RootSignatureMgr.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\Shader_Mgr.cpp" />
+    <ClCompile Include="..\private\ShadowMap.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\TextureMgr.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />

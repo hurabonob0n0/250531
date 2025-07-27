@@ -27,6 +27,7 @@ public:
     CPSO* SetForSkyBox();
     CPSO* Create_PSO();
     CPSO* setForBlending();
+    CPSO* setForShadow();
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

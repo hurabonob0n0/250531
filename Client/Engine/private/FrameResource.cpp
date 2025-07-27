@@ -12,14 +12,14 @@ void CFrameResource::Initialize(ID3D12Device* device)
         IID_PPV_ARGS(&m_CmdListAlloc))))
         MSG_BOX("Failed to Create : CommandListAllocator");
 
-    m_PassCB = CUploadBuffer<PassConstants>::Create(device, 1, true);
+    m_PassCB = CUploadBuffer<PassConstants>::Create(device, 2, true);
     m_ObjectCB = CUploadBuffer<ObjectConstants>::Create(device, 4000, true);
     m_MaterialCB = CUploadBuffer<MaterialData>::Create(device, 1000, false);
 }
 
-void CFrameResource::Set_PassConstants()
+void CFrameResource::Set_PassConstants(_uint index)
 {
-    GETCOMMANDLIST->SetGraphicsRootConstantBufferView(1, m_PassCB->Resource()->GetGPUVirtualAddress());
+    GETCOMMANDLIST->SetGraphicsRootConstantBufferView(1, m_PassCB->Resource()->GetGPUVirtualAddress() + index * sizeof(PassConstants));
 }
 
 void CFrameResource::Set_Materials()

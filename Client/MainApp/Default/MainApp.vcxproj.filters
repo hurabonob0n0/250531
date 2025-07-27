@@ -103,6 +103,18 @@
     <Filter Include="97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room">
       <UniqueIdentifier>{026de808-6b7f-4231-8d01-e7b8a35043c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\UI\UIHP">
+      <UniqueIdentifier>{bb6add5b-28b3-4733-a3db-8dec01ffc6d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UIReloading">
+      <UniqueIdentifier>{9bf48ee1-df4e-463e-bd51-cb5128644031}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UITeamPercent">
+      <UniqueIdentifier>{41f6e742-ac8b-4687-b957-bc1c0ac8d203}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UISelectPos">
+      <UniqueIdentifier>{5f21ce70-a44e-4944-8de2-a739ccb4aeb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -204,6 +216,18 @@
     <ClInclude Include="..\public\Level_Room.h">
       <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UIHP.h">
+      <Filter>01.DefaultObj\UI\UIHP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UIReloading.h">
+      <Filter>01.DefaultObj\UI\UIReloading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UITeamPercent.h">
+      <Filter>01.DefaultObj\UI\UITeamPercent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UISelectPos.h">
+      <Filter>01.DefaultObj\UI\UISelectPos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -296,6 +320,18 @@
     <ClCompile Include="..\private\Level_Room.cpp">
       <Filter>97.ForLobby\97-01.Level_Manager\Levels\2.Level_Room</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UIHP.cpp">
+      <Filter>01.DefaultObj\UI\UIHP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIReloading.cpp">
+      <Filter>01.DefaultObj\UI\UIReloading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UITeamPercent.cpp">
+      <Filter>01.DefaultObj\UI\UITeamPercent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UISelectPos.cpp">
+      <Filter>01.DefaultObj\UI\UISelectPos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
@@ -326,6 +362,9 @@
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\UI.hlsl">
+      <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders\Shadows.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

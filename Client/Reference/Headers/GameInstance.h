@@ -12,6 +12,7 @@
 #include "TextureMgr.h"
 #include "MaterialMgr.h"
 #include "Random_Manager.h"
+#include "ShadowMap.h"
 
 BEGIN(Engine)
 
@@ -37,6 +38,9 @@ public:		//For_GraphicDev
 	void Set_BackBuffer_and_DSV() { m_Graphic_Dev->Set_BackBuffer_and_DSV(); }
 	void Present() { m_Graphic_Dev->Present(); }
 	void OnResize() { m_Graphic_Dev->OnResize(); }
+	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const { return m_Graphic_Dev->DepthStencilView(); }
+	void Set_ViewPort_and_ScissorRect() { m_Graphic_Dev->Set_ViewPort_and_ScissorRect(); }
+	UINT						Get_DSVSize() { return m_Graphic_Dev->Get_DSVSize(); }
 
 public:		//For_InputDev
 	bool Key_Down(UINT vkey) {return m_Input_Dev->Key_Down(vkey);}
@@ -57,7 +61,7 @@ public:		//For_FrameResourceMgr
 	void Reset_CommandList_and_Allocator(ID3D12PipelineState* PSO) { m_FrameResourceMgr->Reset_CommandList_and_Allocator(PSO); } //Todo : 나중에 매개변수로 PSO받아서 설정해주기
 	CFrameResource* Get_Current_FrameResource() { return m_FrameResourceMgr->Get_Current_FrameResource(); }
 	void Flush_CommandQueue() { m_FrameResourceMgr->Flush_CommandQueue(); }
-	void Set_CurrentFramePBMats() { m_FrameResourceMgr->Set_CurrentFramePBMats(); }
+	void Set_CurrentFramePBMats(_uint index) { m_FrameResourceMgr->Set_CurrentFramePBMats(index); }
 	void Execute_Flush_and_Reset() { 
 		m_Graphic_Dev->Execute_CommandList();
 		m_FrameResourceMgr->Flush_CommandQueue();
@@ -92,6 +96,8 @@ public: //For TextureMgr
 	}
 	ID3D12DescriptorHeap* Get_SRVDescriptorHeap() { return m_TextureMgr->Get_DescriptorHeap(); }
 	void Set_DescriptorHeap() { m_TextureMgr->Set_DescriptorHeap(); }
+	void Add_ShadowMap(ID3D12Resource** Resource) { m_TextureMgr->Add_ShadowMap(Resource); }
+	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_CPUSRVDescriptorHeap() { return m_TextureMgr->Get_CPUSRVDescriptorHeap(); }
 
 public: //For PSOMgr
 	ID3D12PipelineState* GetPSO(const string& PSOName) const { return m_PSOMgr->Get(PSOName); }
@@ -129,6 +135,9 @@ private:
 	CMaterialMgr*			m_MaterialMgr;
 	CTextureMgr*			m_TextureMgr;
 	CRandom_Manager*		m_RandomMgr;
+
+public:
+	CShadowMap*				m_ShadowMap;
 };
 
 END

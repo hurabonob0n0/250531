@@ -72,9 +72,9 @@ void CFrameResourceMgr::Set_ObjectConstantBufferIndex(_uint& CBIndex)
 	Get_Current_FrameResource()->Set_ObjectConstantBufferIndex(CBIndex);
 }
 
-void CFrameResourceMgr::Set_CurrentFramePBMats()
+void CFrameResourceMgr::Set_CurrentFramePBMats(_uint index)
 {
-	Get_Current_FrameResource()->Set_PassConstants();
+	Get_Current_FrameResource()->Set_PassConstants(index);
 	Get_Current_FrameResource()->Set_Materials();
 }
 void CFrameResourceMgr::Flush_CommandQueue()
