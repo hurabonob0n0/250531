@@ -135,7 +135,12 @@ void MyPhysicsEngine::CMyPhysicsEngine::Set_Pos(float x, float y, float z)
 void MyPhysicsEngine::CMyPhysicsEngine::Set_Tank_ControlState(TankControlState TCS)
 {
 	gVehicleInputData.setAnalogAccel(
-		(TCS.leftThrust || TCS.rightThrust) ? 1.0f : 0.0f);
+		(TCS.leftThrust || TCS.rightThrust || TCS.leftReverse || TCS.rightReverse) ? 1.0f : 0.0f);
+
+	if (TCS.leftThrust || TCS.rightThrust)
+		gTank->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	else
+		gTank->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 
 	gVehicleInputData.setAnalogLeftThrust(TCS.leftThrust ? 1.0f : 0.0f);
 	gVehicleInputData.setAnalogRightThrust(TCS.rightThrust ? 1.0f : 0.0f);

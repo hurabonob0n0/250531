@@ -33,11 +33,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &BS);
 
-	//m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
-	//Safe_AddRef(m_TankTransform);
+	m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+	Safe_AddRef(m_TankTransform);
 
-	//m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
-	//Safe_AddRef(m_Tank);
+	m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);
+	Safe_AddRef(m_Tank);
 
 
 	m_Distance_TPS = 20.f;
