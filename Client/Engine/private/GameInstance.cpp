@@ -8,9 +8,11 @@ CGameInstance::CGameInstance() : m_Graphic_Dev(CGraphic_Dev::Get_Instance()),m_F
 
 void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 {
-	ID3D12Debug* debugController;
-	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
-	debugController->EnableDebugLayer();
+	//ID3D12Debug* debugController;
+	//D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
+	//debugController->EnableDebugLayer();
+
+
 
 	//InputDev
 	m_Input_Dev = pRawInput;
@@ -39,14 +41,14 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 
 	//ShaderMgr
 	m_ShaderMgr = CShader_Mgr::Get_Instance();
-	m_ShaderMgr->AddShader("DefaultVS", CShader::ST_VS, L"../bin/Shaders/Default.hlsl", nullptr);
-	m_ShaderMgr->AddShader("DefaultPS", CShader::ST_PS, L"../bin/Shaders/Default.hlsl", nullptr);
+	m_ShaderMgr->AddShader("DefaultVS", CShader::ST_VS, L"../bin/Shaders1/Default.hlsl", nullptr);
+	m_ShaderMgr->AddShader("DefaultPS", CShader::ST_PS, L"../bin/Shaders1/Default.hlsl", nullptr);
 
-	m_ShaderMgr->AddShader("SkyVS", CShader::ST_VS, L"../bin/Shaders/Sky.hlsl", nullptr);
-	m_ShaderMgr->AddShader("SkyPS", CShader::ST_PS, L"../bin/Shaders/Sky.hlsl", nullptr);
+	m_ShaderMgr->AddShader("SkyVS", CShader::ST_VS, L"../bin/Shaders1/Sky.hlsl", nullptr);
+	m_ShaderMgr->AddShader("SkyPS", CShader::ST_PS, L"../bin/Shaders1/Sky.hlsl", nullptr);
 
-	m_ShaderMgr->AddShader("PosNorVS", CShader::ST_VS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
-	m_ShaderMgr->AddShader("PosNorPS", CShader::ST_PS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
+	//m_ShaderMgr->AddShader("PosNorVS", CShader::ST_VS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
+	//m_ShaderMgr->AddShader("PosNorPS", CShader::ST_PS, L"../bin/ShaderFiles/Default.hlsl", nullptr);
 
 	m_ShaderMgr->AddShader("EffectVS", CShader::ST_VS, L"../bin/Shaders/Effect.hlsl", nullptr);
 	m_ShaderMgr->AddShader("EffectPS", CShader::ST_PS, L"../bin/Shaders/Effect.hlsl", nullptr);
@@ -54,7 +56,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("UIVS", CShader::ST_VS, L"../bin/Shaders/UI.hlsl", nullptr);
 	m_ShaderMgr->AddShader("UIPS", CShader::ST_PS, L"../bin/Shaders/UI.hlsl", nullptr);
 
-	m_ShaderMgr->AddShader("ShadowVS", CShader::ST_VS, L"../bin/Shaders/Shadows.hlsl", nullptr);
+	m_ShaderMgr->AddShader("ShadowVS", CShader::ST_VS, L"../bin/Shaders1/Shadows.hlsl", nullptr);
+	m_ShaderMgr->AddShader("ShadowPS", CShader::ST_PS, L"../bin/Shaders1/Shadows.hlsl", nullptr);
 
 	//PSOMgr
 	m_PSOMgr = CPSOMgr::Get_Instance();
@@ -72,11 +75,11 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
 		SetForSkyBox()->Create_PSO());
 
-	m_PSOMgr->AddPSO("TerrainPSO", CPSO::Create()->
+	/*m_PSOMgr->AddPSO("TerrainPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_POS_NOR)->
 		SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
-		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());*/
 
 	m_PSOMgr->AddPSO("EffectPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
@@ -93,7 +96,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("ShadowVS"))->
-		SetPS(nullptr)->
+		SetPS(m_ShaderMgr->GetShaderObj("ShadowPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
 		setForShadow()->
 		Create_PSO());

@@ -153,7 +153,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UIHP", CUIHP::Create());
 	m_GameInstance->Add_PrototypeObject("UIReloading", CUIReloading::Create());
 	m_GameInstance->Add_PrototypeObject("UISelectPos", CUISelectPos::Create());
-	//m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
+	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
 
@@ -172,10 +172,12 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
 	//m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
-	/*_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
-	m_GameInstance->AddObject("Effect", "Effect", &mat3);*/
+	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
+	m_GameInstance->AddObject("Effect", "Effect", &mat3);
+	_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
+	m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);
 
-	//m_GameInstance->AddObject("Tree", "Tree", nullptr);
+	m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
 	m_GameInstance->Execute_CommandList();
 
