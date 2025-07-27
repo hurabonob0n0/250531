@@ -63,8 +63,8 @@ void CCamera_Free::Tick(float fTimeDelta)
 {
 
 
-	__super::Tick(fTimeDelta);
-	/*if (m_GameInstance->Key_Down(VK_PAUSE))
+	//__super::Tick(fTimeDelta);
+	if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
@@ -90,7 +90,7 @@ void CCamera_Free::Tick(float fTimeDelta)
 			break;
 		}
 
-	}*/
+	}
 
 }
 
