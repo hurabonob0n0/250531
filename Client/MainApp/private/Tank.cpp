@@ -169,29 +169,42 @@ void CTank::Tick(float fTimeDelta)
 				});*/
 
 
-			if (m_GameInstance->Key_Down('U'))
+			if (m_GameInstance->Key_Down('W'))
 				m_TankConsrolState.leftThrust = true;
 
-			if (m_GameInstance->Key_Down('J'))
+			if (m_GameInstance->Key_Down('S'))
 				m_TankConsrolState.leftBrake = true;
 
-			if (m_GameInstance->Key_Down('O'))
+			if (m_GameInstance->Key_Down('R'))
 				m_TankConsrolState.rightThrust = true;
 
-			if (m_GameInstance->Key_Down('L'))
+			if (m_GameInstance->Key_Down('F'))
 				m_TankConsrolState.rightBrake = true;
 
-			if (m_GameInstance->Key_Up('U'))
+			if (m_GameInstance->Key_Down('X'))
+				m_TankConsrolState.leftReverse = true;
+
+			if (m_GameInstance->Key_Down('V'))
+				m_TankConsrolState.rightReverse = true;
+
+			if (m_GameInstance->Key_Up('W'))
 				m_TankConsrolState.leftThrust = false;
 
-			if (m_GameInstance->Key_Up('J'))
+			if (m_GameInstance->Key_Up('S'))
 				m_TankConsrolState.leftBrake = false;
 
-			if (m_GameInstance->Key_Up('O'))
+			if (m_GameInstance->Key_Up('R'))
 				m_TankConsrolState.rightThrust = false;
 
-			if (m_GameInstance->Key_Up('L'))
+			if (m_GameInstance->Key_Up('F'))
 				m_TankConsrolState.rightBrake = false;
+
+			if (m_GameInstance->Key_Up('X'))
+				m_TankConsrolState.leftReverse = false;
+
+			if (m_GameInstance->Key_Up('V'))
+				m_TankConsrolState.rightReverse = false;
+
 
 			if (m_GameInstance->Mouse_Down(0)) {
 				//m_GameInstance->AddObject("DefaultObject", "BoxObj", &ShotMatrix);
@@ -269,29 +282,42 @@ void CTank::Tick(float fTimeDelta)
 					CGameInstance::Get_Instance()->AddObject("DefaultObject", "BulletObj", &tempMat);
 					});*/
 
-				if (m_GameInstance->Key_Down('U'))
+				if (m_GameInstance->Key_Down('W'))
 					m_TankConsrolState.leftThrust = true;
 
-				if (m_GameInstance->Key_Down('J'))
+				if (m_GameInstance->Key_Down('S'))
 					m_TankConsrolState.leftBrake = true;
 
-				if (m_GameInstance->Key_Down('O'))
+				if (m_GameInstance->Key_Down('R'))
 					m_TankConsrolState.rightThrust = true;
 
-				if (m_GameInstance->Key_Down('L'))
+				if (m_GameInstance->Key_Down('F'))
 					m_TankConsrolState.rightBrake = true;
 
-				if (m_GameInstance->Key_Up('U'))
+				if (m_GameInstance->Key_Down('X'))
+					m_TankConsrolState.leftReverse = true;
+
+				if (m_GameInstance->Key_Down('V'))
+					m_TankConsrolState.rightReverse = true;
+
+				if (m_GameInstance->Key_Up('W'))
 					m_TankConsrolState.leftThrust = false;
 
-				if (m_GameInstance->Key_Up('J'))
+				if (m_GameInstance->Key_Up('S'))
 					m_TankConsrolState.leftBrake = false;
 
-				if (m_GameInstance->Key_Up('O'))
+				if (m_GameInstance->Key_Up('R'))
 					m_TankConsrolState.rightThrust = false;
 
-				if (m_GameInstance->Key_Up('L'))
+				if (m_GameInstance->Key_Up('F'))
 					m_TankConsrolState.rightBrake = false;
+
+				if (m_GameInstance->Key_Up('X'))
+					m_TankConsrolState.leftReverse = false;
+
+				if (m_GameInstance->Key_Up('V'))
+					m_TankConsrolState.rightReverse = false;
+
 
 
 				m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
