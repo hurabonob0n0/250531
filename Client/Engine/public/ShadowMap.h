@@ -1,5 +1,8 @@
 #pragma once
 #include "Base.h"
+
+BEGIN(Engine)
+
 class CShadowMap : public CBase
 {
 	DECLARE_SINGLETON(CShadowMap)
@@ -26,7 +29,10 @@ public:
 
 	XMMATRIX S;
 
+	class CTransform* m_TankTransform;
+
 public:
 	virtual void	Free();
 };
 
+END

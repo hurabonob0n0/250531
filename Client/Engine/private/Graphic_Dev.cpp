@@ -412,7 +412,7 @@ void CGraphic_Dev::Free()
 
     Safe_Release(m_Device);
     Safe_Release(m_dxgiFactory);
-#if defined(DEBUG) | defined(_DEBUG)
+//#if defined(DEBUG) | defined(_DEBUG)
     // D3D12 디버그 레이어를 활성화 합니다.
     {
         ID3D12Debug* debugController;
@@ -422,5 +422,5 @@ void CGraphic_Dev::Free()
         }
         if (debugController != nullptr) debugController->Release();
     } // 메모리 누수 디버깅 체크용 코드
-#endif
+//#endif
 }
