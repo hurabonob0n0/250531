@@ -1,24 +1,24 @@
 #include "Client_pch.h"
-#include "UIReloading.h"
+#include "UITeamPercent.h"
 #include "GameInstance.h"
 
-CUIReloading::CUIReloading() : CUIObject()
+CUITeamPercent::CUITeamPercent() : CUIObject()
 {
 }
 
-CUIReloading::CUIReloading(CUIReloading& rhs) : CUIObject(rhs)
+CUITeamPercent::CUITeamPercent(CUITeamPercent& rhs) : CUIObject(rhs)
 {
 
 }
 
-HRESULT CUIReloading::Initialize_Prototype()
+HRESULT CUITeamPercent::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 
 	return S_OK;
 }
 
-HRESULT CUIReloading::Initialize(void* pArg)
+HRESULT CUITeamPercent::Initialize(void* pArg)
 {
 	m_RG = CRenderer::RG_UI;
 
@@ -26,65 +26,82 @@ HRESULT CUIReloading::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIReloading", CTexture::Create(L"../bin/Models/UI/2.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UITeamPercent", CTexture::Create(L"../bin/Models/UI/5-3.dds"));
 
-	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIReloading", mat));
+	BlankMatIndex = m_GameInstance->Add_Material("UITeamPercentBlank", mat);
+
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIRedTeamPercent", CTexture::Create(L"../bin/Models/UI/5-1.dds"));
+
+	RedTeamIndex = m_GameInstance->Add_Material("UIRedTeamPercent", mat);
+
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIBlueTeamPercent", CTexture::Create(L"../bin/Models/UI/5-2.dds"));
+
+	BlueTeamIndex = m_GameInstance->Add_Material("UIBlueTeamPercent", mat);
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
-	m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.77f);
+	m_BlueTeamBlank = XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(-0.5f, 0.5f, 0.f);
 
-	m_TransformCom->Set_Scale(2.f);
-
-	m_TransformCom->Set_Scale(0.1f);
-
-	m_TransformCom->Set_Scale(CTransform::STATE_LOOK, 0.f);
+	m_RedTeamBlank = XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(+0.5f, 0.5f, 0.f);
 
 	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
 
-	//m_CBBinding->Set_Pad0(1);
+	m_CBBinding->Set_Pad0(2);
 
    // m_isFPS = false;
 
 	return S_OK;
 }
 
-void CUIReloading::Tick(float fTimeDelta)
+void CUITeamPercent::Tick(float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+	//__super::Tick(fTimeDelta);
 }
 
-void CUIReloading::LateTick(float fTimeDelta)
+void CUITeamPercent::LateTick(float fTimeDelta)
 {
-	__super::LateTick(fTimeDelta);
+	//__super::LateTick(fTimeDelta);
 }
 
-void CUIReloading::Render()
+void CUITeamPercent::Render()
 {
-	if (reloading)
-	{
-		__super::Render();
-		m_VIBuffer->Render();
-	}
+	m_CBBinding->Set_CBIndex();
+	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
+	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
+	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(100);
+	m_CBBinding->Update_CBView();
+	m_CBBinding->Set_On_Shader();
+	m_VIBuffer->Render();
+
+	m_CBBinding->Set_CBIndex();
+	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
+	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
+	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(100);
+	m_CBBinding->Update_CBView();
+	m_CBBinding->Set_On_Shader();
+	m_VIBuffer->Render();
+
 }
 
-void CUIReloading::Free()
+void CUITeamPercent::Free()
 {
 	Safe_Release(m_VIBuffer);
 
 	__super::Free();
 }
 
-CUIReloading* CUIReloading::Create()
+CUITeamPercent* CUITeamPercent::Create()
 {
-	CUIReloading* pInstance = new CUIReloading;
+	CUITeamPercent* pInstance = new CUITeamPercent;
 	pInstance->Initialize_Prototype();
 	return pInstance;
 }
 
-CUIReloading* CUIReloading::Clone(void* pArg)
+CUITeamPercent* CUITeamPercent::Clone(void* pArg)
 {
-	CUIReloading* pInstance = new CUIReloading(*this);
+	CUITeamPercent* pInstance = new CUITeamPercent(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
 }

@@ -118,6 +118,9 @@
     <Filter Include="shader">
       <UniqueIdentifier>{2aace5ba-6af6-4e50-904c-d294195dd2ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\UI\UIDamaged">
+      <UniqueIdentifier>{deb6b792-eb55-4848-8bee-54d323bffa14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -231,6 +234,12 @@
     <ClInclude Include="..\public\UISelectPos.h">
       <Filter>01.DefaultObj\UI\UISelectPos</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UIKill.h">
+      <Filter>01.DefaultObj\UI\UIDamaged</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UIDamaged.h">
+      <Filter>01.DefaultObj\UI\UIDamaged</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -334,6 +343,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UISelectPos.cpp">
       <Filter>01.DefaultObj\UI\UISelectPos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIDamaged.cpp">
+      <Filter>01.DefaultObj\UI\UIDamaged</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIKill.cpp">
+      <Filter>01.DefaultObj\UI\UIDamaged</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

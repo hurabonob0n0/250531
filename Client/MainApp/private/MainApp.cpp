@@ -12,6 +12,9 @@
 #include "UIHP.h"
 #include "UIReloading.h"
 #include "UISelectPos.h"
+#include "UIDamaged.h"
+#include "UIKill.h"
+#include "UITeamPercent.h"
 
 /*-----------------
 	For Server
@@ -122,6 +125,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UIHP", CUIHP::Create());
 	m_GameInstance->Add_PrototypeObject("UIReloading", CUIReloading::Create());
 	m_GameInstance->Add_PrototypeObject("UISelectPos", CUISelectPos::Create());
+	m_GameInstance->Add_PrototypeObject("UIDamaged", CUIDamaged::Create());
+	m_GameInstance->Add_PrototypeObject("UIKill", CUIKill::Create());
+	m_GameInstance->Add_PrototypeObject("UITeamPercent", CUITeamPercent::Create());
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 
@@ -206,6 +212,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UI", "UI", nullptr);
 	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);
 	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
+	m_GameInstance->AddObject("UIDamaged", "UIDamaged", nullptr);
+	m_GameInstance->AddObject("UIKill", "UIKill", nullptr);
+	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
 	//m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
 	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);
