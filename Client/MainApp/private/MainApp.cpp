@@ -215,6 +215,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIDamaged", "UIDamaged", nullptr);
 	m_GameInstance->AddObject("UIKill", "UIKill", nullptr);
 	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
+	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 	//m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
 	_matrix mat3 = XMMatrixTranslation(500.f, 40.f, 17.f);

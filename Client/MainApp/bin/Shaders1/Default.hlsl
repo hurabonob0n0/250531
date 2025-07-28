@@ -147,7 +147,6 @@ float4 PS(VertexOut pin) : SV_Target
     
     return litColor;
 
-    return litColor;
 }
 
 
