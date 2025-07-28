@@ -28,7 +28,8 @@ private:
 	
 private:
 	int HP = 100;
-	
+	class CTransform* m_BaseTransform;
+	int FullHP = 100;
 
 public:
 	void Free() override;

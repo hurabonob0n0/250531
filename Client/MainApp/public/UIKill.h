@@ -9,12 +9,12 @@ END
 
 BEGIN(Client)
 
-class CUITeamPercent : public CUIObject
+class CUIKill : public CUIObject
 {
 public:
-	CUITeamPercent();
-	CUITeamPercent(CUITeamPercent& rhs);
-	virtual ~CUITeamPercent() = default;
+	CUIKill();
+	CUIKill(CUIKill& rhs);
+	virtual ~CUIKill() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -25,21 +25,20 @@ public:
 
 private:
 	CVIBuffer_Quad* m_VIBuffer;
-	XMMATRIX m_BlueTeamBlank;
-	XMMATRIX m_RedTeamBlank;
-	XMMATRIX m_BlueTeamFull;
-	XMMATRIX m_RedTeamFull;
-	int BlankMatIndex;
-	int RedTeamIndex;
-	int BlueTeamIndex;
 
-	int Percent = 0.f;
-	
+private:
+	float deltatime;
+	float cooltime = 2.f;
+	bool isHit = false;
+
+public:
+	void reset_deltatime();
+	void set_Hit() { isHit = true; }
 
 public:
 	void Free() override;
-	static CUITeamPercent* Create();
-	CUITeamPercent* Clone(void* pArg);
+	static CUIKill* Create();
+	CUIKill* Clone(void* pArg);
 
 };
 

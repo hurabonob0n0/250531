@@ -19,7 +19,7 @@ public:
 	~Network_Manager();
 
 private:
-
+	
 public:
 	static Network_Manager* GetInstance()
 	{
@@ -118,6 +118,7 @@ public:
 	int REDBAR = 0;
 	int BLUEBAR = 0;
 
+	int MyHp;
 
 
 private:
@@ -138,7 +139,6 @@ private:
 	int MyTankIndex;
 
 
-	int MyHp;
 	int MyKillCount = 0;
 	USE_LOCK;
 
