@@ -23,11 +23,16 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+	void Set_Reloading() { reloading = true; }
+
 private:
 	CVIBuffer_Quad* m_VIBuffer;
 	
 private:
-	bool reloading = true;
+	bool reloading = false;
+	float deltatime = 0.f;
+	float cooltime = 3.f;
 	
 
 public:

@@ -5,7 +5,8 @@
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
 #include "Network_Manager.h"
-
+#include "UIReloading.h"
+#include "UISelectPos.h"
 
 CTank::CTank() : CRenderObject()
 {
@@ -188,7 +189,9 @@ void CTank::Tick(float fTimeDelta)
 				if (_shootTimer >= SHOOT_INTERVAL)
 				{
 					if (Network_Manager::GetInstance()->isConnected())
+
 						SendShootDataToServer(); // 실제 슈팅
+					((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
 
 					_shootTimer = 0.f; // 타이머 초기화
 				}
@@ -223,8 +226,12 @@ void CTank::Tick(float fTimeDelta)
 					if (_shootTimer >= SHOOT_INTERVAL)
 					{
 
-						if (Network_Manager::GetInstance()->isConnected())
+						if (Network_Manager::GetInstance()->isConnected()){
 							SendShootDataToServer(); // 실제 슈팅
+							((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
+						}
+							
+
 
 						_shootTimer = 0.f; // 타이머 초기화
 					}
@@ -1190,6 +1197,8 @@ void CTank::setRespawn() {
 		}
 	}
 	else {
+		Network_Manager::GetInstance()->ReSpawn();
+		((CUISelectPos*)m_GameInstance->GetGameObject("UISelectPos", 0))->set_render_off();
 		_isSpawn = true;
 		_respawnTimer = 0.f;
 		is_choiced = false;

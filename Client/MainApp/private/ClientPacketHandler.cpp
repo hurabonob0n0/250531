@@ -9,6 +9,9 @@
 #include "Room_Manager.h"
 #include "Level_Manager.h"
 #include "Network_Manager.h"
+#include "UIDamaged.h"
+#include "UIKill.h"
+#include "UISelectPos.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -299,7 +302,7 @@ void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		//add Hit UI
+		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UIDamaged", 0)))->set_Hit();
 		});
 }
 
@@ -329,6 +332,7 @@ void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
 		if (index == Network_Manager::GetInstance()->GetMyTankIndex()) {
 			tank->set_Spawn(false);
 			tank->_respawnTimer = 0.f;
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render();
 		}
 		});
 }
@@ -339,6 +343,7 @@ void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UIKill", 0)))->set_Hit();
 		Network_Manager::GetInstance()->add_MyKillCount();
 	});
 }

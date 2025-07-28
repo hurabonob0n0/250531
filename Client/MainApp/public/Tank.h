@@ -95,7 +95,7 @@ private:		//For PosinCrosshair
 	void setRespawn();
 private:
 	float _shootTimer = 0.f;  // 누적 슈팅 시간
-	const float SHOOT_INTERVAL = 4.f; // 4초 주기
+	const float SHOOT_INTERVAL = 3.f; // 4초 주기
 
 public:
 	bool _myPlayer = false;

@@ -52,6 +52,16 @@ HRESULT CUIReloading::Initialize(void* pArg)
 void CUIReloading::Tick(float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+
+	if (reloading)
+	{
+		deltatime += fTimeDelta;
+		if (deltatime >= cooltime)
+		{
+			reloading = false;
+			deltatime = 0.f;
+		}
+	}
 }
 
 void CUIReloading::LateTick(float fTimeDelta)

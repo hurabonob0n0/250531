@@ -65,7 +65,7 @@ void CShadowMap::Late_Update()
 	//2896.31f
 
 	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
-	m_TankTransform = (CTransform*)pGameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+	m_TankTransform = (CTransform*)pGameInstance->Get_Object_Component("Tank", myTankIndex, "TransformCom");
 
 	XMVECTOR lightDir = XMVectorSet(0.57735f, -0.57735f, 0.57735f, 0.f);
 	XMVECTOR lightPos = -2.0f * 500.f* lightDir;

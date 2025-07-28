@@ -118,7 +118,7 @@ public:
 	int REDBAR = 0;
 	int BLUEBAR = 0;
 
-	int MyHp;
+	int MyHp = 100;
 
 
 private:

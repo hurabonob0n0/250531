@@ -41,6 +41,15 @@ float4 PS(VertexOut pin) : SV_Target
     if (color.a <= 0.1f)
         discard;
     
+    if(gObjPad0 == 1)
+        if (color.r == 0.f && color.g == 0.f
+            &&color.b == 0.f)
+            discard;
+    
+    if(gObjPad0 == 2)
+        if(pin.TexC.y < gObjPad1/100.f)
+            discard;
+    
     return color;
 	
 }

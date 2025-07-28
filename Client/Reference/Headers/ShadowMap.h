@@ -13,6 +13,7 @@ private:
 
 public:
 	void Initialize();
+	void Set_My_Tank_Index(int Index) { myTankIndex = Index; }
 	void Late_Update();
 
 public:
@@ -30,6 +31,8 @@ public:
 	XMMATRIX S;
 
 	class CTransform* m_TankTransform;
+
+	int myTankIndex;
 
 public:
 	virtual void	Free();

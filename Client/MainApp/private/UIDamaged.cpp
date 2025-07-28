@@ -43,8 +43,8 @@ void CUIDamaged::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-    if(m_GameInstance->Key_Down(VK_RETURN))
-        isHit = true;
+   /* if(m_GameInstance->Key_Down(VK_RETURN))
+        isHit = true;*/
 
     if (isHit)
     {

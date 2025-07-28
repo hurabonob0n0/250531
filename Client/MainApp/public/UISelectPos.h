@@ -23,11 +23,15 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+	void set_render() { render = true; }
+	void set_render_off() { render = false; }
+
 private:
 	CVIBuffer_Quad* m_VIBuffer;
 	
 private:
-	int HP = 100;
+	bool render = false;
 	
 
 public:

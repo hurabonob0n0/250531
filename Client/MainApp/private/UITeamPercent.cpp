@@ -1,6 +1,7 @@
 #include "Client_pch.h"
 #include "UITeamPercent.h"
 #include "GameInstance.h"
+#include "Network_Manager.h"
 
 CUITeamPercent::CUITeamPercent() : CUIObject()
 {
@@ -40,9 +41,9 @@ HRESULT CUITeamPercent::Initialize(void* pArg)
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
-	m_BlueTeamBlank = XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(-0.5f, 0.5f, 0.f);
+	m_BlueTeamBlank = XMMatrixScaling(0.25f, 0.25f, 0.25f) * XMMatrixTranslation(-0.5f, 0.7f, 0.f);
 
-	m_RedTeamBlank = XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(+0.5f, 0.5f, 0.f);
+	m_RedTeamBlank = XMMatrixScaling(0.25f, 0.25f, 0.25f) * XMMatrixTranslation(+0.5f, 0.7f, 0.f);
 
 	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
 
@@ -60,6 +61,7 @@ void CUITeamPercent::Tick(float fTimeDelta)
 
 void CUITeamPercent::LateTick(float fTimeDelta)
 {
+	m_RendererCom->AddtoRenderObjects(m_RG,this);
 	//__super::LateTick(fTimeDelta);
 }
 
@@ -70,6 +72,7 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
 	m_CBBinding->Set_Pad1(100);
+	m_CBBinding->Set_Pad0(0);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -79,6 +82,25 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
 	m_CBBinding->Set_Pad1(100);
+	m_CBBinding->Set_Pad0(0);
+	m_CBBinding->Update_CBView();
+	m_CBBinding->Set_On_Shader();
+	m_VIBuffer->Render();
+
+	m_CBBinding->Set_CBIndex();
+	m_CBBinding->Set_MaterialIndex(RedTeamIndex);
+	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
+	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(Network_Manager::GetInstance()->REDBAR);
+	m_CBBinding->Update_CBView();
+	m_CBBinding->Set_On_Shader();
+	m_VIBuffer->Render();
+
+	m_CBBinding->Set_CBIndex();
+	m_CBBinding->Set_MaterialIndex(BlueTeamIndex);
+	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
+	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(Network_Manager::GetInstance()->BLUEBAR);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
