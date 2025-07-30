@@ -85,13 +85,18 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
-		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		set_Disable_Depth()-> 
+		set_Blend_Enable()->
+		Create_PSO());
 
 	m_PSOMgr->AddPSO("UIPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("UIVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("UIPS"))->
-		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		set_Blend_Enable()->
+		Create_PSO());
 
 	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->

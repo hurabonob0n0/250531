@@ -71,8 +71,8 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
 	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(100);
-	m_CBBinding->Set_Pad0(0);
+	m_CBBinding->Set_Pad1(0);
+	//m_CBBinding->Set_Pad0(2);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -81,8 +81,8 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
 	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(100);
-	m_CBBinding->Set_Pad0(0);
+	m_CBBinding->Set_Pad1(0);
+	//m_CBBinding->Set_Pad0(2);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -91,7 +91,7 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_MaterialIndex(RedTeamIndex);
 	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(Network_Manager::GetInstance()->REDBAR);
+	m_CBBinding->Set_Pad1(50);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -100,7 +100,7 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_MaterialIndex(BlueTeamIndex);
 	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
 	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(Network_Manager::GetInstance()->BLUEBAR);
+	m_CBBinding->Set_Pad1(50);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();

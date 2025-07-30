@@ -38,7 +38,7 @@ float4 PS(VertexOut pin) : SV_Target
     
     float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC); /*float4(1.f, 1.f, 1.f, 1.f);*/
     
-    if (color.a <= 0.1f)
+    if (color.a <= 0.01f)
         discard;
     
     return color;
