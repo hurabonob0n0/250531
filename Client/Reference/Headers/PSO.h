@@ -28,6 +28,8 @@ public:
     CPSO* Create_PSO();
     CPSO* setForBlending();
     CPSO* setForShadow();
+    CPSO* set_Disable_Depth();
+    CPSO* set_Blend_Enable();
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

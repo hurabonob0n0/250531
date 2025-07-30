@@ -140,6 +140,31 @@ CPSO* CPSO::setForShadow()
     return this;
 }
 
+CPSO* CPSO::set_Disable_Depth()
+{
+    m_PsoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+
+    return this;
+}
+
+CPSO* CPSO::set_Blend_Enable()
+{
+    D3D12_RENDER_TARGET_BLEND_DESC blenddesc;
+    blenddesc.BlendEnable = true;
+    blenddesc.LogicOpEnable = false;
+    blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+    blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+    blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+    blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+    blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+    blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+    blenddesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+    m_PsoDesc.BlendState.RenderTarget[0] = blenddesc;
+    return this;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;
