@@ -19,7 +19,7 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(const string& strModelFilePath, _fmatrix PivotMatrix = XMMatrixIdentity());
+	virtual HRESULT Initialize_Prototype(const string& strModelFilePath, _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
 	virtual HRESULT Initialize(void* pArg);
 	void Update();
 	HRESULT Render(_uint iMeshIndex);
@@ -34,10 +34,10 @@ private:
 	vector< class CVIBuffer_Mesh*>			m_Meshes;
 
 private:
-	HRESULT Ready_Meshes(_fmatrix PivotMatrix = XMMatrixIdentity());
+	HRESULT Ready_Meshes(_fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
 
 public:
-	static CMeshModel* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const string& strModelFilePath , _fmatrix PivotMatrix = XMMatrixIdentity());
+	static CMeshModel* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const string& strModelFilePath , _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 

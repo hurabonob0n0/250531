@@ -43,7 +43,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 		Safe_AddRef(m_Tank);
 	}
 	else {
-		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Tank", 0, "TransformCom");
+		m_TankTransform = (CTransform*)m_GameInstance->Get_Object_Component("Drone", 0, "TransformCom");
 		Safe_AddRef(m_TankTransform);
 
 		m_Tank = (CTank*)m_GameInstance->GetGameObject("Tank", 0);

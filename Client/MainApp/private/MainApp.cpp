@@ -15,6 +15,7 @@
 #include "UIDamaged.h"
 #include "UIKill.h"
 #include "UITeamPercent.h"
+#include "Drone.h"
 
 /*-----------------
 	For Server
@@ -115,6 +116,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddPrototype("TreeModel5", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_5.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 	m_GameInstance->AddPrototype("TreeModel6", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Tree/Dead_Tree_6.FBX", XMMatrixRotationX(XMConvertToRadians(-90.f))));
 
+	m_GameInstance->AddPrototype("DroneModel", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Drone/Drone.fbx",XMMatrixScaling(0.01f,0.01f,0.01f), 1));
+
+
 
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
@@ -130,6 +134,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UITeamPercent", CUITeamPercent::Create());
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
+	m_GameInstance->Add_PrototypeObject("Drone", CDrone::Create());
 
 	
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
@@ -206,6 +211,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 	}
 
+	_matrix mat3 = XMMatrixTranslation(0.f, 43.f, 20.f);
+	m_GameInstance->AddObject("Drone", "Drone", &mat3);
+
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
 
@@ -216,9 +224,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIKill", "UIKill", nullptr);
 	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
 	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
-	//m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
-	_matrix mat3 = XMMatrixTranslation(0.f, 43.f, 20.f);
 	m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);

@@ -43,8 +43,8 @@ void CUIKill::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-    if (m_GameInstance->Key_Down(VK_SPACE))
-        isHit = true;
+   /* if (m_GameInstance->Key_Down(VK_SPACE))
+        isHit = true;*/
 
     if (isHit)
     {

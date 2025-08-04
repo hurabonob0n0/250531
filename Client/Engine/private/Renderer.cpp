@@ -104,9 +104,9 @@ void CRenderer::Render()
 
     Render_Priority();
     
-    //m_CommandList->SetPipelineState(m_GameInstance->GetPSO("TerrainPSO"));
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("PosNorPSO"));
 
-    //Render_NonLight();
+    Render_NonLight();
 
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("DefaultPSO"));
 

@@ -1,0 +1,49 @@
+#pragma once
+#include "Client_Defines.h"
+#include "RenderObject.h"
+
+BEGIN(Engine)
+class CMeshModel;
+class CBBinding;
+END
+
+BEGIN(Client)
+
+class CDrone : public CRenderObject
+{
+public:
+	CDrone();
+	CDrone(CDrone& rhs);
+	virtual ~CDrone() = default;
+
+public:
+	virtual HRESULT Initialize_Prototype();
+	virtual HRESULT Initialize(void* pArg);
+	virtual void Tick(float fTimeDelta);
+	virtual void LateTick(float fTimeDelta);
+	virtual void Render();
+
+private:
+	void Update_Speed_and_Rot(float fTimeDelta);
+	void Update_Rot_and_Pos(float fTimeDelta);
+
+private:
+	CMeshModel* m_VIBuffer;
+	CBBinding* m_CBBindingCom;
+	float m_fMaxSpeed = 25.f;
+	float m_fRightAxisSpeed = 0.f;
+	float m_fLookAxisSpeed = 0.f;
+	float m_fUpAxisSpeed = 0.f;
+	float m_fYawRot = 0.f;
+	float m_fRollRot = 0.f;
+	float m_fPitchRot = 0.f;
+	XMVECTOR m_vPos{ 0.f,60.f,0.f,1.f };
+
+public:
+	void Free() override;
+	static CDrone* Create();
+	CRenderObject* Clone(void* pArg);
+
+};
+
+END

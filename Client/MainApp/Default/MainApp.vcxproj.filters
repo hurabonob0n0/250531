@@ -121,6 +121,12 @@
     <Filter Include="01.DefaultObj\UI\UIDamaged">
       <UniqueIdentifier>{deb6b792-eb55-4848-8bee-54d323bffa14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\Drone">
+      <UniqueIdentifier>{13d53018-77b1-4a38-8ed9-882fdd59e133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaderfile">
+      <UniqueIdentifier>{ce8f14ab-cd8b-4c21-b068-878e6efa9294}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -240,6 +246,9 @@
     <ClInclude Include="..\public\UIDamaged.h">
       <Filter>01.DefaultObj\UI\UIDamaged</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Drone.h">
+      <Filter>01.DefaultObj\Drone</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -350,6 +359,9 @@
     <ClCompile Include="..\private\UIKill.cpp">
       <Filter>01.DefaultObj\UI\UIDamaged</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Drone.cpp">
+      <Filter>01.DefaultObj\Drone</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
@@ -368,9 +380,6 @@
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Default.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\ShaderFiles\Default.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Sky.hlsl">
@@ -402,6 +411,12 @@
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Sky.hlsl">
       <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\LightingUtil.hlsl">
+      <Filter>Shaderfile</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Default3.hlsl">
+      <Filter>ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
