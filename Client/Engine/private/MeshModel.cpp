@@ -17,7 +17,7 @@ CMeshModel::CMeshModel(const CMeshModel& rhs)
 	}
 }
 
-HRESULT CMeshModel::Initialize_Prototype(const string& strModelFilePath, _fmatrix PivotMatrix)
+HRESULT CMeshModel::Initialize_Prototype(const string& strModelFilePath, _fmatrix PivotMatrix, _uint type)
 {
 	//_uint		iFlag = aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast | aiProcess_PreTransformVertices;
 	//_uint		iFlag = aiProcessPreset_TargetRealtime_Fast | aiProcess_PreTransformVertices;
@@ -28,7 +28,7 @@ HRESULT CMeshModel::Initialize_Prototype(const string& strModelFilePath, _fmatri
 	if (nullptr == m_pAIScene)
 		return E_FAIL;
 
-	if (FAILED(Ready_Meshes(PivotMatrix)))
+	if (FAILED(Ready_Meshes(PivotMatrix,type)))
 		return E_FAIL;
 
 	return S_OK;
@@ -47,7 +47,7 @@ HRESULT CMeshModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-HRESULT CMeshModel::Ready_Meshes(_fmatrix PivotMatrix )
+HRESULT CMeshModel::Ready_Meshes(_fmatrix PivotMatrix, _uint type)
 {
 	/* 현재 모델을 구성하는 메시의 갯수. */
 	m_iNumMeshes = m_pAIScene->mNumMeshes;
@@ -57,7 +57,7 @@ HRESULT CMeshModel::Ready_Meshes(_fmatrix PivotMatrix )
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
 		/* VB, IB를 만든다. */
-		CVIBuffer_Mesh* pMesh = CVIBuffer_Mesh::Create(m_Device, m_CommandList, m_pAIScene->mMeshes[i], PivotMatrix);
+		CVIBuffer_Mesh* pMesh = CVIBuffer_Mesh::Create(m_Device, m_CommandList, m_pAIScene->mMeshes[i], PivotMatrix,type);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -67,11 +67,11 @@ HRESULT CMeshModel::Ready_Meshes(_fmatrix PivotMatrix )
 	return S_OK;
 }
 
-CMeshModel* CMeshModel::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const string& strModelFilePath, _fmatrix PivotMatrix)
+CMeshModel* CMeshModel::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const string& strModelFilePath, _fmatrix PivotMatrix, _uint type)
 {
 	CMeshModel* pInstance = new CMeshModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(strModelFilePath, PivotMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(strModelFilePath, PivotMatrix,type)))
 	{
 		MSG_BOX("Failed to Created : CMeshModel");
 		Safe_Release(pInstance);

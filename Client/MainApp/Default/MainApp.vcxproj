@@ -177,6 +177,7 @@
     <ClInclude Include="..\public\Client_pch.h" />
     <ClInclude Include="..\public\DefaultObj.h" />
     <ClInclude Include="..\public\Define.h" />
+    <ClInclude Include="..\public\Drone.h" />
     <ClInclude Include="..\public\Effect.h" />
     <ClInclude Include="..\public\GameLobby.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -237,6 +238,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\private\DefaultObj.cpp" />
+    <ClCompile Include="..\private\Drone.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
     <ClCompile Include="..\private\GameLobby.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
@@ -284,7 +286,9 @@
     <ClCompile Include="..\private\WinningTeam.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\bin\ShaderFiles\Default.hlsl">
+    <FxCompile Include="..\bin\ShaderFiles\LightingUtil.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -295,6 +299,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Default.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\Default3.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -8,12 +8,12 @@ CVIBuffer_Mesh::CVIBuffer_Mesh(ID3D12Device* pDevice, ID3D12GraphicsCommandList*
 {
 }
 
-CVIBuffer_Mesh::CVIBuffer_Mesh(CVIBuffer_Mesh & rhs)
+CVIBuffer_Mesh::CVIBuffer_Mesh(CVIBuffer_Mesh& rhs)
 	: CVIBuffer(rhs)
 {
 }
 
-HRESULT CVIBuffer_Mesh::Initialize_Prototype(const aiMesh * pAIMesh, _fmatrix PivotMatrix)
+HRESULT CVIBuffer_Mesh::Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix,_uint type)
 {
 	m_VertexNum = pAIMesh->mNumVertices;
 	m_IndexNum = pAIMesh->mNumFaces * 3;
@@ -23,8 +23,8 @@ HRESULT CVIBuffer_Mesh::Initialize_Prototype(const aiMesh * pAIMesh, _fmatrix Pi
 
 #pragma region VERTEX_BUFFER
 
-	Ready_Mesh(pAIMesh,PivotMatrix);
-	
+	Ready_Mesh(pAIMesh, PivotMatrix,type);
+
 #pragma endregion
 
 
@@ -52,7 +52,7 @@ HRESULT CVIBuffer_Mesh::Initialize_Prototype(const aiMesh * pAIMesh, _fmatrix Pi
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Mesh::Initialize(void * pArg)
+HRESULT CVIBuffer_Mesh::Initialize(void* pArg)
 {
 	return S_OK;
 }
@@ -68,7 +68,7 @@ HRESULT CVIBuffer_Mesh::Render()
 }
 
 
-HRESULT CVIBuffer_Mesh::Ready_Mesh(const aiMesh * pAIMesh, _fmatrix PivotMatrix)
+HRESULT CVIBuffer_Mesh::Ready_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix, _uint type)
 {
 	m_VertexByteStride = sizeof(VTXMESH);
 	m_VertexBufferByteSize = m_VertexByteStride * m_VertexNum;
@@ -76,18 +76,33 @@ HRESULT CVIBuffer_Mesh::Ready_Mesh(const aiMesh * pAIMesh, _fmatrix PivotMatrix)
 	VTXMESH* pVertices = new VTXMESH[m_VertexNum];
 	ZeroMemory(pVertices, sizeof(VTXMESH) * m_VertexNum);
 
-	for (size_t i = 0; i < m_VertexNum; i++)
+	if (type == 0)
 	{
-		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
-		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
+		for (size_t i = 0; i < m_VertexNum; i++)
+		{
+			memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+			XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
 
-		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
+			memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+			XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
 
-		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+			memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+			memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+		}
 	}
+	else
+	{
+		for (size_t i = 0; i < m_VertexNum; i++)
+		{
+			memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+			XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
 
+			memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+			XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
+
+			memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+		}
+	}
 	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
 
 	delete[] pVertices;
@@ -96,11 +111,11 @@ HRESULT CVIBuffer_Mesh::Ready_Mesh(const aiMesh * pAIMesh, _fmatrix PivotMatrix)
 	return S_OK;
 }
 
-CVIBuffer_Mesh* CVIBuffer_Mesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const aiMesh* pAIMesh, _fmatrix PivotMatrix)
+CVIBuffer_Mesh* CVIBuffer_Mesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const aiMesh* pAIMesh, _fmatrix PivotMatrix, _uint type)
 {
 	CVIBuffer_Mesh* pInstance = new CVIBuffer_Mesh(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pAIMesh,PivotMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(pAIMesh, PivotMatrix,type)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Mesh");
 		Safe_Release(pInstance);
@@ -109,7 +124,7 @@ CVIBuffer_Mesh* CVIBuffer_Mesh::Create(ID3D12Device* pDevice, ID3D12GraphicsComm
 	return pInstance;
 }
 
-CComponent * CVIBuffer_Mesh::Clone(void * pArg)
+CComponent* CVIBuffer_Mesh::Clone(void* pArg)
 {
 	CVIBuffer_Mesh* pInstance = new CVIBuffer_Mesh(*this);
 
