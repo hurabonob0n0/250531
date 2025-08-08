@@ -157,6 +157,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		}
 
 		int tankIndex = 0;
+
 		for (std::map<int, std::vector<Room_Ready_Data>>::iterator it = tankSlotMap.begin(); it != tankSlotMap.end(); ++it)
 		{
 			int driverPosition = it->first;
@@ -173,8 +174,14 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 			_matrix tankMat = XMMatrixTranslation(x, y, z);
 			m_GameInstance->AddObject("Tank", "Tank", &tankMat);
 
+			_matrix DroneMat = XMMatrixTranslation(x, y + 50.f, z);
+			m_GameInstance->AddObject("Drone", "Drone", &DroneMat);
+		
+
 			CTank* tank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", tankIndex));
-			if (tank)
+			CDrone* drone = dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", tankIndex));
+
+			if (tank && drone)
 			{
 				tank->Set_Team(isBlue + 1);
 
@@ -184,17 +191,27 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 					const Room_Ready_Data& player = playerList[j];
 					if (player.Position == myPos)  // <-- ID 대신 포지션 비교
 					{
+						drone->Set_My_Drone();
 						tank->set_MyPlayer();
+
 						tank->Set_Team(3);
 						if (player.Position % 2 == 0) {
 
-							tank->Set_POSU();
-							Network_Manager::GetInstance()->ImPosu = true;
+							Network_Manager::GetInstance()->MyPosMode = POS_POSU;
+						}
+						else {
+
+							Network_Manager::GetInstance()->MyPosMode = POS_DRIVER;
+						}
+
+						if (player.Position == 1) {
+							Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
 						}
 
 						Network_Manager::GetInstance()->SetMyTankIndex(tankIndex);
 						if (tankIndex >= 0 && tankIndex < 8)
 						{
+
 							const XMFLOAT3& pos = g_RespawnPositions[tankIndex];
 							tank->Set_MyPos(pos.x, pos.y, pos.z);
 						}
@@ -206,13 +223,18 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		}
 	}
 	else {
+		Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
+
 		_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 		m_GameInstance->AddObject("Tank", "Tank", &mat1);
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+
+
+		_matrix mat3 = XMMatrixTranslation(10.f, 90.f, 10.f);
+		m_GameInstance->AddObject("Drone", "Drone", &mat3);
+		dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", 0))->Set_My_Drone();
 	}
 
-	_matrix mat3 = XMMatrixTranslation(0.f, 43.f, 20.f);
-	m_GameInstance->AddObject("Drone", "Drone", &mat3);
 
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
@@ -225,7 +247,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
 	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
-	m_GameInstance->AddObject("Effect", "Effect", &mat3);
+	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
 	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);
 

@@ -44,6 +44,13 @@ public:
 	static CDrone* Create();
 	CRenderObject* Clone(void* pArg);
 
+public:
+
+	bool _myDrone = false;
+	void Set_My_Drone() { _myDrone = true; };
+
+	void SetOtherDroneMat(const XMFLOAT4X4& world);
+	void SendMyPosToServer();
 };
 
 END
