@@ -20,7 +20,7 @@ Level_RoomList::~Level_RoomList()
 void Level_RoomList::Initialize()
 {
 	if(!Network_Manager::GetInstance()->isConnected())
-		Network_Manager::GetInstance()->Initialize(L"10.30.2.5", 7777);
+		Network_Manager::GetInstance()->Initialize(L"127.0.0.1", 7777);
 
 	Object_Manager::Get_Instance()->LevelChange = true;
 

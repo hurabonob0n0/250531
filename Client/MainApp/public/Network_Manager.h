@@ -6,6 +6,13 @@ enum class PacketQueueType
 	INGAME
 };
 
+
+enum PosMode {
+
+	POS_MASTER, POS_DRIVER, POS_POSU, POS_END
+
+};
+
 struct QueuedPacket
 {
 	PacketQueueType type;
@@ -108,17 +115,16 @@ public:
 		++MyKillCount;
 	};
 
-	bool ImPosu = false;
 	int myPosition;
 
 	bool ReSpawnChoice = false;
 	int ReSpawnPos;
-	bool SingleMode = true;
-
 	int REDBAR = 0;
 	int BLUEBAR = 0;
-
 	int MyHp = 100;
+
+
+	PosMode MyPosMode;
 
 
 private:

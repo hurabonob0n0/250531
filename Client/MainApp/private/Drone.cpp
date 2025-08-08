@@ -1,6 +1,9 @@
 #include "Client_pch.h"
 #include "Drone.h"
 #include "GameInstance.h"
+#include "ClientPacketHandler.h"
+#include "ServiceManager.h"
+#include "Network_Manager.h"
 
 CDrone::CDrone() : CRenderObject()
 {
@@ -44,9 +47,16 @@ void CDrone::Tick(float fTimeDelta)
 
     //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 
-    Update_Speed_and_Rot(fTimeDelta);
+    if (_myDrone) {
 
-    Update_Rot_and_Pos(fTimeDelta);
+        Update_Speed_and_Rot(fTimeDelta);
+        Update_Rot_and_Pos(fTimeDelta);
+
+        if(Network_Manager::GetInstance()->isConnected())
+            SendMyPosToServer();
+        
+    }
+
 }
 
 void CDrone::LateTick(float fTimeDelta)
@@ -171,4 +181,21 @@ CRenderObject* CDrone::Clone(void* pArg)
     CDrone* pInstance = new CDrone(*this);
     pInstance->Initialize(pArg);
     return pInstance;
+}
+
+void CDrone::SetOtherDroneMat(const XMFLOAT4X4& world)
+{
+    XMMATRIX m = XMLoadFloat4x4(&world);
+    m_TransformCom->Set_WorldMatrix(m);
+
+}
+
+void CDrone::SendMyPosToServer()
+{
+
+    _float4x4 TempMat;
+    XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
+    auto sendBuffer = ClientPacketHandler::Make_C_DRONE_MOVE(TempMat);
+    ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
 }

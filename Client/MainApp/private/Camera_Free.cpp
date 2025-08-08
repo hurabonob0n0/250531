@@ -66,8 +66,9 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
 
-	if (Network_Manager::GetInstance()->ImPosu)
+	if (Network_Manager::GetInstance()->MyPosMode == POS_POSU)
 		m_PS = FPS;
+
 	return S_OK;
 }
 
