@@ -16,6 +16,8 @@
 #include "UIKill.h"
 #include "UITeamPercent.h"
 #include "Drone.h"
+#include "Camera_Drone.h"
+#include "BulletPath.h"
 
 /*-----------------
 	For Server
@@ -135,7 +137,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 	m_GameInstance->Add_PrototypeObject("Drone", CDrone::Create());
-
+	m_GameInstance->Add_PrototypeObject("Camera_Drone", CCamera_Drone::Create());
+	m_GameInstance->Add_PrototypeObject("BulletPath", CBulletPath::Create());
 	
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 
@@ -217,6 +220,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	_matrix matCamera = XMMatrixTranslation(0.f, 200.f, 0.f);
 	m_GameInstance->AddObject("Camera", "Camera", &matCamera);
 
+	m_GameInstance->AddObject("Camera_Drone", "Camera", nullptr);
+
 	m_GameInstance->AddObject("UI", "UI", nullptr);
 	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);
 	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
@@ -226,10 +231,15 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
 
 	m_GameInstance->AddObject("Effect", "Effect", &mat3);
-	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
-	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);
+	_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
+	m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);
 
 	m_GameInstance->AddObject("Tree", "Tree", nullptr);
+
+	CBulletPath::BulletPathstr bps;
+	bps.Dir = XMVectorSet(10.f, 10.f, 10.f, 0.f);
+	bps.Pos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
 
 	m_GameInstance->m_ShadowMap->Set_My_Tank_Index(Network_Manager::GetInstance()->GetMyTankIndex());
 

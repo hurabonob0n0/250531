@@ -127,6 +127,12 @@
     <Filter Include="Shaderfile">
       <UniqueIdentifier>{ce8f14ab-cd8b-4c21-b068-878e6efa9294}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Camera\Camera_Drone">
+      <UniqueIdentifier>{35333502-ece4-457d-a81b-84790e080fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\BulletPath">
+      <UniqueIdentifier>{a33d4228-195c-4a60-b1b6-d0bbdb2a9d54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -249,6 +255,12 @@
     <ClInclude Include="..\public\Drone.h">
       <Filter>01.DefaultObj\Drone</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Drone.h">
+      <Filter>02.Camera\Camera_Drone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BulletPath.h">
+      <Filter>01.DefaultObj\BulletPath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -362,6 +374,12 @@
     <ClCompile Include="..\private\Drone.cpp">
       <Filter>01.DefaultObj\Drone</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Camera_Drone.cpp">
+      <Filter>02.Camera\Camera_Drone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BulletPath.cpp">
+      <Filter>01.DefaultObj\BulletPath</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
@@ -417,6 +435,9 @@
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Default3.hlsl">
       <Filter>ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\BulletInstance.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

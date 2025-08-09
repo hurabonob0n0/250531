@@ -15,6 +15,7 @@ void CFrameResource::Initialize(ID3D12Device* device)
     m_PassCB = CUploadBuffer<PassConstants>::Create(device, 2, true);
     m_ObjectCB = CUploadBuffer<ObjectConstants>::Create(device, 4000, true);
     m_MaterialCB = CUploadBuffer<MaterialData>::Create(device, 1000, false);
+    m_InstanceCB = CUploadBuffer<InstanceData>::Create(device, 1000, false);
 }
 
 void CFrameResource::Set_PassConstants(_uint index)
@@ -25,6 +26,11 @@ void CFrameResource::Set_PassConstants(_uint index)
 void CFrameResource::Set_Materials()
 {
     GETCOMMANDLIST->SetGraphicsRootShaderResourceView(2, m_MaterialCB->Resource()->GetGPUVirtualAddress());
+}
+
+void CFrameResource::Set_InstanceDatas()
+{
+    GETCOMMANDLIST->SetGraphicsRootShaderResourceView(6, m_InstanceCB->Resource()->GetGPUVirtualAddress());
 }
 
 void CFrameResource::Set_ObjectConstantBufferIndex(_uint& CBIndex)

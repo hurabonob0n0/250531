@@ -13,7 +13,7 @@ protected:
 public:
     HRESULT Initialize_Prototype() override;
     HRESULT Initialize(void* pArg) override;
-    HRESULT Render() override;
+    HRESULT Render(int instanceNum = 1) override;
 
 public:
     static CVIBuffer_Quad* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList);

@@ -14,7 +14,7 @@ public:
 	void Create_Buffer(ID3D12Resource** GPU, ID3D12Resource** Uploader, const void* initData, UINT64 byteSize);
 
 public:
-	virtual HRESULT Render();
+	virtual HRESULT Render(int instanceNum = 1);
 
 public:
 	D3D12_VERTEX_BUFFER_VIEW	VertexBufferView()const;

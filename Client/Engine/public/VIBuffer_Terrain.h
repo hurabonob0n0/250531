@@ -26,7 +26,7 @@ public:
 
 public:
     void Save_TerrainMesh_ToFile(const std::string& filename, const std::vector<VTXMESH>& vertices, const std::vector<UINT32>& indices);
-    HRESULT Render() override;
+    HRESULT Render(int instanceNum = 1) override;
 
     inline int Get_Index(int x, int z) const {
         return z * 4096 + x;

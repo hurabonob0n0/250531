@@ -59,6 +59,9 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("ShadowVS", CShader::ST_VS, L"../bin/Shaders1/Shadows.hlsl", nullptr);
 	m_ShaderMgr->AddShader("ShadowPS", CShader::ST_PS, L"../bin/Shaders1/Shadows.hlsl", nullptr);
 
+	m_ShaderMgr->AddShader("BulletPathVS", CShader::ST_VS, L"../bin/Shaders1/BulletInstance.hlsl", nullptr);
+	m_ShaderMgr->AddShader("BulletPathPS", CShader::ST_PS, L"../bin/Shaders1/BulletInstance.hlsl", nullptr);
+
 	//PSOMgr
 	m_PSOMgr = CPSOMgr::Get_Instance();
 
@@ -105,6 +108,14 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetPS(m_ShaderMgr->GetShaderObj("ShadowPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
 		setForShadow()->
+		Create_PSO());
+
+	m_PSOMgr->AddPSO("BulletPathPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_MESH)->
+		SetVS(m_ShaderMgr->GetShaderObj("BulletPathVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("BulletPathPS"))->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		set_Blend_Enable()->
 		Create_PSO());
 
 	//Renderer

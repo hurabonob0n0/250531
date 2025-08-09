@@ -46,11 +46,16 @@ void CRenderer::ResetRenderObjects()
         Safe_Release(pRenderObject);
     }
     m_vRenderObjects[RG_UI].clear();
+
+    for (auto& pRenderObject : m_vRenderObjects[RG_BULLETPATH]) {
+        Safe_Release(pRenderObject);
+    }
+    m_vRenderObjects[RG_BULLETPATH].clear();
 }
 
 void CRenderer::Resize_RenderGroups()
 {
-    for (int i = 0; i < (int)RG_UI; ++i)
+    for (int i = 0; i < (int)RG_BULLETPATH; ++i)
     {
         m_vRenderObjects[i].reserve(1000);
     }
@@ -112,8 +117,11 @@ void CRenderer::Render()
 
     Render_NonBlend();
 
-   m_CommandList->SetPipelineState(m_GameInstance->GetPSO("EffectPSO"));
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("EffectPSO"));
     Render_Blend();
+
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("BulletPathPSO"));
+    Render_BulletPath();
 
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("UIPSO"));
     Render_UI();
@@ -183,6 +191,17 @@ void CRenderer::Render_UI()
         Safe_Release(pGameObject);
     }
     m_vRenderObjects[RG_UI].clear();
+}
+
+void CRenderer::Render_BulletPath()
+{
+    for (auto& pGameObject : m_vRenderObjects[RG_BULLETPATH])
+    {
+        pGameObject->Render();
+
+        Safe_Release(pGameObject);
+    }
+    m_vRenderObjects[RG_BULLETPATH].clear();
 }
 
 CRenderer* CRenderer::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, CGameInstance* pInstance)

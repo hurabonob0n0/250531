@@ -383,12 +383,12 @@ void CVIBuffer_Terrain::Save_TerrainMesh_ToFile(const std::string& filename,
 
 }
 
-HRESULT CVIBuffer_Terrain::Render()
+HRESULT CVIBuffer_Terrain::Render(int instanceNum)
 {
     m_CommandList->IASetVertexBuffers(0, 1, &VertexBufferView());
     m_CommandList->IASetIndexBuffer(&IndexBufferView());
     m_CommandList->IASetPrimitiveTopology(m_PrimitiveType);
-    m_CommandList->DrawIndexedInstanced(m_IndexNum, 1, 0, 0, 0);
+    m_CommandList->DrawIndexedInstanced(m_IndexNum, instanceNum, 0, 0, 0);
     return S_OK;
 }
 
