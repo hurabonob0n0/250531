@@ -14,7 +14,7 @@ protected:
 	virtual~CVIBuffer_Geos() = default;
 
 public:
-	HRESULT Render() override;
+	HRESULT Render(int instanceNum = 1) override;
 
 protected:
 	HRESULT Initialize_Prototype() override;

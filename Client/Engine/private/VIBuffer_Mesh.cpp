@@ -61,9 +61,9 @@ void CVIBuffer_Mesh::Update()
 {
 }
 
-HRESULT CVIBuffer_Mesh::Render()
+HRESULT CVIBuffer_Mesh::Render(int instanceNum)
 {
-	__super::Render();
+	__super::Render(instanceNum);
 	return S_OK;
 }
 

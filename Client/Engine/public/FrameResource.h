@@ -20,6 +20,7 @@ public:
 public:
     void Set_PassConstants(_uint index);
     void Set_Materials();
+    void Set_InstanceDatas();
 
 public:
     void Set_ObjectConstantBufferIndex(_uint& CBIndex);
@@ -33,6 +34,7 @@ public:
     CUploadBuffer<PassConstants>* m_PassCB = nullptr;
     CUploadBuffer<ObjectConstants>* m_ObjectCB = nullptr;
     CUploadBuffer<MaterialData>* m_MaterialCB = nullptr;
+    CUploadBuffer<InstanceData>* m_InstanceCB = nullptr;
 
 public:
     _uint UsedObjectCBIndex = 0;

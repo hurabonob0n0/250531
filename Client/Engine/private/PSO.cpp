@@ -162,6 +162,7 @@ CPSO* CPSO::set_Blend_Enable()
     blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
     m_PsoDesc.BlendState.RenderTarget[0] = blenddesc;
+
     return this;
 }
 

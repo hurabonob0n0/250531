@@ -10,13 +10,13 @@ CVIBuffer_Geos::CVIBuffer_Geos(CVIBuffer_Geos& rhs) : CVIBuffer(rhs)
 	m_SubMeshInfos = rhs.m_SubMeshInfos;
 }
 
-HRESULT CVIBuffer_Geos::Render()
+HRESULT CVIBuffer_Geos::Render(int instanceNum)
 {
 	m_CommandList->IASetVertexBuffers(0, 1, &VertexBufferView());
 	m_CommandList->IASetIndexBuffer(&IndexBufferView());
 	m_CommandList->IASetPrimitiveTopology(m_PrimitiveType);
 
-	m_CommandList->DrawIndexedInstanced(m_RenderedSubMesh.IndexCount, 1, m_RenderedSubMesh.StartIndexLocation, m_RenderedSubMesh.BaseVertexLocation, 0);
+	m_CommandList->DrawIndexedInstanced(m_RenderedSubMesh.IndexCount, instanceNum, m_RenderedSubMesh.StartIndexLocation, m_RenderedSubMesh.BaseVertexLocation, 0);
 
 	return S_OK;
 }
@@ -24,7 +24,7 @@ HRESULT CVIBuffer_Geos::Render()
 HRESULT CVIBuffer_Geos::Initialize_Prototype()
 {
 	GeometryGenerator geoGen;
-	GeometryGenerator::MeshData box = geoGen.CreateBox(1.f, 1.f, 1.f, 3);
+	GeometryGenerator::MeshData box = geoGen.CreateBox(1.f, 1.f, 1.f, 0);
 	GeometryGenerator::MeshData grid = geoGen.CreateGrid(20.0f, 30.0f, 60, 40);
 	GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
 	GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.5f, 1.0f, 20, 20);

@@ -120,9 +120,9 @@ HRESULT CVIBuffer_Quad::Initialize(void* pArg)
     return S_OK;
 }
 
-HRESULT CVIBuffer_Quad::Render()
+HRESULT CVIBuffer_Quad::Render(int instanceNum)
 {
-    return __super::Render();
+    return __super::Render(instanceNum);
 }
 
 CVIBuffer_Quad* CVIBuffer_Quad::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)

@@ -105,6 +105,14 @@ namespace Engine
 		UINT MaterialPad2;
 	};
 
+	struct ENGINE_DLL InstanceData
+	{
+		XMFLOAT4X4 World = XMFLOAT4X4{};
+		UINT     MaterialIndex = 0;
+		UINT     ObjPad0 = 0;
+		UINT     ObjPad1 = 0;
+		float     ObjPad2 = 0;
+	};
 }
 
 namespace Engine {

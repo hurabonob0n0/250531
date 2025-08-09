@@ -85,13 +85,13 @@ void CVIBuffer::Create_Buffer(ID3D12Resource** GPU, ID3D12Resource** Uploader, c
 
 }
 
-HRESULT CVIBuffer::Render()
+HRESULT CVIBuffer::Render(int instanceNum)
 {
 	m_CommandList->IASetVertexBuffers(0, 1, &VertexBufferView());
 	m_CommandList->IASetIndexBuffer(&IndexBufferView());
 	m_CommandList->IASetPrimitiveTopology(m_PrimitiveType);
 
-	m_CommandList->DrawIndexedInstanced(m_IndexNum, 1, 0, 0, 0);
+	m_CommandList->DrawIndexedInstanced(m_IndexNum, instanceNum, 0, 0, 0);
 
 	return S_OK;
 }

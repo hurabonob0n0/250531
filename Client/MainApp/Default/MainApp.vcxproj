@@ -169,7 +169,9 @@
     <ClInclude Include="..\public\AbstractFactory.h" />
     <ClInclude Include="..\public\Bmp_Manager.h" />
     <ClInclude Include="..\public\BoxObj.h" />
+    <ClInclude Include="..\public\BulletPath.h" />
     <ClInclude Include="..\public\Button.h" />
+    <ClInclude Include="..\public\Camera_Drone.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\public\ClientPacketHandler.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
@@ -227,7 +229,9 @@
   <ItemGroup>
     <ClCompile Include="..\private\Bmp_Manager.cpp" />
     <ClCompile Include="..\private\BoxObj.cpp" />
+    <ClCompile Include="..\private\BulletPath.cpp" />
     <ClCompile Include="..\private\Button.cpp" />
+    <ClCompile Include="..\private\Camera_Drone.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\private\ClientPacketHandler.cpp" />
     <ClCompile Include="..\private\Client_Globals.cpp" />
@@ -287,6 +291,12 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\ShaderFiles\LightingUtil.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\BulletInstance.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

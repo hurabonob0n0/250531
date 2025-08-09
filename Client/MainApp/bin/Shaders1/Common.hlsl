@@ -20,14 +20,23 @@
 
 struct MaterialData
 {
-	float4   DiffuseAlbedo;
-	float3   FresnelR0;
-	float    Roughness;
-	float4x4 MatTransform;
-	uint     DiffuseMapIndex;
-	uint     NormalMapIndex;
-	uint     MatPad1;
-	uint     MatPad2;
+    float4 DiffuseAlbedo;
+    float3 FresnelR0;
+    float Roughness;
+    float4x4 MatTransform;
+    uint DiffuseMapIndex;
+    uint NormalMapIndex;
+    uint MatPad1;
+    uint MatPad2;
+};
+
+struct InstanceData
+{
+    float4x4 WorldMat;
+    uint MaterialIndex;
+    uint ObjPad0;
+    uint ObjPad1;
+    float ObjPad2;
 };
 
 TextureCube gCubeMap : register(t0);
@@ -40,13 +49,14 @@ Texture2D gTextureMaps[500] : register(t2);
 // Put in space1, so the texture array does not overlap with these resources.  
 // The texture array will occupy registers t0, t1, ..., t3 in space0. 
 StructuredBuffer<MaterialData> gMaterialData : register(t0, space1);
+StructuredBuffer<InstanceData> gInstanceData : register(t1, space1);
 
 
-SamplerState gsamPointWrap        : register(s0);
-SamplerState gsamPointClamp       : register(s1);
-SamplerState gsamLinearWrap       : register(s2);
-SamplerState gsamLinearClamp      : register(s3);
-SamplerState gsamAnisotropicWrap  : register(s4);
+SamplerState gsamPointWrap : register(s0);
+SamplerState gsamPointClamp : register(s1);
+SamplerState gsamLinearWrap : register(s2);
+SamplerState gsamLinearClamp : register(s3);
+SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
 SamplerComparisonState gsamShadow : register(s6);
 
@@ -54,11 +64,11 @@ SamplerComparisonState gsamShadow : register(s6);
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
-	float4x4 gTexTransform;
-	uint gMaterialIndex;
-	uint gObjPad0;
-	uint gObjPad1;
-	uint gObjPad2;
+    float4x4 gTexTransform;
+    uint gMaterialIndex;
+    uint gObjPad0;
+    uint gObjPad1;
+    uint gObjPad2;
 };
 
 cbuffer cbPass : register(b1)
@@ -93,19 +103,19 @@ cbuffer cbPass : register(b1)
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {
 	// Uncompress each component from [0,1] to [-1,1].
-	float3 normalT = 2.0f*normalMapSample - 1.0f;
+    float3 normalT = 2.0f * normalMapSample - 1.0f;
 
 	// Build orthonormal basis.
-	float3 N = unitNormalW;
-	float3 T = normalize(tangentW - dot(tangentW, N)*N);
-	float3 B = cross(N, T);
+    float3 N = unitNormalW;
+    float3 T = normalize(tangentW - dot(tangentW, N) * N);
+    float3 B = cross(N, T);
 
-	float3x3 TBN = float3x3(T, B, N);
+    float3x3 TBN = float3x3(T, B, N);
 
 	// Transform from tangent space to world space.
-	float3 bumpedNormalW = mul(normalT, TBN);
+    float3 bumpedNormalW = mul(normalT, TBN);
 
-	return bumpedNormalW;
+    return bumpedNormalW;
 }
 
 //---------------------------------------------------------------------------------------

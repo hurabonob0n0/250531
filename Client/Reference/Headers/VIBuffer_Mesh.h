@@ -21,7 +21,7 @@ public:
 
 public:
 	void Update();
-	virtual HRESULT Render();
+	virtual HRESULT Render(int instanceNum = 1);
 
 private:
 	HRESULT Ready_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
