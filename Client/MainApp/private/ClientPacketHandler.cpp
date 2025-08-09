@@ -1,6 +1,7 @@
 #include "Client_pch.h"
 #include "Client_Globals.h"
 #include "Tank.h"
+#include "Drone.h"
 #include "ClientPacketHandler.h"
 #include "BufferReader.h"
 #include "BufferWriter.h"
@@ -434,8 +435,8 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 
 		for (uint16 i = 0; i < tankCount; ++i)
 		{
-			uint8 tankID;
-			br >> tankID;
+			uint8 TankIndex;
+			br >> TankIndex;
 
 			_float4x4 mat = {};
 
@@ -451,8 +452,8 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 
 			uint8 myTankID = Network_Manager::GetInstance()->GetMyTankIndex();
 
-			Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", static_cast<int>(tankID)));
-			if (tankID != myTankID)
+			Client::CTank* tank = dynamic_cast<Client::CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", static_cast<int>(TankIndex)));
+			if (TankIndex != myTankID)
 			{
 				if (tank)
 				{
@@ -461,21 +462,67 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 			}
 			else
 			{
-				if (Network_Manager::GetInstance()->ImPosu)
+				if (Network_Manager::GetInstance()->MyPosMode == POS_POSU)
 				{
 					float x = mat.m[3][0];
 					float y = mat.m[3][1];
 					float z = mat.m[3][2];
 					tank->Set_MyPos(x, y, z);
 				}
-				else
+				else if(Network_Manager::GetInstance()->MyPosMode == POS_DRIVER)
 				{
-					tank->Set_Posin(potapAngle, posinAngle);
+					tank->Set_DriverModeData(potapAngle, posinAngle);
+				}
+				else {
+					break;
 				}
 			}
 
 		}
 		});
+}
+
+void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+		
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		br >> header;
+
+		uint16 DroneCount = 0;
+		br >> DroneCount;
+
+		for (uint16 i = 0; i < DroneCount; ++i)
+		{
+			uint8 DroneIndex;
+			br >> DroneIndex;
+
+			_float4x4 mat = {};
+
+			for (int row = 0; row < 4; ++row)
+				for (int col = 0; col < 4; ++col)
+					br >> mat.m[row][col];
+
+			uint8 DroneHP = 0;
+
+			br >> DroneHP;
+
+			uint8 myDroneIndex = Network_Manager::GetInstance()->GetMyTankIndex();
+
+			Client::CDrone* drone = dynamic_cast<Client::CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", static_cast<int>(myDroneIndex)));
+			if (DroneIndex != myDroneIndex)
+			{
+				if (drone)
+				{
+					drone->SetOtherDroneMat(mat);
+				}
+			}
+
+		}
+	});
 }
 
 
@@ -708,8 +755,8 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float pot
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
-	uint8 id = Network_Manager::GetInstance()->GetMyTankIndex();
-	bw << id;
+	uint8 Tankindex = Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << Tankindex;
 	for (int i = 0; i < 4; ++i)
 	{
 		bw << worldMatrix.m[i][0];  // row i, col 0
@@ -762,6 +809,34 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 	sendBuffer->Close(bw.WriteSize());
 	return sendBuffer;
 
+}
+
+SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(_float4x4& worldMatrix)
+{
+
+
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+
+	uint8 Droneindex = Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << Droneindex;
+	for (int i = 0; i < 4; ++i)
+	{
+		bw << worldMatrix.m[i][0];  // row i, col 0
+		bw << worldMatrix.m[i][1];  // row i, col 1
+		bw << worldMatrix.m[i][2];  // row i, col 2
+		bw << worldMatrix.m[i][3];  // row i, col 3
+	}
+
+
+	header->size = bw.WriteSize();
+	header->id = C_MYDRONEMOVE;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
 }
 
 

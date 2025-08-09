@@ -32,6 +32,8 @@ public:
 public:
 	void Set_PotapRotation(float fDegree);
 	void Set_PoSinpRotation(float fDegree);
+	void Set_Potap_For_Driver(float fDegree);
+	void Set_Posin_For_Driver(float fDegree);
 	void Set_ShotDir(XMVECTOR Vec);
 	void Set_ShotMatrix(_matrix mat);
 
@@ -55,12 +57,28 @@ private:
 private:
 	void RotPotap_And_Posin(float fTimeDelta);
 
+
+
+public:
+	/*--------------
+	
+		For ÇÔ¼öÈ­
+
+	-------------*/
+
+	void Master_Pos_KeyInput();
+	void Driver_Pos_KeyInput();
+	void POSU_Pos_KeyInput();
+
+	void Set_Tank_Element_from_Engine();
+	void Set_Tank_Element_from_ServerData();
+
+	void ErrorRespawn();
 public:
 	void set_MyPlayer() {
 		_myPlayer = true;
 		Set_Team(3);
 	}
-	void Set_POSU() { _ImPosu = true; };
 	void Set_MyTeam(bool isBlue) { _MyTeam = isBlue; };
 	void SendMyStateToServer();
 	void SendPosinData();
@@ -71,6 +89,8 @@ public:
 
 
 	void Set_Posin(float PotapRot, float PosinRot);
+
+	void Set_DriverModeData(float PotapRot, float PosinRot);
 
 	void Set_MyPos(float x, float y, float z);
 
@@ -100,7 +120,6 @@ private:
 public:
 	bool _myPlayer = false;
 	bool _MyTeam;
-	int  _ImPosu;
 	bool is_choiced;
 
 	int Choiced_Pos;
