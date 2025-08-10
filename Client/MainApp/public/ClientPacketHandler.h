@@ -27,6 +27,7 @@ enum
 	S_CAPTURE = 17,
 	S_ALL_DRONE_STATE = 18,
 	S_BULLET_ADD = 19,
+	S_AIRDROP_INDEX = 20,
 
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
@@ -85,8 +86,7 @@ public:
 	static void Handle_S_GAME_LOSE(BYTE* buffer, int32 len);
 	static void Handle_S_CAPTURE(BYTE* buffer, int32 len);
 	
-	
-	
+	static void Handle_S_AIRDROP(BYTE* buffer, int32 len);
 	//static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 
 

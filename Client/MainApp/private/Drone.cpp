@@ -183,6 +183,23 @@ CRenderObject* CDrone::Clone(void* pArg)
     return pInstance;
 }
 
+void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
+{
+    XMMATRIX m = XMLoadFloat4x4(&world);
+
+    // 현재 위치 벡터 추출
+    XMVECTOR pos = m.r[3];
+
+    // y 값만 +50
+    pos = XMVectorSetY(pos, XMVectorGetY(pos) + 50.0f);
+
+    // 수정된 위치 다시 적용
+    m.r[3] = pos;
+
+    m_TransformCom->Set_WorldMatrix(m);
+
+}
+
 void CDrone::SetOtherDroneMat(const XMFLOAT4X4& world)
 {
     XMMATRIX m = XMLoadFloat4x4(&world);
@@ -199,3 +216,4 @@ void CDrone::SendMyPosToServer()
     ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 
 }
+

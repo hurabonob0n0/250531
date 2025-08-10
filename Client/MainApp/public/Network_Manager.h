@@ -13,6 +13,12 @@ enum PosMode {
 
 };
 
+enum ControlTarget {
+
+	CONTROL_TANK, CONTROL_POSIN, CONTROL_DRONE, CONTROL_END
+
+};
+
 struct QueuedPacket
 {
 	PacketQueueType type;
@@ -125,7 +131,7 @@ public:
 
 
 	PosMode MyPosMode;
-
+	ControlTarget MyControlTarget;
 
 private:
 

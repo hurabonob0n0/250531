@@ -14,6 +14,7 @@
 #include "UIKill.h"
 #include "UISelectPos.h"
 #include "BulletPath.h"
+#include "Zet.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -62,28 +63,40 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_ROOM_ALL_PLAYER_FINISH_LOADING:
 		Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(buffer, len);
 		break;
+
 	case S_TANK_DAMAGED:
 		Handle_S_DAMAGED_TANK(buffer, len);
+		break;
 	case S_TANK_DEAD:
 		Handle_S_DEAD_TANK(buffer, len);
 		break;
+
 	case S_TANK_HIT:
 		Handle_S_HIT_TANK(buffer, len);
 		break;
+
 	case S_TANK_KILL:
 		Handle_S_KILL_TANK(buffer, len);
 		break;
+
 	case S_GAME_WIN:
 		Handle_S_GAME_WIN(buffer, len);
 		break;
+
 	case S_GAME_LOSE:
 		Handle_S_GAME_LOSE(buffer, len);
 		break;
+
 	case S_CAPTURE:
 		Handle_S_CAPTURE(buffer, len);
 		break;
+
 	case S_BULLET_ADD:
 		Handle_S_BULLET_ADD(buffer, len);
+		break;
+
+	case S_AIRDROP_INDEX:
+		Handle_S_AIRDROP(buffer, len);
 		break;
 	default:
 		break;
@@ -307,7 +320,9 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		
+		PacketHeader header;
+		br >> header;
+
 		float DirX;
 		float DirY;
 		float DirZ;
@@ -363,6 +378,7 @@ void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
 			tank->set_Spawn(false);
 			tank->_respawnTimer = 0.f;
 			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render();
+			//TODOUI -> UISelectPos UI바꾸기, MasterMode와 Driver가 선택지 선택, POSU일때는 선택 불가능 UI 띄우기
 		}
 		});
 }
@@ -385,6 +401,7 @@ void ClientPacketHandler::Handle_S_GAME_WIN(BYTE* buffer, int32 len)
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
+		//TODOUI 승리 UI 만들기
 		//이겼을 때 처리
 		});
 }
@@ -395,9 +412,9 @@ void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-
+		//TODOUI 패배 UI 만들기
 		//졌을 때 처리
-		});
+	});
 }
 
 
@@ -432,8 +449,22 @@ void ClientPacketHandler::Handle_S_CAPTURE(BYTE* buffer, int32 len)
 	});
 }
 
+void ClientPacketHandler::Handle_S_AIRDROP(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
+		PacketHeader header;
+		uint8 AreaIndex;
+		br >> header;
+		br >> AreaIndex;
+
+		dynamic_cast<CZet*>(CGameInstance::Get_Instance()->GetGameObject("Zet", 0))->Set_StartPos_And_Move(AreaIndex);
+	});
+
+}
 
 void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
 {
@@ -781,6 +812,8 @@ SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
 
 	header->size = bw.WriteSize();
 	header->id = C_AIRDROP;
+	sendBuffer->Close(bw.WriteSize());
+
 	return sendBuffer;
 }
 

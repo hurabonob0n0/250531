@@ -219,6 +219,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 							const XMFLOAT3& pos = g_RespawnPositions[tankIndex];
 							tank->Set_MyPos(pos.x, pos.y, pos.z);
+							XMFLOAT4X4 worldFloat4x4;
+							XMStoreFloat4x4(&worldFloat4x4, tank->Get_WorldMatrix());
+							drone->Set_My_DronePos_OnTank(worldFloat4x4);
 						}
 					}
 				}
@@ -246,10 +249,16 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddObject("Camera_Drone", "Camera", nullptr);
 
+
+	//TODOUI -> (모든 상황 전체 Render) 숫자 넣으면 그 숫자에 따라 출력되는 UI 만들기 (NumUI60X90),(NumUI30X40)
+	//			TeamPercentUI변경
+	//TODOUI -> (POSIN모드) -> AIR_STRIKE 스킬 UI, USEDRONE UI, AIRSTRIKE위에 쿨타임에 맞게 Render되는 빨간 쿨타임 박스 
+	//TODOUI -> (Drone모드) -> FOLLW TANK UI, Drone화면UI, Drone모드에서 탱크 조준UI 지우기
+
 	m_GameInstance->AddObject("UI", "UI", nullptr);
-	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);
+	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
 	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
-	m_GameInstance->AddObject("UIDamaged", "UIDamaged", nullptr);
+	m_GameInstance->AddObject("UIDamaged", "UIDamaged", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
 	m_GameInstance->AddObject("UIKill", "UIKill", nullptr);
 	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
 	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
