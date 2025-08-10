@@ -22,9 +22,15 @@ public:
 		m_TransformCom->Set_State(CTransform::STATE_POSITION, vec);
 	}
 
+public:
+	bool Get_Dead() { return isDead; }
+
 protected:
 	CTransform* m_TransformCom = {};
 	class CGameInstance* m_GameInstance;
+
+protected:
+	bool isDead = false;
 
 public:
 	CComponent* Get_Object_Component(string ComName) { return m_Components[ComName]; };

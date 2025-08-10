@@ -63,10 +63,21 @@ void CObjectMgr::LateUpdate(const float& fTimeDelta)
 {
     for (auto& pair : m_Layers)
     {
-        for (auto& obj : pair.second)
+        for (auto it = pair.second.begin(); it != pair.second.end();)
         {
-            if (obj)
-                obj->LateTick(fTimeDelta);
+            CGameObject* obj = *it;
+            if (!obj) { continue; }
+
+            // 보통은 LateTick 먼저 돌리고, 그 안에서 죽음 플래그가 설령 켜져도 다음 줄에서 바로 반영
+            obj->LateTick(fTimeDelta);
+
+            if (obj->Get_Dead()) {
+                Safe_Release(obj);
+                it = pair.second.erase(it);  // erase가 다음 원소 이터레이터를 반환
+            }
+            else {
+                ++it;
+            }
         }
     }
 }

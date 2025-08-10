@@ -55,6 +55,9 @@ void CBulletPath::Tick(float fTimeDelta)
 		m_Pos1 = m_Pos2;
 		m_fDeltaTime = 0.f;
 	}
+
+	if (BulletDatas.size() >= 1000)
+		isDead = true;
 }
 
 void CBulletPath::LateTick(float fTimeDelta)
