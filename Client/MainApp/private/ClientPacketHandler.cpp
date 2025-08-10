@@ -316,6 +316,8 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		float PosY;
 		float PosZ;
 
+		br >> DirX >> DirY >> DirZ >> PosX >> PosY >> PosZ;
+
 		CBulletPath::BulletPathstr bps;
 		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
 		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
