@@ -18,6 +18,7 @@
 #include "Drone.h"
 #include "Camera_Drone.h"
 #include "BulletPath.h"
+#include "Zet.h"
 
 /*-----------------
 	For Server
@@ -51,8 +52,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-	PSTR cmdLine, int showCmd)
-{
+	PSTR cmdLine, int showCmd){
 	//_CrtSetBreakAlloc(8420);
 
 	if (!RunLobbyWindowLoop(hInstance, showCmd))
@@ -120,7 +120,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("DroneModel", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Drone/Drone.fbx",XMMatrixScaling(0.01f,0.01f,0.01f), 1));
 
-
+	m_GameInstance->AddPrototype("ZetModel", CMeshModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), "../bin/Models/Zet/Zet1.fbx",  
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(3.141592 * 0.5f) ,1));
 
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
@@ -137,6 +138,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 	m_GameInstance->Add_PrototypeObject("Drone", CDrone::Create());
+	m_GameInstance->Add_PrototypeObject("Zet", CZet::Create());
 	m_GameInstance->Add_PrototypeObject("Camera_Drone", CCamera_Drone::Create());
 	m_GameInstance->Add_PrototypeObject("BulletPath", CBulletPath::Create());
 	
@@ -233,7 +235,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
 
-		_matrix mat3 = XMMatrixTranslation(10.f, 90.f, 10.f);
+		_matrix mat3 = XMMatrixTranslation(-2048.f, 90.f, -2048.f);
 		m_GameInstance->AddObject("Drone", "Drone", &mat3);
 		dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", 0))->Set_My_Drone();
 	}
@@ -261,9 +263,12 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
 	CBulletPath::BulletPathstr bps;
-	bps.Dir = XMVectorSet(10.f, 10.f, 10.f, 0.f);
-	bps.Pos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	bps.Dir = XMVectorSet(1.f, 1.f, 1.f, 0.f);
+	bps.Pos = XMVectorSet(0.f, 40.f, 0.f, 1.f);
 	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
+
+	XMMATRIX matZet = XMMatrixTranslation(20.f, 60.f, 20.f);
+	m_GameInstance->AddObject("Zet", "Zet", &matZet);
 
 	m_GameInstance->m_ShadowMap->Set_My_Tank_Index(Network_Manager::GetInstance()->GetMyTankIndex());
 

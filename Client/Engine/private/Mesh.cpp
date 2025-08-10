@@ -90,6 +90,11 @@ void CMesh::Set_Team(int team)
 	m_CBBinding->Set_Pad2(team);
 }
 
+_float4x4 CMesh::Get_CombinedMatrix()
+{
+	return m_Bone->Get_CombinedMatrix();
+}
+
 void CMesh::Update()
 {
 	m_CBBinding->Set_CBIndex();

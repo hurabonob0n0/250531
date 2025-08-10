@@ -30,7 +30,7 @@ HRESULT CUI::Initialize(void* pArg)
 
     TPSMatIndex = m_GameInstance->Add_Material("UITPS", mat);
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIFPS", CTexture::Create(L"../bin/Models/UI/7.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIFPS", CTexture::Create(L"../bin/Models/UI/FPSUI.dds"));
 
     FPSMatIndex = m_GameInstance->Add_Material("UIFPS", mat);
 
@@ -38,7 +38,7 @@ HRESULT CUI::Initialize(void* pArg)
 
     m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.77f);
 
-    m_TransformCom->Set_Scale(1.f);
+    m_TransformCom->Set_Scale(2.f);
 
     //m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
 

@@ -133,6 +133,9 @@
     <Filter Include="01.DefaultObj\BulletPath">
       <UniqueIdentifier>{a33d4228-195c-4a60-b1b6-d0bbdb2a9d54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\Zet">
+      <UniqueIdentifier>{dd913489-609a-4aab-a8b3-a8d6ad8e5384}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -261,6 +264,9 @@
     <ClInclude Include="..\public\BulletPath.h">
       <Filter>01.DefaultObj\BulletPath</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Zet.h">
+      <Filter>01.DefaultObj\Zet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -379,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="..\private\BulletPath.cpp">
       <Filter>01.DefaultObj\BulletPath</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Zet.cpp">
+      <Filter>01.DefaultObj\Zet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

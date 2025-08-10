@@ -41,6 +41,8 @@ private:
 	float m_fDeltaTime = 0.f;
 	XMVECTOR m_Pos1;
 	XMVECTOR m_Pos2;
+	float m_fYSpeed = 0.f;
+
 
 public:
 	void Free() override;
