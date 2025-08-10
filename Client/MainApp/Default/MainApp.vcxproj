@@ -225,6 +225,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\WinningTeam.h" />
+    <ClInclude Include="..\public\Zet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Bmp_Manager.cpp" />
@@ -288,6 +289,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\WinningTeam.cpp" />
+    <ClCompile Include="..\private\Zet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\ShaderFiles\LightingUtil.hlsl">

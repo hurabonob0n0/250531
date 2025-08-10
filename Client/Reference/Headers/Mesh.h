@@ -5,7 +5,6 @@
 #include "VIBuffer.h"
 #include "Model.h"
 
-
 BEGIN(Engine)
 
 class CMesh final : public CVIBuffer
@@ -19,6 +18,7 @@ public:
 	_uint Get_MaterialIndex() const {
 		return m_iMaterialIndex;
 	}
+	_float4x4 Get_CombinedMatrix();
 
 public:
 	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);

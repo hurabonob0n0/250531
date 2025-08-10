@@ -13,36 +13,6 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(CVIBuffer_Terrain& rhs): CVIBuffer(rhs), m_
 
 float CVIBuffer_Terrain::Get_Terrain_Heights(float x, float z)
 {
-    //int LX = int(x + NUMVERTERTICES/2.f);
-    //int DZ = int(z + NUMVERTERTICES / 2.f);
-
-    //if (x < -NUMVERTERTICES / 2.f || z < -NUMVERTERTICES / 2.f || x > NUMVERTERTICES / 2.f || z > NUMVERTERTICES / 2.f)
-    //    return 0.f;
-
-    //_vector Positions[4];
-
-    ///*Positions[0] = XMLoadFloat3( &m_vertices[(DZ + 1) * NUMVERTERTICES + LX].vPosition);
-    //Positions[1] = XMLoadFloat3( &m_vertices[(DZ + 1) * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[2] = XMLoadFloat3( &m_vertices[DZ * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[3] = XMLoadFloat3( &m_vertices[DZ * NUMVERTERTICES + LX].vPosition);*/
-
-    //Positions[0] = XMVectorSet(m_heightMap[(DZ + 1) * NUMVERTERTICES + LX]);
-    //Positions[1] = XMLoadFloat3(&m_vertices[(DZ + 1) * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[2] = XMLoadFloat3(&m_vertices[DZ * NUMVERTERTICES + LX + 1].vPosition);
-    //Positions[3] = XMLoadFloat3(&m_vertices[DZ * NUMVERTERTICES + LX].vPosition);
-
-    //float DeltaX = x - float(LX) + NUMVERTERTICES / 2.f;
-    //float DeltaZ = z - float(DZ) + NUMVERTERTICES / 2.f;
-
-    //_vector PlaneNormal;
-
-    //if (DeltaX + DeltaZ <= 1)
-    //    PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[2], Positions[3]);
-
-    //if (DeltaX + DeltaZ > 1)
-    //    PlaneNormal = XMPlaneFromPoints(Positions[0], Positions[1], Positions[2]);
-
-    //return -(XMVectorGetX(PlaneNormal) * x + XMVectorGetZ(PlaneNormal) * z + XMVectorGetW(PlaneNormal)) / XMVectorGetY(PlaneNormal);
     float half = NUMVERTERTICES / 2.f;
 
     int LX = int(x + half);
