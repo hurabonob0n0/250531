@@ -83,11 +83,16 @@ void CCamera_Free::Tick(float fTimeDelta)
 	if (!m_isPaused) {
 		if (m_GameInstance->Mouse_Down(1))
 		{
-			if (m_PS == FPS)
+			if (m_PS == FPS) {
+				Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
 				m_PS = TPS;
 
-			else if (m_PS == TPS)
+			}
+
+			else if (m_PS == TPS) {
 				m_PS = FPS;
+				Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
+			}
 		}
 
 		switch (m_PS)

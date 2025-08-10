@@ -61,9 +61,19 @@ HRESULT CCamera_Drone::Initialize(void* pArg)
 
 void CCamera_Drone::Tick(float fTimeDelta)
 {
+	//TODO 여기 키 변경 Y + Drone의 3인칭은 버리기
+	//
+	if (m_GameInstance->Key_Down(VK_RETURN)) {
 
-	if (m_GameInstance->Key_Down(VK_RETURN))
 		isDroneRender = !isDroneRender;
+		if (isDroneRender) {
+			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
+		}
+		else {
+			Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
+		}
+
+	}
 
 	//__super::Tick(fTimeDelta);
 	if (m_GameInstance->Key_Down(VK_PAUSE))

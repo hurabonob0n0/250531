@@ -48,6 +48,8 @@ public:
 
 	bool _myDrone = false;
 	void Set_My_Drone() { _myDrone = true; };
+	void Set_My_DronePos_OnTank(XMFLOAT4X4& world);
+
 
 	void SetOtherDroneMat(const XMFLOAT4X4& world);
 	void SendMyPosToServer();

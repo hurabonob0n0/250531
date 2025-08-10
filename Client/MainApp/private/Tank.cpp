@@ -8,6 +8,7 @@
 #include "UIReloading.h"
 #include "UISelectPos.h"
 #include "BulletPath.h"
+#include "Drone.h"
 
 CTank::CTank() : CRenderObject()
 {
@@ -92,7 +93,7 @@ HRESULT CTank::Initialize(void* pArg)
 
 	Set_Team(1);
 	//set_Spawn(false);
-	is_choiced = false;
+	is_RespawnArea_choiced = false;
 	Initialize_For_PosinQuad();
 
 	return S_OK;
@@ -118,6 +119,7 @@ void CTank::Tick(float fTimeDelta)
 {
 
 	if (_myPlayer) {
+		UpdateAirDropCooldown(fTimeDelta);
 		_shootTimer += fTimeDelta;
 
 		if (!_isSpawn)
@@ -348,10 +350,89 @@ void CTank::RotPotap_And_Posin(float fTimeDelta)
 		m_fPosinRotation = m_fCamPosinRot;
 }
 
+void CTank::Request_Air_Drop()
+{
+
+	if (!_airdropMode) return;     // 모드일 때만 입력 처리
+	if (!_airdropReady) return;    // 쿨타임 중 차단
+	if (!Network_Manager::GetInstance()->isConnected()) return;
+
+	for (uint8 slot = 1; slot <= 9; ++slot)
+	{
+		char key = '0' + slot; // '1'~'9'
+		if (m_GameInstance->Key_Down(key))
+		{
+			auto sendBuffer = ClientPacketHandler::Make_C_AIRDROP(slot); // 숫자 그대로
+			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
+			// 쿨타임 시작
+			_airdropReady = false;
+			_airdropTimer = 0.f;
+
+			// TODOUI: 성공 효과, 알림 등
+			Exit_AirDropMode(); // 1회 선택 후 모드 종료
+			break;
+		}
+	}
+
+	// 취소 키(ESC)로 모드 종료 옵션
+	if (m_GameInstance->Key_Down(27)) { // 27 == ESC
+		Exit_AirDropMode();
+	}
+}
+
+void CTank::Enter_Air_DropMode()
+{
+	if (CanEnterAirDropMode()) {
+		Start_AirDropMode();
+		// UI가 떠 있는 동안 숫자키 입력을 받음
+		Request_Air_Drop();
+	}
+	else {
+		// TODOUI: 쿨타임 남았거나 조건 미충족 메시지
+		// 예) 남은 쿨타임 표시도 가능: AIRDROP_COOLDOWN_SEC - _airdropTimer
+	}
+
+}
+
+void CTank::UpdateAirDropCooldown(float dt)
+{
+	if (_airdropReady) return;
+	_airdropTimer += dt;
+	if (_airdropTimer >= AIRDROP_COOLDOWN_SEC) {
+		_airdropTimer = 0.f;
+		_airdropReady = true;
+		// TODOUI: UI에 "에어드랍 준비 완료" 같은 표시 가능
+	}
+}
+
+bool CTank::CanEnterAirDropMode() const
+{
+	if (!_isSpawn) return false;
+	if (!Network_Manager::GetInstance()->isConnected()) return false;
+	if (!_airdropReady) return false;
+	//if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_POSIN) return false;
+	return true;
+}
+
+void CTank::Start_AirDropMode()
+{
+	_airdropMode = true;
+	((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render();
+	// TODOUI: 에어드랍 영역 선택 UI 켜기
+}
+
+void CTank::Exit_AirDropMode()
+{
+	_airdropMode = false;
+	((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render_off();
+	// TODOUI: 에어드랍 선택 UI 끄기
+}
+
 void CTank::Master_Pos_KeyInput()
 {
 
-	if (m_GameInstance->Key_Down('9')) {
+	if (m_GameInstance->Key_Down('M')) {
 		_respawnTimer = 0.f;
 		_isSpawn = false;
 	}
@@ -401,33 +482,25 @@ void CTank::Master_Pos_KeyInput()
 				
 				((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
 
-				_float4x4 TempMat;
-				XMStoreFloat4x4(&TempMat, ShotMatrix);
-				_vector vPos = ShotMatrix.r[3];
-				_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
-
-				_float3 fPos, fDir;
-				XMStoreFloat3(&fPos, vPos);
-				XMStoreFloat3(&fDir, vDir);
-
-				CBulletPath::BulletPathstr bps;
-				bps.Dir = XMVector4Normalize(XMVectorSet(fDir.x, fDir.y, fDir.z, 0.f)) * fTest;
-				bps.Pos = XMVectorSet(fPos.x, fPos.y, fPos.z, 1.f);
-				m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
-
 			}
 			_shootTimer = 0.f; // 타이머 초기화
 		}
+
+
 	}
 
-	
+	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN)
+	{
+		// 모드 진입 키(예: B) - 원하면 다른 키로 바꿔
+		if (m_GameInstance->Key_Down('T')) {
+			Enter_Air_DropMode();
+		}
 
-	if (m_GameInstance->Key_Down(VK_DOWN))
-		fTest -= 0.1f;
-
-	if (m_GameInstance->Key_Down(VK_UP))
-		fTest += 0.1f;
-
+		// 모드 활성 중이면 숫자 입력 처리
+		if (_airdropMode) {
+			Request_Air_Drop(); // 한 번 선택되면 Exit_AirDropMode()에서 빠져나감
+		}
+	}
 
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 
@@ -818,15 +891,9 @@ void CTank::SendShootDataToServer()
 	   fDir.x, fDir.y, fDir.z   // 정규화된 방향
 	};
 
-
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-
-	CBulletPath::BulletPathstr bps;
-	bps.Dir = XMVectorSet(1.f, 1.f, 1.f, 0.f);
-	bps.Pos = XMVectorSet(0.f, 40.f, 0.f, 1.f);
-	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
 
 
 }
@@ -944,12 +1011,12 @@ void CTank::CheckRespawnKeyInput()
 }
 
 void CTank::setRespawn() {
-	if (!is_choiced) {
+	if (!is_RespawnArea_choiced) {
 		CheckRespawnKeyInput();
 
 		if (Choiced_Pos != 0)
 		{
-			is_choiced = true;
+			is_RespawnArea_choiced = true;
 		}
 	}
 	else {
@@ -957,7 +1024,7 @@ void CTank::setRespawn() {
 		((CUISelectPos*)m_GameInstance->GetGameObject("UISelectPos", 0))->set_render_off();
 		_isSpawn = true;
 		_respawnTimer = 0.f;
-		is_choiced = false;
+		is_RespawnArea_choiced = false;
 		XMFLOAT3 respawnPosVec;
 
 		switch (Choiced_Pos)
@@ -986,6 +1053,9 @@ void CTank::setRespawn() {
 			auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
 			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 		}
+
+		dynamic_cast<CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", Network_Manager::GetInstance()->GetMyTankIndex()))->Set_My_DronePos_OnTank(TempMat);
 		Choiced_Pos = 0;
 	}
 }
+

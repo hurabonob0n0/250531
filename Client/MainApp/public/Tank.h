@@ -60,6 +60,20 @@ private:
 private:
 	void RotPotap_And_Posin(float fTimeDelta);
 
+public:
+	//For AirDrop
+	void  UpdateAirDropCooldown(float dt);
+	bool  CanEnterAirDropMode() const;
+	void  Start_AirDropMode();     // UI on
+	void  Exit_AirDropMode();      // UI off
+	void  Request_Air_Drop();      // 숫자키 처리(보내면 쿨타임 시작)
+	void  Enter_Air_DropMode();    // (키 입력으로 진입 시 호출)
+
+	static constexpr float AIRDROP_COOLDOWN_SEC = 10.f;
+
+	bool  _airdropMode = false;  // 선택 UI/상태 on/off
+	bool  _airdropReady = true;   // 쿨타임 여부
+	float _airdropTimer = 0.f;    // 경과 시간
 
 
 public:
@@ -123,7 +137,8 @@ private:
 public:
 	bool _myPlayer = false;
 	bool _MyTeam;
-	bool is_choiced;
+	bool is_RespawnArea_choiced;
+	bool is_AirDropArea_choiced = false;
 
 	int Choiced_Pos;
 	bool _isSpawn;
