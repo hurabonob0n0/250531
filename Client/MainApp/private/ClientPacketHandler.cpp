@@ -13,6 +13,7 @@
 #include "UIDamaged.h"
 #include "UIKill.h"
 #include "UISelectPos.h"
+#include "BulletPath.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -80,7 +81,10 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		break;
 	case S_CAPTURE:
 		Handle_S_CAPTURE(buffer, len);
-
+		break;
+	case S_BULLET_ADD:
+		Handle_S_BULLET_ADD(buffer, len);
+		break;
 	default:
 		break;
 	}
@@ -294,6 +298,29 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 		Hit_Matrix.r[3] = hitPos;
 
 		CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
+		});
+}
+
+void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		
+		float DirX;
+		float DirY;
+		float DirZ;
+
+		float PosX;
+		float PosY;
+		float PosZ;
+
+		CBulletPath::BulletPathstr bps;
+		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
+		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
+		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
+
 		});
 }
 
@@ -738,6 +765,20 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
 
 	sendBuffer->Close(bw.WriteSize());
 
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << (uint8)AreaNum;
+
+	header->size = bw.WriteSize();
+	header->id = C_AIRDROP;
 	return sendBuffer;
 }
 

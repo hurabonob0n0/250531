@@ -26,6 +26,8 @@ enum
 	S_GAME_LOSE = 16,
 	S_CAPTURE = 17,
 	S_ALL_DRONE_STATE = 18,
+	S_BULLET_ADD = 19,
+
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
 	C_KEYINPUT = 1003,
@@ -41,7 +43,8 @@ enum
 	C_RESPAWN_TANK = 1013,
 	C_MYPOS = 1014,
 	C_MYPOSIN = 1015,
-	C_MYDRONEMOVE = 1016
+	C_MYDRONEMOVE = 1016,
+	C_AIRDROP = 1017
 
 };
 
@@ -71,6 +74,8 @@ public:
 	static void Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len);
 	static void Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len);
 	static void Handle_S_WEAPON_HIT(BYTE* buffer, int32 len);
+	static void Handle_S_BULLET_ADD(BYTE* buffer, int32 len);
+
 
 	static void Handle_S_HIT_TANK(BYTE* buffer, int32 len);
 	static void Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len);
@@ -108,6 +113,7 @@ public:
 	static SendBufferRef Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation);
 	static SendBufferRef Make_C_TANK_POSMOVE(_float4x4& worldMatrix);
 
+	static SendBufferRef Make_C_AIRDROP(uint8 AreaNum);
 	//For GamePlay
 
 
