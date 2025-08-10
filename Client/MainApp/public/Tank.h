@@ -55,6 +55,9 @@ private:
 	_uint matindex = 0;
 
 private:
+	float fTest = 1.f;
+
+private:
 	void RotPotap_And_Posin(float fTimeDelta);
 
 

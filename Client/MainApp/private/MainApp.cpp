@@ -51,8 +51,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-	PSTR cmdLine, int showCmd)
-{
+	PSTR cmdLine, int showCmd){
 	//_CrtSetBreakAlloc(8420);
 
 	if (!RunLobbyWindowLoop(hInstance, showCmd))
@@ -261,8 +260,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
 	CBulletPath::BulletPathstr bps;
-	bps.Dir = XMVectorSet(10.f, 10.f, 10.f, 0.f);
-	bps.Pos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	bps.Dir = XMVectorSet(1.f, 1.f, 1.f, 0.f);
+	bps.Pos = XMVectorSet(0.f, 40.f, 0.f, 1.f);
 	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
 
 	m_GameInstance->m_ShadowMap->Set_My_Tank_Index(Network_Manager::GetInstance()->GetMyTankIndex());

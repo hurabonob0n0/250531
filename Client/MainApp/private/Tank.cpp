@@ -7,6 +7,7 @@
 #include "Network_Manager.h"
 #include "UIReloading.h"
 #include "UISelectPos.h"
+#include "BulletPath.h"
 
 CTank::CTank() : CRenderObject()
 {
@@ -401,8 +402,32 @@ void CTank::Master_Pos_KeyInput()
 			}
 			_shootTimer = 0.f; // 타이머 초기화
 		}
-
 	}
+
+	_float4x4 TempMat;
+	XMStoreFloat4x4(&TempMat, ShotMatrix);
+	_vector vPos = ShotMatrix.r[3];
+	_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
+
+	_float3 fPos, fDir;
+	XMStoreFloat3(&fPos, vPos);
+	XMStoreFloat3(&fDir, vDir);
+
+	if (m_GameInstance->Key_Down(VK_DOWN))
+		fTest -= 0.1f;
+
+	if (m_GameInstance->Key_Down(VK_UP))
+		fTest += 0.1f;
+
+	if (m_GameInstance->Key_Down('M'))
+	{
+		CBulletPath::BulletPathstr bps;
+		bps.Dir = XMVector4Normalize(XMVectorSet(fDir.x, fDir.y, fDir.z, 0.f)) * fTest;
+		bps.Pos = XMVectorSet(fPos.x, fPos.y, fPos.z, 1.f);
+		m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
+	}
+
+	
 
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 

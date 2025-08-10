@@ -22,7 +22,7 @@ HRESULT CBulletPath::Initialize(void* pArg)
     m_RG = CRenderer::RG_BULLETPATH; // 바꿔야함.
 
 	BulletPathstr* Info = (BulletPathstr*)pArg;
-	m_Dir = Info->Dir;
+	m_Dir = Info->Dir * 150.f;
 	m_Pos1 = Info->Pos;
 	m_Pos2 = Info->Pos;
 	XMMATRIX mat = XMMatrixTranslation(XMVectorGetX( Info->Pos), XMVectorGetY(Info->Pos), XMVectorGetZ(Info->Pos));
@@ -43,7 +43,9 @@ void CBulletPath::Tick(float fTimeDelta)
 	//m_fDeltaTime += fTimeDelta;
 	m_fDeltaTime += fTimeDelta;
 
-	m_Pos2 += m_Dir * fTimeDelta;
+	m_fYSpeed -= 6.8 * fTimeDelta;
+
+	m_Pos2 += m_Dir * fTimeDelta + XMVectorSet(0.f,m_fYSpeed * fTimeDelta,0.f,0.f);
 
 	if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000)
 	{
@@ -115,7 +117,7 @@ InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, cons
 
 	// 스케일 행렬 생성 (궤적 두께 0.1, 길이는 distance)
 	// Z축으로 길어지도록 설정합니다. VIBuffer의 정육면체 모델이 Z축을 바라보도록 제작되어야 합니다.
-	XMMATRIX scaleMatrix = XMMatrixScaling(1.f, 1.f, distance);
+	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, distance);
 
 	// 위치 행렬 생성 (두 위치의 중간 지점)
 	XMVECTOR midPoint = XMVectorScale(XMVectorAdd(oldPos, newPos), 0.5f);
