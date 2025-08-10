@@ -262,10 +262,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddObject("Tree", "Tree", nullptr);
 
-	CBulletPath::BulletPathstr bps;
-	bps.Dir = XMVectorSet(1.f, 1.f, 1.f, 0.f);
-	bps.Pos = XMVectorSet(0.f, 40.f, 0.f, 1.f);
-	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
+
 
 	XMMATRIX matZet = XMMatrixTranslation(20.f, 60.f, 20.f);
 	m_GameInstance->AddObject("Zet", "Zet", &matZet);

@@ -398,20 +398,29 @@ void CTank::Master_Pos_KeyInput()
 		{
 			if (Network_Manager::GetInstance()->isConnected()) {
 				SendShootDataToServer(); // 실제 슈팅
+				
 				((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
+
+				_float4x4 TempMat;
+				XMStoreFloat4x4(&TempMat, ShotMatrix);
+				_vector vPos = ShotMatrix.r[3];
+				_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
+
+				_float3 fPos, fDir;
+				XMStoreFloat3(&fPos, vPos);
+				XMStoreFloat3(&fDir, vDir);
+
+				CBulletPath::BulletPathstr bps;
+				bps.Dir = XMVector4Normalize(XMVectorSet(fDir.x, fDir.y, fDir.z, 0.f)) * fTest;
+				bps.Pos = XMVectorSet(fPos.x, fPos.y, fPos.z, 1.f);
+				m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
+
 			}
 			_shootTimer = 0.f; // 타이머 초기화
 		}
 	}
 
-	_float4x4 TempMat;
-	XMStoreFloat4x4(&TempMat, ShotMatrix);
-	_vector vPos = ShotMatrix.r[3];
-	_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
-
-	_float3 fPos, fDir;
-	XMStoreFloat3(&fPos, vPos);
-	XMStoreFloat3(&fDir, vDir);
+	
 
 	if (m_GameInstance->Key_Down(VK_DOWN))
 		fTest -= 0.1f;
@@ -419,15 +428,6 @@ void CTank::Master_Pos_KeyInput()
 	if (m_GameInstance->Key_Down(VK_UP))
 		fTest += 0.1f;
 
-	if (m_GameInstance->Key_Down('M'))
-	{
-		CBulletPath::BulletPathstr bps;
-		bps.Dir = XMVector4Normalize(XMVectorSet(fDir.x, fDir.y, fDir.z, 0.f)) * fTest;
-		bps.Pos = XMVectorSet(fPos.x, fPos.y, fPos.z, 1.f);
-		m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
-	}
-
-	
 
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 
@@ -822,6 +822,12 @@ void CTank::SendShootDataToServer()
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
+	CBulletPath::BulletPathstr bps;
+	bps.Dir = XMVectorSet(1.f, 1.f, 1.f, 0.f);
+	bps.Pos = XMVectorSet(0.f, 40.f, 0.f, 1.f);
+	m_GameInstance->AddObject("BulletPath", "BulletPath", &bps);
+
 
 }
 
