@@ -20,7 +20,10 @@
 #include "BulletPath.h"
 #include "Zet.h"
 #include "UINumber.h"
-
+#include "UISkillBox.h"
+#include "AirDrop.h"
+#include "UI_DEFEAT.h"
+#include "UI_VICTORY.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -137,6 +140,12 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UIKill", CUIKill::Create());
 	m_GameInstance->Add_PrototypeObject("UITeamPercent", CUITeamPercent::Create());
 	m_GameInstance->Add_PrototypeObject("UINumber", CUINumber::Create());
+	m_GameInstance->Add_PrototypeObject("UISkillbox", CUISkillBox::Create());
+	m_GameInstance->Add_PrototypeObject("UIAirDrop", CUI_AirDrop::Create());
+	m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
+	m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
+
+
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 	m_GameInstance->Add_PrototypeObject("Drone", CDrone::Create());
@@ -205,14 +214,17 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 						if (player.Position % 2 == 0) {
 
 							Network_Manager::GetInstance()->MyPosMode = POS_POSU;
+							CStateMgr::Get_Instance()->Set_GameMode(GM_FPS);
 						}
 						else {
 
 							Network_Manager::GetInstance()->MyPosMode = POS_DRIVER;
+							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
 						}
 
-						if (player.Position == 1) {
+						if (player.Position == 1|| player.Position ==9) {
 							Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
+							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
 						}
 
 						Network_Manager::GetInstance()->SetMyTankIndex(tankIndex);
@@ -266,15 +278,10 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIKill", "UI", nullptr);
 	m_GameInstance->AddObject("UITeamPercent", "UI", nullptr);
 	m_GameInstance->AddObject("UISelectPos", "UI", nullptr);
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Minute
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Minute
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Seconds
-	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Seconds
-
-
+	m_GameInstance->AddObject("UISkillbox", "UI", nullptr);
+	m_GameInstance->AddObject("UIAirDrop", "UI", nullptr);
+	m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
+	m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
@@ -333,8 +340,8 @@ int CMainApp::Run()
 				{
 					Network_Manager::GetInstance()->Dispatch(PacketQueueType::INGAME);
 				}
-				if(m_GameInstance->Key_Down(VK_RIGHT))
-					CStateMgr::Set_GameMode((GameMode)(((int)CStateMgr::Get_GameMode()+1)%3));
+				
+				//CStateMgr::Set_GameMode((GameMode)(((int)CStateMgr::Get_GameMode()+1)%3));
 
 				Update(m_Timer);
 				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());

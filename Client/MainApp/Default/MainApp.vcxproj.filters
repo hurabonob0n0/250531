@@ -139,14 +139,26 @@
     <Filter Include="StateMgr">
       <UniqueIdentifier>{732b992e-48eb-4b94-af94-a4b7a216a773}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.DefaultObj\UI\UICrossHair">
-      <UniqueIdentifier>{e6a22d89-9874-4184-b337-3323b18a00e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.DefaultObj\UI\UINumber">
       <UniqueIdentifier>{2a402a52-0650-4593-9eb1-6699e96b4cec}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.DefaultObj\UI\UITime">
       <UniqueIdentifier>{a3718a9a-1589-4aae-9632-1c4a1e190cab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UISkillBox">
+      <UniqueIdentifier>{cef9fd98-0b9b-4425-acc3-14b40f816bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UICrossHair">
+      <UniqueIdentifier>{e6a22d89-9874-4184-b337-3323b18a00e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UIAirDrop">
+      <UniqueIdentifier>{a8a678bb-c7f3-4393-b084-091b7becc43e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UIDEFEAT">
+      <UniqueIdentifier>{c659a85e-6697-4eaf-991b-3587587d79ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UIVICTORY">
+      <UniqueIdentifier>{f3acf15f-4bd3-417b-942f-4ff553252d25}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +300,18 @@
     <ClInclude Include="..\public\UITime.h">
       <Filter>01.DefaultObj\UI\UITime</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UISkillBox.h">
+      <Filter>01.DefaultObj\UI\UISkillBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AirDrop.h">
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_DEFEAT.h">
+      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_VICTORY.h">
+      <Filter>01.DefaultObj\UI\UIVICTORY</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -418,6 +442,18 @@
     </ClCompile>
     <ClCompile Include="..\private\UITime.cpp">
       <Filter>01.DefaultObj\UI\UITime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UISkillBox.cpp">
+      <Filter>01.DefaultObj\UI\UISkillBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AirDrop.cpp">
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_DEFEAT.cpp">
+      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_VICTORY.cpp">
+      <Filter>01.DefaultObj\UI\UIVICTORY</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

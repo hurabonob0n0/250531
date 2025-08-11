@@ -33,7 +33,7 @@ HRESULT CUIDamaged::Initialize(void* pArg)
 
     m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
-    m_TransformCom->Set_Scale(0.25f);
+    m_TransformCom->Set_Scale(0.1f);
     m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.777f);
 
     return S_OK;

@@ -68,7 +68,7 @@ cbuffer cbPerObject : register(b0)
     uint gMaterialIndex;
     uint gObjPad0;
     uint gObjPad1;
-    uint gObjPad2;
+    float gObjPad2;
 };
 
 cbuffer cbPass : register(b1)

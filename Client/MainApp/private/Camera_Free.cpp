@@ -4,7 +4,7 @@
 #include "Client_Globals.h"
 #include "Terrain.h"
 #include "Network_Manager.h"
-
+#include "StateMgr.h"
 CCamera_Free::CCamera_Free() : CCamera()
 {
 }
@@ -81,17 +81,25 @@ void CCamera_Free::Tick(float fTimeDelta)
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
-		if (m_GameInstance->Mouse_Down(1))
-		{
-			if (m_PS == FPS) {
-				Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
-				m_PS = TPS;
+		if (Network_Manager::GetInstance()->MyPosMode == POS_MASTER) {
 
-			}
+			if (m_GameInstance->Mouse_Down(1))
+			{
 
-			else if (m_PS == TPS) {
-				m_PS = FPS;
-				Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
+				if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
+					if (m_PS == FPS) {
+						Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
+						CStateMgr::Set_GameMode(GM_TPS);
+						m_PS = TPS;
+
+					}
+
+					else if (m_PS == TPS) {
+						m_PS = FPS;
+						Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
+						CStateMgr::Set_GameMode(GM_FPS);
+					}
+				}
 			}
 		}
 

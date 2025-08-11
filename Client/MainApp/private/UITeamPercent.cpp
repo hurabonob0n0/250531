@@ -67,7 +67,7 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_CBIndex();
 	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
 	m_CBBinding->Set_WorldMatrix(m_TransformCom);
-	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(0);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -79,8 +79,8 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_CBIndex();
 	m_CBBinding->Set_MaterialIndex(BlueMatIndex);
 	m_CBBinding->Set_WorldMatrix(m_TransformCom);
-	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	//여기에 추가해야함 Todo: 
+	m_CBBinding->Set_Pad1(1);
+	m_CBBinding->Set_Pad2((float)Network_Manager::GetInstance()->BLUEBAR); 
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
@@ -92,7 +92,8 @@ void CUITeamPercent::Render()
 	m_CBBinding->Set_CBIndex();
 	m_CBBinding->Set_MaterialIndex(RedMatIndex);
 	m_CBBinding->Set_WorldMatrix(m_TransformCom);
-	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	m_CBBinding->Set_Pad1(2);
+	m_CBBinding->Set_Pad2((float)Network_Manager::GetInstance()->REDBAR);
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();

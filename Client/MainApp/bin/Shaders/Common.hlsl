@@ -27,7 +27,7 @@ struct MaterialData
 	uint     DiffuseMapIndex;
 	uint     NormalMapIndex;
 	uint     MatPad1;
-	uint     MatPad2;
+	float     MatPad2;
 };
 
 TextureCube gCubeMap : register(t0);
@@ -59,7 +59,7 @@ cbuffer cbPerObject : register(b0)
 	uint gMaterialIndex;
 	uint gObjPad0;
 	uint gObjPad1;
-	uint gObjPad2;
+	float gObjPad2;
 };
 
 // Constant data that varies per material.
