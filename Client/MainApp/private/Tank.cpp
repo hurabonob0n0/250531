@@ -287,6 +287,17 @@ void CTank::Set_PoSinpRotation(float fDegree)
 	m_fCamPosinRot = fDegree;
 }
 
+void CTank::Set_Other_PotapRotation(float fDegree)
+{
+	m_fPotapRotation = fDegree;
+}
+
+void CTank::Set_Other_PoSinpRotation(float fDegree)
+{
+	m_fPosinRotation = fDegree;
+}
+
+
 void CTank::Set_Potap_For_Driver(float fDegree) {
 	
 	m_fPotapRotation = fDegree;
@@ -926,8 +937,8 @@ void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
 {
 
 	m_TransformCom->Set_WorldMatrix(mat);
-	Set_PotapRotation(PotapRot);
-	Set_PoSinpRotation(PosinRot);
+	Set_Other_PotapRotation(PotapRot);
+	Set_Other_PoSinpRotation(PosinRot);
 
 }
 

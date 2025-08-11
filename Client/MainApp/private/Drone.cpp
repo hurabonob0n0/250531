@@ -7,10 +7,12 @@
 
 CDrone::CDrone() : CRenderObject()
 {
+    _myDrone = false;
 }
 
 CDrone::CDrone(CDrone& rhs) : CRenderObject(rhs)
 {
+    _myDrone = false;
 }
 
 HRESULT CDrone::Initialize_Prototype()
@@ -55,6 +57,9 @@ void CDrone::Tick(float fTimeDelta)
             if (Network_Manager::GetInstance()->isConnected())
                 SendMyPosToServer();
         }
+    }
+    else {
+        Update_Rot_and_Pos(fTimeDelta);
     }
 
 }
@@ -195,10 +200,12 @@ void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
 
 void CDrone::SetOtherDroneMat(float PosX, float PosY,float PosZ, float Yaw, float Roll, float pitch)
 {
-    m_vPos = { PosX , PosY, PosZ, 1.f };
-    m_fYawRot = Yaw;
-    m_fRollRot = Roll;
-    m_fPitchRot = pitch;
+    if (!_myDrone) {
+        m_vPos = { PosX , PosY, PosZ, 1.f };
+        m_fYawRot = Yaw;
+        m_fRollRot = Roll;
+        m_fPitchRot = pitch;
+    }
 }
 
 void CDrone::SendMyPosToServer()

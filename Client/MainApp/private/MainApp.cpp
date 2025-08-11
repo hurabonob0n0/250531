@@ -142,8 +142,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UINumber", CUINumber::Create());
 	m_GameInstance->Add_PrototypeObject("UISkillbox", CUISkillBox::Create());
 	m_GameInstance->Add_PrototypeObject("UIAirDrop", CUI_AirDrop::Create());
-	m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
-	m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
+	//m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
+	//m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
 
 
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
@@ -274,14 +274,14 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UICrossHair", "UI", nullptr);
 	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
 	m_GameInstance->AddObject("UIReloading", "UI", nullptr);
-	m_GameInstance->AddObject("UIDamaged", "UI", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
 	m_GameInstance->AddObject("UIKill", "UI", nullptr);
+	m_GameInstance->AddObject("UIDamaged", "UI", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
 	m_GameInstance->AddObject("UITeamPercent", "UI", nullptr);
 	m_GameInstance->AddObject("UISelectPos", "UI", nullptr);
 	m_GameInstance->AddObject("UISkillbox", "UI", nullptr);
 	m_GameInstance->AddObject("UIAirDrop", "UI", nullptr);
-	m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
-	m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
+	//m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
+	//m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);

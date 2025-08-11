@@ -32,6 +32,8 @@ public:
 public:
 	void Set_PotapRotation(float fDegree);
 	void Set_PoSinpRotation(float fDegree);
+	void Set_Other_PotapRotation(float fDegree);
+	void Set_Other_PoSinpRotation(float fDegree);
 	void Set_Potap_For_Driver(float fDegree);
 	void Set_Posin_For_Driver(float fDegree);
 	void Set_ShotDir(XMVECTOR Vec);
