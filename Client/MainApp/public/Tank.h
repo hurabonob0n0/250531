@@ -69,7 +69,7 @@ public:
 	void  Request_Air_Drop();      // 숫자키 처리(보내면 쿨타임 시작)
 	void  Enter_Air_DropMode();    // (키 입력으로 진입 시 호출)
 
-	static constexpr float AIRDROP_COOLDOWN_SEC = 10.f;
+	static constexpr float AIRDROP_COOLDOWN_SEC = 30.f;
 
 	bool  _airdropMode = false;  // 선택 UI/상태 on/off
 	bool  _airdropReady = true;   // 쿨타임 여부

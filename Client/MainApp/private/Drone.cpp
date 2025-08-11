@@ -185,34 +185,28 @@ CRenderObject* CDrone::Clone(void* pArg)
 
 void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
 {
-    XMMATRIX m = XMLoadFloat4x4(&world);
+    float posX = world._41;
+    float posY = world._42 + 50.f; // Y값만 +50
+    float posZ = world._43;
 
-    // 현재 위치 벡터 추출
-    XMVECTOR pos = m.r[3];
-
-    // y 값만 +50
-    pos = XMVectorSetY(pos, XMVectorGetY(pos) + 50.0f);
-
-    // 수정된 위치 다시 적용
-    m.r[3] = pos;
-
-    m_TransformCom->Set_WorldMatrix(m);
+    m_vPos = { posX, posY, posZ, 1.f };
 
 }
 
-void CDrone::SetOtherDroneMat(const XMFLOAT4X4& world)
+void CDrone::SetOtherDroneMat(float PosX, float PosY,float PosZ, float Yaw, float Roll, float pitch)
 {
-    XMMATRIX m = XMLoadFloat4x4(&world);
-    m_TransformCom->Set_WorldMatrix(m);
-
+    m_vPos = { PosX , PosY, PosZ, 1.f };
+    m_fYawRot = Yaw;
+    m_fRollRot = Roll;
+    m_fPitchRot = pitch;
 }
 
 void CDrone::SendMyPosToServer()
 {
-
-    _float4x4 TempMat;
-    XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
-    auto sendBuffer = ClientPacketHandler::Make_C_DRONE_MOVE(TempMat);
+    float x = XMVectorGetX(m_vPos);
+    float y = XMVectorGetY(m_vPos);
+    float z = XMVectorGetZ(m_vPos);
+    auto sendBuffer = ClientPacketHandler::Make_C_DRONE_MOVE(x,y,z, m_fYawRot, m_fRollRot, m_fPitchRot);
     ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 
 }

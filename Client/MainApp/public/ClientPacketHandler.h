@@ -94,7 +94,7 @@ public:
 	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation);
 	static SendBufferRef Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ);
 
-	static SendBufferRef Make_C_DRONE_MOVE(_float4x4& worldMatrix);
+	static SendBufferRef Make_C_DRONE_MOVE(float PosX, float PosY, float PosZ, float Yaw, float Roll, float Pitch);
 
 	static SendBufferRef Make_C_LOGIN(uint64 id);
 	static SendBufferRef Make_C_KEYINPUT(uint8 key);
