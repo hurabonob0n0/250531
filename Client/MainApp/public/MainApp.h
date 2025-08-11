@@ -5,6 +5,7 @@
 #include "RawInput.h"
 #include "GameInstance.h"
 #include "MyPhysicsEngine.h"
+#include "StateMgr.h"
 
 BEGIN(Client)
 
@@ -59,6 +60,7 @@ private:
 	CRawInput* m_Input_Dev{ nullptr };
 	CTimer* m_Timer = { nullptr };
 	MyPhysicsEngine::CMyPhysicsEngine* m_PhysicsEngine = { nullptr };
+	CStateMgr* GameModeMgr{ nullptr };
 
 public:
 	virtual void Free() override;

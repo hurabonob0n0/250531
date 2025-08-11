@@ -25,15 +25,18 @@ public:
 
 private:
 	CVIBuffer_Quad* m_VIBuffer;
-	XMMATRIX m_BlueTeamBlank;
-	XMMATRIX m_RedTeamBlank;
-	XMMATRIX m_BlueTeamFull;
-	XMMATRIX m_RedTeamFull;
-	int BlankMatIndex;
-	int RedTeamIndex;
-	int BlueTeamIndex;
 
-	int Percent = 0.f;
+	_float2 BlankPos{ 960,980.f };
+	_float2 BlankScale{ 1.f,0.1f };
+	_float2 BlueTeamPos{ 700.f,965.f };
+	_float2 BlueTeamScale{0.45f,0.025f };
+	_float2 RedTeamPos{ 1220.f,965.f };
+	_float2 RedTeamScale{0.45f,0.025f };
+
+private:
+	int BlankMatIndex;
+	int BlueMatIndex;
+	int RedMatIndex;
 	
 
 public:

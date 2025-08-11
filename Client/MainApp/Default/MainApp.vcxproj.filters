@@ -136,6 +136,18 @@
     <Filter Include="01.DefaultObj\Zet">
       <UniqueIdentifier>{dd913489-609a-4aab-a8b3-a8d6ad8e5384}</UniqueIdentifier>
     </Filter>
+    <Filter Include="StateMgr">
+      <UniqueIdentifier>{732b992e-48eb-4b94-af94-a4b7a216a773}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UICrossHair">
+      <UniqueIdentifier>{e6a22d89-9874-4184-b337-3323b18a00e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UINumber">
+      <UniqueIdentifier>{2a402a52-0650-4593-9eb1-6699e96b4cec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.DefaultObj\UI\UITime">
+      <UniqueIdentifier>{a3718a9a-1589-4aae-9632-1c4a1e190cab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -176,9 +188,6 @@
     </ClInclude>
     <ClInclude Include="..\public\Effect.h">
       <Filter>01.DefaultObj\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\UI.h">
-      <Filter>01.DefaultObj\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WinningTeam.h">
       <Filter>01.DefaultObj\WinningTeam</Filter>
@@ -267,6 +276,18 @@
     <ClInclude Include="..\public\Zet.h">
       <Filter>01.DefaultObj\Zet</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\StateMgr.h">
+      <Filter>StateMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UICrossHair.h">
+      <Filter>01.DefaultObj\UI\UICrossHair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UINumber.h">
+      <Filter>01.DefaultObj\UI\UINumber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UITime.h">
+      <Filter>01.DefaultObj\UI\UITime</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -304,9 +325,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Effect.cpp">
       <Filter>01.DefaultObj\Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\UI.cpp">
-      <Filter>01.DefaultObj\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WinningTeam.cpp">
       <Filter>01.DefaultObj\WinningTeam</Filter>
@@ -388,6 +406,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Zet.cpp">
       <Filter>01.DefaultObj\Zet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateMgr.cpp">
+      <Filter>StateMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UICrossHair.cpp">
+      <Filter>01.DefaultObj\UI\UICrossHair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UINumber.cpp">
+      <Filter>01.DefaultObj\UI\UINumber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UITime.cpp">
+      <Filter>01.DefaultObj\UI\UITime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

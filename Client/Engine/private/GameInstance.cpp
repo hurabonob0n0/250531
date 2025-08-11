@@ -90,7 +90,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
-		set_Disable_Depth()-> 
+		set_Disable_Depth_Write()-> 
 		set_Blend_Enable()->
 		Create_PSO());
 
@@ -100,6 +100,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetPS(m_ShaderMgr->GetShaderObj("UIPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
 		set_Blend_Enable()->
+		set_Disable_Depth_Write()->
+		//set_Disable_Depth_Test()->
 		Create_PSO());
 
 	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->

@@ -26,19 +26,25 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 void CUIObject::Tick(float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+	if (m_isRender)
+		__super::Tick(fTimeDelta);
 }
 
 void CUIObject::LateTick(float fTimeDelta)
 {
-	__super::LateTick(fTimeDelta);
+	if (m_isRender)
+	{
+		__super::LateTick(fTimeDelta);
 
-	m_CBBinding->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
+		m_CBBinding->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
+	}
+
 }
 
 void CUIObject::Render()
 {
-	m_CBBinding->Set_On_Shader();
+	if (m_isRender)
+		m_CBBinding->Set_On_Shader();
 }
 
 void CUIObject::Free()

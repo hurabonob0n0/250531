@@ -87,7 +87,7 @@ void CMesh::Set_Bone(const vector<class CBone*> Bones)
 
 void CMesh::Set_Team(int team)
 {
-	m_CBBinding->Set_Pad2(team);
+	m_CBBinding->Set_Pad1(team);
 }
 
 _float4x4 CMesh::Get_CombinedMatrix()

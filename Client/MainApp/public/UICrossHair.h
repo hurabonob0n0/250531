@@ -9,12 +9,12 @@ END
 
 BEGIN(Client)
 
-class CUI : public CUIObject
+class CUICrossHair : public CUIObject
 {
 public:
-	CUI();
-	CUI(CUI& rhs);
-	virtual ~CUI() = default;
+	CUICrossHair();
+	CUICrossHair(CUICrossHair& rhs);
+	virtual ~CUICrossHair() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -23,21 +23,22 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+	void Update_State();
+
 private:
 	CVIBuffer_Quad* m_VIBuffer;
-	
-private:
-	_bool			m_isFPS;
 
 private:
 	int TPSMatIndex;
 	int FPSMatIndex;
+	int DroneMatIndex;
 	
 
 public:
 	void Free() override;
-	static CUI* Create();
-	CUI* Clone(void* pArg);
+	static CUICrossHair* Create();
+	CUICrossHair* Clone(void* pArg);
 
 };
 

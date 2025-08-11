@@ -36,19 +36,17 @@ float4 PS(VertexOut pin) : SV_Target
     
     uint diffuseMapIndex = matData.DiffuseMapIndex;
     
-    float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC); /*float4(1.f, 1.f, 1.f, 1.f);*/
+    float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC) /*+ float4(0.1f, 0.1f, 0.1f, 0.f)*/; /*float4(1.f, 1.f, 1.f, 1.f);*/
     
-    if (color.a <= 0.01f)
-        discard;
     
-    //if(gObjPad0 == 1)
-    //    if (color.r == 0.f && color.g == 0.f
-    //        &&color.b == 0.f)
-    //        discard;
+    if(gObjPad0 == 2) // Á¡·ÉÁö
+    {
+        
+    }
     
-    if(gObjPad0 == 2)
-        if(pin.TexC.y < (float)gObjPad1/100.f)
-            discard;
+    else if(gObjPad0 == 1) // HpBar
+            if(pin.TexC.x >gObjPad2/100.f)
+                discard;
     
     return color;
 	
