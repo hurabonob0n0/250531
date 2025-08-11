@@ -58,7 +58,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_ALL_TANK_STATE:
 		Handle_S_ALL_TANK_STATE(buffer, len);
 		break;
-
+	case S_ALL_DRONE_STATE:
+		Handle_S_ALL_DRONE_STATE(buffer, len);
+		break;
 	case S_WEAPON_HIT:
 		Handle_S_WEAPON_HIT(buffer, len);
 		break;
@@ -350,7 +352,7 @@ void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", 4)))->set_Hit();
+		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", 3)))->set_Hit();
 		});
 }
 
@@ -392,7 +394,7 @@ void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", 3)))->set_Hit();
+		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", 4)))->set_Hit();
 		Network_Manager::GetInstance()->add_MyKillCount();
 	});
 }
@@ -534,7 +536,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 					tank->Set_DriverModeData(potapAngle, posinAngle);
 				}
 				else {
-					break;
+				
 				}
 			}
 
@@ -566,8 +568,8 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 			br >> DroneHP;
 
 			uint8 myDroneIndex = Network_Manager::GetInstance()->GetMyTankIndex();
-
-			Client::CDrone* drone = dynamic_cast<Client::CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", static_cast<int>(myDroneIndex)));
+			 
+			Client::CDrone* drone = dynamic_cast<Client::CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", static_cast<int>(DroneIndex)));
 			if (DroneIndex != myDroneIndex)
 			{
 				if (drone)

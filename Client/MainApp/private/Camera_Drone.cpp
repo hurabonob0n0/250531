@@ -36,7 +36,7 @@ HRESULT CCamera_Drone::Initialize(void* pArg)
 
 
 	if (Network_Manager::GetInstance()->isConnected()) {
-		m_DroneTransform = (CTransform*)m_GameInstance->Get_Object_Component("Drone", 0, "TransformCom");
+		m_DroneTransform = (CTransform*)m_GameInstance->Get_Object_Component("Drone", Network_Manager::GetInstance()->GetMyTankIndex(), "TransformCom");
 		Safe_AddRef(m_DroneTransform);
 	}
 	else {
