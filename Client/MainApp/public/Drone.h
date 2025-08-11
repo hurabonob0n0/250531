@@ -23,9 +23,34 @@ public:
 	virtual void LateTick(float fTimeDelta);
 	virtual void Render();
 
+public:
+
+	float	Get_DroneYaw() {
+		return m_fYawRot;
+	};
+	void	Set_DroneYaw(float Yaw) {
+		m_fYawRot = Yaw;
+	};
+
+
+	float	Get_DroneRoll() {
+		return m_fRollRot;
+	};
+	void	Set_DroneRoll(float Roll) {
+		m_fRollRot = Roll;
+	};
+
+
+	float	Get_DronePitch() {
+		return m_fPitchRot;
+	};
+	void	Set_DronePitch(float Pitch) {
+		m_fPitchRot = Pitch;
+	};
 private:
 	void Update_Speed_and_Rot(float fTimeDelta);
 	void Update_Rot_and_Pos(float fTimeDelta);
+
 
 private:
 	CMeshModel* m_VIBuffer;
@@ -51,7 +76,7 @@ public:
 	void Set_My_DronePos_OnTank(XMFLOAT4X4& world);
 
 
-	void SetOtherDroneMat(const XMFLOAT4X4& world);
+	void SetOtherDroneMat(float PosX, float PosY, float PosZ, float Yaw, float Roll, float pitch);
 	void SendMyPosToServer();
 };
 

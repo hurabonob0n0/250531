@@ -558,15 +558,10 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 		for (uint16 i = 0; i < DroneCount; ++i)
 		{
 			uint8 DroneIndex;
-			br >> DroneIndex;
-
-			_float4x4 mat = {};
-
-			for (int row = 0; row < 4; ++row)
-				for (int col = 0; col < 4; ++col)
-					br >> mat.m[row][col];
-
+			float PosX, PosY, PosZ, Yaw, Roll, Pitch;
 			uint8 DroneHP = 0;
+			br >> DroneIndex;
+			br >> PosX >> PosY >> PosZ >> Yaw >> Roll >> Pitch;
 
 			br >> DroneHP;
 
@@ -577,7 +572,7 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 			{
 				if (drone)
 				{
-					drone->SetOtherDroneMat(mat);
+					drone->SetOtherDroneMat(PosX,PosY,PosZ,Yaw,Roll,Pitch);
 				}
 			}
 
@@ -817,8 +812,6 @@ SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
 	return sendBuffer;
 }
 
-
-
 #pragma endregion Packet_to_Server
 
 #pragma region ForIngame
@@ -887,7 +880,7 @@ SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float Pos
 
 }
 
-SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(_float4x4& worldMatrix)
+SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(float PosX, float PosY, float PosZ, float Yaw, float Roll, float Pitch)
 {
 
 
@@ -898,20 +891,13 @@ SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(_float4x4& worldMatrix)
 
 	uint8 Droneindex = Network_Manager::GetInstance()->GetMyTankIndex();
 	bw << Droneindex;
-	for (int i = 0; i < 4; ++i)
-	{
-		bw << worldMatrix.m[i][0];  // row i, col 0
-		bw << worldMatrix.m[i][1];  // row i, col 1
-		bw << worldMatrix.m[i][2];  // row i, col 2
-		bw << worldMatrix.m[i][3];  // row i, col 3
-	}
+	bw << PosX << PosY << PosZ << Yaw << Roll << Pitch;
 
 
 	header->size = bw.WriteSize();
 	header->id = C_MYDRONEMOVE;
 
 	sendBuffer->Close(bw.WriteSize());
-
 	return sendBuffer;
 }
 
