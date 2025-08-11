@@ -1,24 +1,24 @@
 #include "Client_pch.h"
-#include "UISelectPos.h"
+#include "UI_DEFEAT.h"
 #include "GameInstance.h"
 
-CUISelectPos::CUISelectPos() : CUIObject()
+CUI_DEFEAT::CUI_DEFEAT() : CUIObject()
 {
 }
 
-CUISelectPos::CUISelectPos(CUISelectPos& rhs) : CUIObject(rhs)
+CUI_DEFEAT::CUI_DEFEAT(CUI_DEFEAT& rhs) : CUIObject(rhs)
 {
 
 }
 
-HRESULT CUISelectPos::Initialize_Prototype()
+HRESULT CUI_DEFEAT::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 
 	return S_OK;
 }
 
-HRESULT CUISelectPos::Initialize(void* pArg)
+HRESULT CUI_DEFEAT::Initialize(void* pArg)
 {
 	m_RG = CRenderer::RG_UI;
 
@@ -26,9 +26,9 @@ HRESULT CUISelectPos::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UISelectPos", CTexture::Create(L"../bin/Models/FinalUI/DestroyedUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DefeatUI", CTexture::Create(L"../bin/Models/FinalUI/DefeatUI.dds"));
 
-	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UISelectPos", mat));
+	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("DefeatUI", mat));
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
@@ -45,17 +45,17 @@ HRESULT CUISelectPos::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CUISelectPos::Tick(float fTimeDelta)
+void CUI_DEFEAT::Tick(float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 }
 
-void CUISelectPos::LateTick(float fTimeDelta)
+void CUI_DEFEAT::LateTick(float fTimeDelta)
 {
 	__super::LateTick(fTimeDelta);
 }
 
-void CUISelectPos::Render()
+void CUI_DEFEAT::Render()
 {
 	if (render)
 	{
@@ -64,23 +64,23 @@ void CUISelectPos::Render()
 	}
 }
 
-void CUISelectPos::Free()
+void CUI_DEFEAT::Free()
 {
 	Safe_Release(m_VIBuffer);
 
 	__super::Free();
 }
 
-CUISelectPos* CUISelectPos::Create()
+CUI_DEFEAT* CUI_DEFEAT::Create()
 {
-	CUISelectPos* pInstance = new CUISelectPos;
+	CUI_DEFEAT* pInstance = new CUI_DEFEAT;
 	pInstance->Initialize_Prototype();
 	return pInstance;
 }
 
-CUISelectPos* CUISelectPos::Clone(void* pArg)
+CUI_DEFEAT* CUI_DEFEAT::Clone(void* pArg)
 {
-	CUISelectPos* pInstance = new CUISelectPos(*this);
+	CUI_DEFEAT* pInstance = new CUI_DEFEAT(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
 }

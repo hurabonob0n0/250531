@@ -13,8 +13,11 @@
 #include "UIDamaged.h"
 #include "UIKill.h"
 #include "UISelectPos.h"
+#include "UI_DEFEAT.h"
+#include "UI_VICTORY.h"
 #include "BulletPath.h"
 #include "Zet.h"
+
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -347,7 +350,7 @@ void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UIDamaged", 0)))->set_Hit();
+		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", 4)))->set_Hit();
 		});
 }
 
@@ -377,7 +380,7 @@ void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
 		if (index == Network_Manager::GetInstance()->GetMyTankIndex()) {
 			tank->set_Spawn(false);
 			tank->_respawnTimer = 0.f;
-			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render();
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI",6)))->set_render();
 			//TODOUI -> UISelectPos UI바꾸기, MasterMode와 Driver가 선택지 선택, POSU일때는 선택 불가능 UI 띄우기
 		}
 		});
@@ -389,7 +392,7 @@ void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UIKill", 0)))->set_Hit();
+		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", 3)))->set_Hit();
 		Network_Manager::GetInstance()->add_MyKillCount();
 	});
 }
@@ -400,9 +403,7 @@ void ClientPacketHandler::Handle_S_GAME_WIN(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-
-		//TODOUI 승리 UI 만들기
-		//이겼을 때 처리
+		dynamic_cast<CUI_VICTORY*>((CGameInstance::Get_Instance()->GetGameObject("UI", 10)))->set_render();
 		});
 }
 
@@ -412,8 +413,7 @@ void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		//TODOUI 패배 UI 만들기
-		//졌을 때 처리
+		dynamic_cast<CUI_DEFEAT*>((CGameInstance::Get_Instance()->GetGameObject("UI", 9)))->set_render();
 	});
 }
 

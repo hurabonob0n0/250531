@@ -32,6 +32,8 @@ HRESULT CUINumber::Initialize(void* pArg)
     m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("NumberUI", mat));
 
     m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
+    
+   
 
     return S_OK;
 }

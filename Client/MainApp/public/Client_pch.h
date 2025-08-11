@@ -44,7 +44,8 @@ using PlayerRef = shared_ptr<class Player>;
 
 
 #define RESPAWNPOS_0 0.f, 38.f, 0.f
-#define RESPAWNPOS_1 1127.f, 38.f, 410.f
+#define RESPAWNPOS_1 0.f, 38.f, 0.f
+//#define RESPAWNPOS_1 1127.f, 38.f, 410.f
 #define RESPAWNPOS_2 507.f, 38.f, 1084.f
 #define RESPAWNPOS_3 -410.f, 38.f, 1127.f
 #define RESPAWNPOS_4 -1084.f, 38.f, 507.f

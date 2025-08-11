@@ -75,6 +75,14 @@ public:
 	bool  _airdropReady = true;   // 쿨타임 여부
 	float _airdropTimer = 0.f;    // 경과 시간
 
+	float GetCoolScale() {
+		if (_airdropTimer >= AIRDROP_COOLDOWN_SEC)
+			return 0.0f;
+
+		// 스킬 직후(타이머 0초) → 1,  
+		// 시간이 지날수록 0에 가까워지게
+		return 1.0f - (_airdropTimer / AIRDROP_COOLDOWN_SEC);
+	};
 
 public:
 	/*--------------

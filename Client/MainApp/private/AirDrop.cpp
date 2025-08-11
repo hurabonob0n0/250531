@@ -1,24 +1,24 @@
 #include "Client_pch.h"
-#include "UISelectPos.h"
+#include "AirDrop.h"
 #include "GameInstance.h"
 
-CUISelectPos::CUISelectPos() : CUIObject()
+CUI_AirDrop::CUI_AirDrop() : CUIObject()
 {
 }
 
-CUISelectPos::CUISelectPos(CUISelectPos& rhs) : CUIObject(rhs)
+CUI_AirDrop::CUI_AirDrop(CUI_AirDrop& rhs) : CUIObject(rhs)
 {
 
 }
 
-HRESULT CUISelectPos::Initialize_Prototype()
+HRESULT CUI_AirDrop::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 
 	return S_OK;
 }
 
-HRESULT CUISelectPos::Initialize(void* pArg)
+HRESULT CUI_AirDrop::Initialize(void* pArg)
 {
 	m_RG = CRenderer::RG_UI;
 
@@ -26,9 +26,9 @@ HRESULT CUISelectPos::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UISelectPos", CTexture::Create(L"../bin/Models/FinalUI/DestroyedUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIAirDrop", CTexture::Create(L"../bin/Models/FinalUI/AIRSTRIKEUI.dds"));
 
-	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UISelectPos", mat));
+	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIAirDrop", mat));
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
@@ -45,17 +45,17 @@ HRESULT CUISelectPos::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CUISelectPos::Tick(float fTimeDelta)
+void CUI_AirDrop::Tick(float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 }
 
-void CUISelectPos::LateTick(float fTimeDelta)
+void CUI_AirDrop::LateTick(float fTimeDelta)
 {
 	__super::LateTick(fTimeDelta);
 }
 
-void CUISelectPos::Render()
+void CUI_AirDrop::Render()
 {
 	if (render)
 	{
@@ -64,23 +64,23 @@ void CUISelectPos::Render()
 	}
 }
 
-void CUISelectPos::Free()
+void CUI_AirDrop::Free()
 {
 	Safe_Release(m_VIBuffer);
 
 	__super::Free();
 }
 
-CUISelectPos* CUISelectPos::Create()
+CUI_AirDrop* CUI_AirDrop::Create()
 {
-	CUISelectPos* pInstance = new CUISelectPos;
+	CUI_AirDrop* pInstance = new CUI_AirDrop;
 	pInstance->Initialize_Prototype();
 	return pInstance;
 }
 
-CUISelectPos* CUISelectPos::Clone(void* pArg)
+CUI_AirDrop* CUI_AirDrop::Clone(void* pArg)
 {
-	CUISelectPos* pInstance = new CUISelectPos(*this);
+	CUI_AirDrop* pInstance = new CUI_AirDrop(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
 }

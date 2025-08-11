@@ -4,7 +4,7 @@
 #include "Client_Globals.h"
 #include "Terrain.h"
 #include "Network_Manager.h"
-
+#include "StateMgr.h"
 CCamera_Drone::CCamera_Drone() : CCamera()
 {
 }
@@ -63,16 +63,18 @@ void CCamera_Drone::Tick(float fTimeDelta)
 {
 	//TODO 여기 키 변경 Y + Drone의 3인칭은 버리기
 	//
-	if (m_GameInstance->Key_Down(VK_RETURN)) {
+	if (m_GameInstance->Key_Down('Y')) {
 
-		isDroneRender = !isDroneRender;
-		if (isDroneRender) {
+		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
+			SetDroneRender(true);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
+			CStateMgr::Set_GameMode(GM_Drone);
 		}
-		else {
-			Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
+		else if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+			SetDroneRender(false);
+			Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
+			CStateMgr::Set_GameMode(GM_FPS);
 		}
-
 	}
 
 	//__super::Tick(fTimeDelta);
@@ -80,13 +82,16 @@ void CCamera_Drone::Tick(float fTimeDelta)
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
-		if (m_GameInstance->Mouse_Down(1))
-		{
+		
+		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
+			if (m_GameInstance->Mouse_Down(1))
+			{
 			if (m_PS == FPS)
 				m_PS = TPS;
 
 			else if (m_PS == TPS)
 				m_PS = FPS;
+			}
 		}
 
 		switch (m_PS)

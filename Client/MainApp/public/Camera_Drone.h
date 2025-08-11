@@ -47,6 +47,11 @@ private:
 
 	bool isDroneRender = false;
 public:
+	void SetDroneRender(bool tf) {
+
+		isDroneRender = tf;
+	}
+public:
 	void Free() override;
 	static CCamera_Drone* Create();
 	CCamera_Drone* Clone(void* pArg);

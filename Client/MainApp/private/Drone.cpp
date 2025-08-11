@@ -48,13 +48,13 @@ void CDrone::Tick(float fTimeDelta)
     //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 
     if (_myDrone) {
+        if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+            Update_Speed_and_Rot(fTimeDelta);
+            Update_Rot_and_Pos(fTimeDelta);
 
-        Update_Speed_and_Rot(fTimeDelta);
-        Update_Rot_and_Pos(fTimeDelta);
-
-        if(Network_Manager::GetInstance()->isConnected())
-            SendMyPosToServer();
-        
+            if (Network_Manager::GetInstance()->isConnected())
+                SendMyPosToServer();
+        }
     }
 
 }

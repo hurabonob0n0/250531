@@ -9,6 +9,7 @@
 #include "UISelectPos.h"
 #include "BulletPath.h"
 #include "Drone.h"
+#include "AirDrop.h"
 
 CTank::CTank() : CRenderObject()
 {
@@ -117,7 +118,6 @@ void CTank::Initialize_For_PosinQuad()
 
 void CTank::Tick(float fTimeDelta)
 {
-
 	if (_myPlayer) {
 		UpdateAirDropCooldown(fTimeDelta);
 		_shootTimer += fTimeDelta;
@@ -180,9 +180,11 @@ void CTank::LateTick(float fTimeDelta)
 			Tick_For_Posin_Image(fTimeDelta);
 			ErrorRespawn();
 
-			if (m_GameInstance->Mouse_Down(1))
-				m_isFPS = !m_isFPS;
-
+			if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
+				if (m_GameInstance->Mouse_Down(1)) {
+					m_isFPS = !m_isFPS;
+				}
+			}
 			if (Network_Manager::GetInstance()->isConnected())
 				SendMyStateToServer();
 
@@ -230,7 +232,8 @@ void CTank::Render()
 		switch (Network_Manager::GetInstance()->MyPosMode) {
 		case POS_MASTER:
 		{
-			if (m_isFPS) {
+			if (Network_Manager::GetInstance()->MyControlTarget==CONTROL_POSIN) {
+
 				Render_For_Posin_Image();
 			}
 			else
@@ -251,7 +254,14 @@ void CTank::Render()
 			break;
 		case POS_POSU:
 		{
-			Render_For_Posin_Image();
+			if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
+
+				Render_For_Posin_Image();
+			}
+			else {
+				for (int i = 0; i < 55; ++i)
+					m_VIBuffer->Render(i);
+			}
 		}
 			break;
 		default:
@@ -409,7 +419,7 @@ void CTank::UpdateAirDropCooldown(float dt)
 bool CTank::CanEnterAirDropMode() const
 {
 	if (!_isSpawn) return false;
-	if (!Network_Manager::GetInstance()->isConnected()) return false;
+	if (!Network_Manager::GetInstance()->isConnected()) return true;
 	if (!_airdropReady) return false;
 	//if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_POSIN) return false;
 	return true;
@@ -418,90 +428,87 @@ bool CTank::CanEnterAirDropMode() const
 void CTank::Start_AirDropMode()
 {
 	_airdropMode = true;
-	((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render();
+	((CUI_AirDrop*)(CGameInstance::Get_Instance()->GetGameObject("UI", 8)))->set_render();
 	// TODOUI: 에어드랍 영역 선택 UI 켜기
 }
 
 void CTank::Exit_AirDropMode()
 {
 	_airdropMode = false;
-	((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UISelectPos", 0)))->set_render_off();
+	((CUI_AirDrop*)(CGameInstance::Get_Instance()->GetGameObject("UI", 8)))->set_render_off();
 	// TODOUI: 에어드랍 선택 UI 끄기
 }
 
 void CTank::Master_Pos_KeyInput()
 {
-
-	if (m_GameInstance->Key_Down('M')) {
-		_respawnTimer = 0.f;
-		_isSpawn = false;
-	}
-
-	if (m_GameInstance->Key_Down('W'))
-		m_TankConsrolState.leftThrust = true;
-
-	if (m_GameInstance->Key_Down('S'))
-		m_TankConsrolState.leftBrake = true;
-
-	if (m_GameInstance->Key_Down('R'))
-		m_TankConsrolState.rightThrust = true;
-
-	if (m_GameInstance->Key_Down('F'))
-		m_TankConsrolState.rightBrake = true;
-
-	if (m_GameInstance->Key_Down('X'))
-		m_TankConsrolState.leftReverse = true;
-
-	if (m_GameInstance->Key_Down('V'))
-		m_TankConsrolState.rightReverse = true;
-
-	if (m_GameInstance->Key_Up('W'))
-		m_TankConsrolState.leftThrust = false;
-
-	if (m_GameInstance->Key_Up('S'))
-		m_TankConsrolState.leftBrake = false;
-
-	if (m_GameInstance->Key_Up('R'))
-		m_TankConsrolState.rightThrust = false;
-
-	if (m_GameInstance->Key_Up('F'))
-		m_TankConsrolState.rightBrake = false;
-
-	if (m_GameInstance->Key_Up('X'))
-		m_TankConsrolState.leftReverse = false;
-
-	if (m_GameInstance->Key_Up('V'))
-		m_TankConsrolState.rightReverse = false;
-
-	if (m_GameInstance->Mouse_Down(0)) {
-
-		if (_shootTimer >= SHOOT_INTERVAL)
-		{
-			if (Network_Manager::GetInstance()->isConnected()) {
-				SendShootDataToServer(); // 실제 슈팅
-				
-				((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
-
-			}
-			_shootTimer = 0.f; // 타이머 초기화
+	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_TANK) {
+		if (m_GameInstance->Key_Down('M')) {
+			_respawnTimer = 0.f;
+			_isSpawn = false;
 		}
 
+		if (m_GameInstance->Key_Down('W'))
+			m_TankConsrolState.leftThrust = true;
 
+		if (m_GameInstance->Key_Down('S'))
+			m_TankConsrolState.leftBrake = true;
+
+		if (m_GameInstance->Key_Down('R'))
+			m_TankConsrolState.rightThrust = true;
+
+		if (m_GameInstance->Key_Down('F'))
+			m_TankConsrolState.rightBrake = true;
+
+		if (m_GameInstance->Key_Down('X'))
+			m_TankConsrolState.leftReverse = true;
+
+		if (m_GameInstance->Key_Down('V'))
+			m_TankConsrolState.rightReverse = true;
+
+		if (m_GameInstance->Key_Up('W'))
+			m_TankConsrolState.leftThrust = false;
+
+		if (m_GameInstance->Key_Up('S'))
+			m_TankConsrolState.leftBrake = false;
+
+		if (m_GameInstance->Key_Up('R'))
+			m_TankConsrolState.rightThrust = false;
+
+		if (m_GameInstance->Key_Up('F'))
+			m_TankConsrolState.rightBrake = false;
+
+		if (m_GameInstance->Key_Up('X'))
+			m_TankConsrolState.leftReverse = false;
+
+		if (m_GameInstance->Key_Up('V'))
+			m_TankConsrolState.rightReverse = false;
 	}
+	else if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
 
-	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN)
-	{
-		// 모드 진입 키(예: B) - 원하면 다른 키로 바꿔
+		if (m_GameInstance->Mouse_Down(0)) {
+
+			if (_shootTimer >= SHOOT_INTERVAL)
+			{
+				if (Network_Manager::GetInstance()->isConnected()) {
+					SendShootDataToServer(); // 실제 슈팅
+
+					((CUIReloading*)m_GameInstance->GetGameObject("UI", 2))->Set_Reloading();
+
+				}
+				_shootTimer = 0.f; // 타이머 초기화
+			}
+
+
+		}
 		if (m_GameInstance->Key_Down('T')) {
 			Enter_Air_DropMode();
 		}
-
 		// 모드 활성 중이면 숫자 입력 처리
 		if (_airdropMode) {
 			Request_Air_Drop(); // 한 번 선택되면 Exit_AirDropMode()에서 빠져나감
 		}
 	}
-
+	
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
 
 }
@@ -556,7 +563,7 @@ void CTank::POSU_Pos_KeyInput()
 		{
 			if (Network_Manager::GetInstance()->isConnected()) {
 				SendShootDataToServer();
-				((CUIReloading*)m_GameInstance->GetGameObject("UIReloading", 0))->Set_Reloading();
+				((CUIReloading*)m_GameInstance->GetGameObject("UI", 2))->Set_Reloading();
 			}
 
 			_shootTimer = 0.f;
@@ -1008,6 +1015,7 @@ void CTank::CheckRespawnKeyInput()
 	else if (m_GameInstance->Key_Down('6')) Choiced_Pos = 6;
 	else if (m_GameInstance->Key_Down('7')) Choiced_Pos = 7;
 	else if (m_GameInstance->Key_Down('8')) Choiced_Pos = 8;
+
 }
 
 void CTank::setRespawn() {
@@ -1021,7 +1029,7 @@ void CTank::setRespawn() {
 	}
 	else {
 		Network_Manager::GetInstance()->ReSpawn();
-		((CUISelectPos*)m_GameInstance->GetGameObject("UISelectPos", 0))->set_render_off();
+		((CUISelectPos*)m_GameInstance->GetGameObject("UI", 6))->set_render_off();
 		_isSpawn = true;
 		_respawnTimer = 0.f;
 		is_RespawnArea_choiced = false;
