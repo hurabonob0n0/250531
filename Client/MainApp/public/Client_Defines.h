@@ -3,10 +3,7 @@
 #include <Windows.h>
 
 namespace Client {
-	static unsigned int		g_iWinSizeX = 1600;
-	static unsigned int		g_iWinSizeY = 900;
+	enum GameMode { GM_TPS, GM_FPS, GM_Drone, GM_END };
 };
 using namespace Client;
 using namespace std;
-
-

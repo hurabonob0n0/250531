@@ -27,44 +27,18 @@ HRESULT CUIHP::Initialize(void* pArg)
 
     MaterialData mat{};
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIHP", CTexture::Create(L"../bin/Models/UI/1.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("HPBar", CTexture::Create(L"../bin/Models/FinalUI/HPBar.dds"));
 
-    m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIHP", mat));
+    m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("HPBar", mat));
 
     m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
-  /*  m_BaseTransform = (CTransform*)m_GameInstance->Get_Component("TransformCom");
+    m_CBBinding->Set_Pad0(1);
 
-    m_BaseTransform->Set_Scale(CTransform::STATE_UP, 1.77f);
-
-    m_BaseTransform->Set_Scale(2.f);
-
-    m_BaseTransform->Set_Scale(CTransform::STATE_UP, 25);
-
-    m_BaseTransform->Set_Scale(CTransform::STATE_RIGHT, 50.f);
-
-    m_BaseTransform->Set_Scale(0.01f);*/
-
-    //m_BaseTransform->Set_State(CTransform::STATE_POSITION, XMVectorSet(-0.5f, -0.9f, 0.f, 1.f));
-
-    //m_TransformCom->Set_Scale(CTransform::STATE_UP, 1.77f);
-
-    //m_TransformCom->Set_Scale(2.f);
-
-    //m_TransformCom->Set_Scale(CTransform::STATE_UP, 25);
-
-    //m_TransformCom->Set_Scale(CTransform::STATE_RIGHT, 50.f);
-
-    //m_TransformCom->Set_Scale(0.01f);
-
-    //m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(-0.5f, -0.9f, 0.f, 1.f));
+    __super::Set_Scale(0.75f, 0.1f);
+    __super::Set_Pos(480, 100.f);
 
 
-    //m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
-
-    //m_CBBinding->Set_Pad0(1);
-
-   // m_isFPS = false;
 
     return S_OK;
 }
@@ -73,23 +47,7 @@ void CUIHP::Tick(float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-    /*if (m_GameInstance->Key_Down(VK_LEFT))
-    {
-        HP = HP - 25;
-    }
-
-    if (m_GameInstance->Key_Down(VK_RIGHT))
-    {
-        HP = HP + 25;
-    }*/
-
-    m_TransformCom->Identity();
-
-    m_TransformCom->Set_Scale(CTransform::STATE_RIGHT, (float)Network_Manager::GetInstance()->MyHp / (float)FullHP);
-
-    m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(-0.5f - (1.f- (float)HP / (float)FullHP)*0.43f, -0.9f, 0.f, 1.f));
-
-    
+    m_CBBinding->Set_Pad2((float)Network_Manager::GetInstance()->MyHp);
 }
 
 void CUIHP::LateTick(float fTimeDelta)

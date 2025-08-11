@@ -20,7 +20,7 @@ namespace Engine
 		UINT     MaterialIndex = 0;
 		UINT     ObjPad0 = 0;
 		UINT     ObjPad1 = 0;
-		UINT     ObjPad2 = 0;
+		float     ObjPad2 = 0;
 	};
 
 	struct ENGINE_DLL Light

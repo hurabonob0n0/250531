@@ -27,80 +27,72 @@ HRESULT CUITeamPercent::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UITeamPercent", CTexture::Create(L"../bin/Models/UI/5-3.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CaptureUI", CTexture::Create(L"../bin/Models/FinalUI/CaptureUI.dds"));
 
-	BlankMatIndex = m_GameInstance->Add_Material("UITeamPercentBlank", mat);
+	BlankMatIndex = m_GameInstance->Add_Material("CaptureUI", mat);
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIRedTeamPercent", CTexture::Create(L"../bin/Models/UI/5-1.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("BlueCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/BlueCaptureUI.dds"));
 
-	RedTeamIndex = m_GameInstance->Add_Material("UIRedTeamPercent", mat);
+	BlueMatIndex = m_GameInstance->Add_Material("BlueCaptureUI", mat);
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIBlueTeamPercent", CTexture::Create(L"../bin/Models/UI/5-2.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("RedCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/RedCaptureUI.dds"));
 
-	BlueTeamIndex = m_GameInstance->Add_Material("UIBlueTeamPercent", mat);
+	RedMatIndex = m_GameInstance->Add_Material("RedCaptureUI", mat);
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
-	m_BlueTeamBlank = XMMatrixScaling(0.25f, 0.25f, 0.25f) * XMMatrixTranslation(-0.5f, 0.7f, 0.f);
-
-	m_RedTeamBlank = XMMatrixScaling(0.25f, 0.25f, 0.25f) * XMMatrixTranslation(+0.5f, 0.7f, 0.f);
-
-	//m_TransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.09f, 0.f, 1.f));
+	m_CBBinding->Set_TexCoordMatrix(XMMatrixIdentity());
 
 	m_CBBinding->Set_Pad0(2);
-
-   // m_isFPS = false;
 
 	return S_OK;
 }
 
 void CUITeamPercent::Tick(float fTimeDelta)
 {
-	//__super::Tick(fTimeDelta);
+	__super::Tick(fTimeDelta);
 }
 
 void CUITeamPercent::LateTick(float fTimeDelta)
 {
-	m_RendererCom->AddtoRenderObjects(m_RG,this);
-	//__super::LateTick(fTimeDelta);
+	__super::LateTick(fTimeDelta);
 }
 
 void CUITeamPercent::Render()
 {
-	m_CBBinding->Set_CBIndex();
-	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
-	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
-	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(0);
-	//m_CBBinding->Set_Pad0(2);
-	m_CBBinding->Update_CBView();
-	m_CBBinding->Set_On_Shader();
-	m_VIBuffer->Render();
+	m_TransformCom->Identity();
+	__super::Set_Scale(BlankScale.x, BlankScale.y);
+	__super::Set_Pos(BlankPos.x, BlankPos.y);
 
 	m_CBBinding->Set_CBIndex();
 	m_CBBinding->Set_MaterialIndex(BlankMatIndex);
-	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
-	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(0);
-	//m_CBBinding->Set_Pad0(2);
+	m_CBBinding->Set_WorldMatrix(m_TransformCom);
+	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
 
+	m_TransformCom->Identity();
+	__super::Set_Scale(BlueTeamScale.x, BlueTeamScale.y);
+	__super::Set_Pos(BlueTeamPos.x, BlueTeamPos.y);
+
 	m_CBBinding->Set_CBIndex();
-	m_CBBinding->Set_MaterialIndex(RedTeamIndex);
-	m_CBBinding->Set_WorldMatrix(m_RedTeamBlank);
-	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(50);
+	m_CBBinding->Set_MaterialIndex(BlueMatIndex);
+	m_CBBinding->Set_WorldMatrix(m_TransformCom);
+	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
+	//여기에 추가해야함 Todo: 
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();
 
+	m_TransformCom->Identity();
+	__super::Set_Scale(RedTeamScale.x, RedTeamScale.y);
+	__super::Set_Pos(RedTeamPos.x, RedTeamPos.y);
+
 	m_CBBinding->Set_CBIndex();
-	m_CBBinding->Set_MaterialIndex(BlueTeamIndex);
-	m_CBBinding->Set_WorldMatrix(m_BlueTeamBlank);
-	m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
-	m_CBBinding->Set_Pad1(50);
+	m_CBBinding->Set_MaterialIndex(RedMatIndex);
+	m_CBBinding->Set_WorldMatrix(m_TransformCom);
+	//m_CBBinding->Set_TexCoordMatrix(m_TransformCom->Get_WorldMatrix());
 	m_CBBinding->Update_CBView();
 	m_CBBinding->Set_On_Shader();
 	m_VIBuffer->Render();

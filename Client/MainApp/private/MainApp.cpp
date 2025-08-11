@@ -6,7 +6,7 @@
 #include "Tank.h"
 #include "Terrain.h"
 #include "Effect.h"
-#include "UI.h"
+#include "UICrossHair.h"
 #include "WinningTeam.h"
 #include "Tree.h"
 #include "UIHP.h"
@@ -19,6 +19,7 @@
 #include "Camera_Drone.h"
 #include "BulletPath.h"
 #include "Zet.h"
+#include "UINumber.h"
 
 /*-----------------
 	For Server
@@ -128,13 +129,14 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
-	m_GameInstance->Add_PrototypeObject("UI", CUI::Create());
+	m_GameInstance->Add_PrototypeObject("UICrossHair", CUICrossHair::Create());
 	m_GameInstance->Add_PrototypeObject("UIHP", CUIHP::Create());
 	m_GameInstance->Add_PrototypeObject("UIReloading", CUIReloading::Create());
 	m_GameInstance->Add_PrototypeObject("UISelectPos", CUISelectPos::Create());
 	m_GameInstance->Add_PrototypeObject("UIDamaged", CUIDamaged::Create());
 	m_GameInstance->Add_PrototypeObject("UIKill", CUIKill::Create());
 	m_GameInstance->Add_PrototypeObject("UITeamPercent", CUITeamPercent::Create());
+	m_GameInstance->Add_PrototypeObject("UINumber", CUINumber::Create());
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
 	m_GameInstance->Add_PrototypeObject("Drone", CDrone::Create());
@@ -233,6 +235,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	else {
 		Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
 
+		CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
+
 		_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 		m_GameInstance->AddObject("Tank", "Tank", &mat1);
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
@@ -255,13 +259,21 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//TODOUI -> (POSIN모드) -> AIR_STRIKE 스킬 UI, USEDRONE UI, AIRSTRIKE위에 쿨타임에 맞게 Render되는 빨간 쿨타임 박스 
 	//TODOUI -> (Drone모드) -> FOLLW TANK UI, Drone화면UI, Drone모드에서 탱크 조준UI 지우기
 
-	m_GameInstance->AddObject("UI", "UI", nullptr);
-	m_GameInstance->AddObject("UIHP", "UIHP", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
-	m_GameInstance->AddObject("UIReloading", "UIReloading", nullptr);
-	m_GameInstance->AddObject("UIDamaged", "UIDamaged", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
-	m_GameInstance->AddObject("UIKill", "UIKill", nullptr);
-	m_GameInstance->AddObject("UITeamPercent", "UITeamPercent", nullptr);
-	m_GameInstance->AddObject("UISelectPos", "UISelectPos", nullptr);
+	m_GameInstance->AddObject("UICrossHair", "UI", nullptr);
+	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
+	m_GameInstance->AddObject("UIReloading", "UI", nullptr);
+	m_GameInstance->AddObject("UIDamaged", "UI", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
+	m_GameInstance->AddObject("UIKill", "UI", nullptr);
+	m_GameInstance->AddObject("UITeamPercent", "UI", nullptr);
+	m_GameInstance->AddObject("UISelectPos", "UI", nullptr);
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// HP
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Minute
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Minute
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Seconds
+	m_GameInstance->AddObject("UINumber", "UI", nullptr);// Seconds
+
 
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
@@ -321,6 +333,8 @@ int CMainApp::Run()
 				{
 					Network_Manager::GetInstance()->Dispatch(PacketQueueType::INGAME);
 				}
+				if(m_GameInstance->Key_Down(VK_RIGHT))
+					CStateMgr::Set_GameMode((GameMode)(((int)CStateMgr::Get_GameMode()+1)%3));
 
 				Update(m_Timer);
 				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());

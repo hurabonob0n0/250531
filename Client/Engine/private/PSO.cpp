@@ -140,7 +140,7 @@ CPSO* CPSO::setForShadow()
     return this;
 }
 
-CPSO* CPSO::set_Disable_Depth()
+CPSO* CPSO::set_Disable_Depth_Write()
 {
     m_PsoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
@@ -163,6 +163,12 @@ CPSO* CPSO::set_Blend_Enable()
 
     m_PsoDesc.BlendState.RenderTarget[0] = blenddesc;
 
+    return this;
+}
+
+CPSO* CPSO::set_Disable_Depth_Test()
+{
+    m_PsoDesc.DepthStencilState.DepthEnable = true;
     return this;
 }
 

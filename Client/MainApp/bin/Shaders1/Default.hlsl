@@ -138,11 +138,11 @@ float4 PS(VertexOut pin) : SV_Target
             litColor.rgb += float3(0.f, 0.f, 0.05f);
     }
     
-    if (gObjPad2 == 1)
+    if (gObjPad1 == 1)
         litColor.r += 0.1f;
-    else if (gObjPad2 == 2)
+    else if (gObjPad1 == 2)
         litColor.b += 0.1f;
-    else if (gObjPad2 == 3)
+    else if (gObjPad1 == 3)
         litColor.rgb -= 0.1f;
     
     return litColor;
