@@ -83,16 +83,16 @@ void CCamera_Drone::Tick(float fTimeDelta)
 
 	if (!m_isPaused) {
 		
-		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
-			if (m_GameInstance->Mouse_Down(1))
-			{
-			if (m_PS == FPS)
-				m_PS = TPS;
+		//if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
+		//	if (m_GameInstance->Mouse_Down(1))
+		//	{
+		//	if (m_PS == FPS)
+		//		m_PS = TPS;
 
-			else if (m_PS == TPS)
-				m_PS = FPS;
-			}
-		}
+		//	else if (m_PS == TPS)
+		//		m_PS = FPS;
+		//	}
+		//}
 
 		switch (m_PS)
 		{

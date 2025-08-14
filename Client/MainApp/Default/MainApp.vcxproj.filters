@@ -300,17 +300,17 @@
     <ClInclude Include="..\public\UITime.h">
       <Filter>01.DefaultObj\UI\UITime</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\UISkillBox.h">
-      <Filter>01.DefaultObj\UI\UISkillBox</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\AirDrop.h">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_DEFEAT.h">
-      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_VICTORY.h">
-      <Filter>01.DefaultObj\UI\UIVICTORY</Filter>
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UISkillBox.h">
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -443,17 +443,17 @@
     <ClCompile Include="..\private\UITime.cpp">
       <Filter>01.DefaultObj\UI\UITime</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\UISkillBox.cpp">
-      <Filter>01.DefaultObj\UI\UISkillBox</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\AirDrop.cpp">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_DEFEAT.cpp">
-      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_VICTORY.cpp">
-      <Filter>01.DefaultObj\UI\UIVICTORY</Filter>
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UISkillBox.cpp">
+      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\AbstractFactory.h" />
+    <ClInclude Include="..\public\AirDrop.h" />
     <ClInclude Include="..\public\Bmp_Manager.h" />
     <ClInclude Include="..\public\BoxObj.h" />
     <ClInclude Include="..\public\BulletPath.h" />
@@ -220,6 +221,7 @@
     <ClInclude Include="..\public\UINumber.h" />
     <ClInclude Include="..\public\UIReloading.h" />
     <ClInclude Include="..\public\UISelectPos.h" />
+    <ClInclude Include="..\public\UISkillBox.h" />
     <ClInclude Include="..\public\UITeamPercent.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -232,10 +234,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\public\UI_DEFEAT.h" />
+    <ClInclude Include="..\public\UI_VICTORY.h" />
     <ClInclude Include="..\public\WinningTeam.h" />
     <ClInclude Include="..\public\Zet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\AirDrop.cpp" />
     <ClCompile Include="..\private\Bmp_Manager.cpp" />
     <ClCompile Include="..\private\BoxObj.cpp" />
     <ClCompile Include="..\private\BulletPath.cpp" />
@@ -292,6 +297,7 @@
     <ClCompile Include="..\private\UINumber.cpp" />
     <ClCompile Include="..\private\UIReloading.cpp" />
     <ClCompile Include="..\private\UISelectPos.cpp" />
+    <ClCompile Include="..\private\UISkillBox.cpp" />
     <ClCompile Include="..\private\UITeamPercent.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -304,6 +310,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\private\UI_DEFEAT.cpp" />
+    <ClCompile Include="..\private\UI_VICTORY.cpp" />
     <ClCompile Include="..\private\WinningTeam.cpp" />
     <ClCompile Include="..\private\Zet.cpp" />
   </ItemGroup>
