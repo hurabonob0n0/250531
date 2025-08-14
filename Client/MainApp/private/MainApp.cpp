@@ -142,8 +142,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UINumber", CUINumber::Create());
 	m_GameInstance->Add_PrototypeObject("UISkillbox", CUISkillBox::Create());
 	m_GameInstance->Add_PrototypeObject("UIAirDrop", CUI_AirDrop::Create());
-	//m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
-	//m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
+	m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
+	m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
 
 
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
@@ -280,8 +280,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UISelectPos", "UI", nullptr);
 	m_GameInstance->AddObject("UISkillbox", "UI", nullptr);
 	m_GameInstance->AddObject("UIAirDrop", "UI", nullptr);
-	//m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
-	//m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
+	m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
+	m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
@@ -300,6 +300,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Execute_CommandList();
 
 	m_GameInstance->Flush_CommandQueue();
+	
+	//((CUI_VICTORY*)m_GameInstance->GetGameObject("UI", 9))->set_render();
+	//((CUI_DEFEAT*)m_GameInstance->GetGameObject("UI",10))->set_render();
 
 
 	if (Network_Manager::GetInstance()->isConnected()) {
