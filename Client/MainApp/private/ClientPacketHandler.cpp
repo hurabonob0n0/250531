@@ -103,6 +103,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_AIRDROP_INDEX:
 		Handle_S_AIRDROP(buffer, len);
 		break;
+	case S_TANK_RESPAWN:
+		Handle_S_RESPAWN(buffer, len);
+		break;
 	default:
 		break;
 	}
@@ -468,6 +471,25 @@ void ClientPacketHandler::Handle_S_AIRDROP(BYTE* buffer, int32 len)
 
 }
 
+void ClientPacketHandler::Handle_S_RESPAWN(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		uint8 TankIndex;
+		br >> header;
+		br >> TankIndex;
+		if(Network_Manager::GetInstance()->MyPosMode == POS_POSU)
+			dynamic_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", TankIndex))->setRespawnForPosinMode();
+		//add UI
+	});
+
+
+}
+
 void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
 {
 
@@ -536,7 +558,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 					tank->Set_DriverModeData(potapAngle, posinAngle);
 				}
 				else {
-				
+				//마스터 포지션
 				}
 			}
 

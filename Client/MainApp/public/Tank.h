@@ -138,8 +138,9 @@ private:		//For PosinCrosshair
 	void Render_For_Posin_Image();
 
 	void CheckRespawnKeyInput();
-
+public:
 	void setRespawn();
+	void setRespawnForPosinMode();
 private:
 	float _shootTimer = 0.f;  // 누적 슈팅 시간
 	const float SHOOT_INTERVAL = 3.f; // 4초 주기

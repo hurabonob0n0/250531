@@ -127,9 +127,8 @@ void CTank::Tick(float fTimeDelta)
 			_respawnTimer += fTimeDelta;
 			if (_respawnTimer >= 5.f)
 			{
-
-				//포수일경우 리스폰 설정 고민
-				setRespawn();
+				if(Network_Manager::GetInstance()->MyPosMode != POS_POSU)
+					setRespawn();
 			}
 			return;
 		}
@@ -580,6 +579,14 @@ void CTank::POSU_Pos_KeyInput()
 			_shootTimer = 0.f;
 		}
 
+	}
+
+	if (m_GameInstance->Key_Down('T')) {
+		Enter_Air_DropMode();
+	}
+	// 모드 활성 중이면 숫자 입력 처리
+	if (_airdropMode) {
+		Request_Air_Drop(); // 한 번 선택되면 Exit_AirDropMode()에서 빠져나감
 	}
 }
 
@@ -1076,5 +1083,11 @@ void CTank::setRespawn() {
 		dynamic_cast<CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", Network_Manager::GetInstance()->GetMyTankIndex()))->Set_My_DronePos_OnTank(TempMat);
 		Choiced_Pos = 0;
 	}
+}
+
+void CTank::setRespawnForPosinMode()
+{
+	_isSpawn = true;
+	Network_Manager::GetInstance()->ReSpawn();
 }
 

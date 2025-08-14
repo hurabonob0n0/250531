@@ -106,7 +106,8 @@ void CCamera_Free::Tick(float fTimeDelta)
 		switch (m_PS)
 		{
 		case Client::CCamera_Free::FPS:
-			Tick_For_FPS(fTimeDelta);
+			if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN)
+				Tick_For_FPS(fTimeDelta);
 			break;
 		case Client::CCamera_Free::TPS:
 			Tick_For_TPS(fTimeDelta);
