@@ -224,7 +224,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 							Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
 						}
 
-						if (player.Position == 1|| player.Position ==9) {
+						if (player.Position == 1) {
 							Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
 							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
 							Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
