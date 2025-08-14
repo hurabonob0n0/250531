@@ -568,25 +568,28 @@ void CTank::Driver_Pos_KeyInput()
 
 void CTank::POSU_Pos_KeyInput()
 {
-	if (m_GameInstance->Mouse_Down(0)) {
-		if (_shootTimer >= SHOOT_INTERVAL)
-		{
-			if (Network_Manager::GetInstance()->isConnected()) {
-				SendShootDataToServer();
-				((CUIReloading*)m_GameInstance->GetGameObject("UI", 2))->Set_Reloading();
+	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
+
+		if (m_GameInstance->Mouse_Down(0)) {
+			if (_shootTimer >= SHOOT_INTERVAL)
+			{
+				if (Network_Manager::GetInstance()->isConnected()) {
+					SendShootDataToServer();
+					((CUIReloading*)m_GameInstance->GetGameObject("UI", 2))->Set_Reloading();
+				}
+
+				_shootTimer = 0.f;
 			}
 
-			_shootTimer = 0.f;
 		}
 
-	}
-
-	if (m_GameInstance->Key_Down('T')) {
-		Enter_Air_DropMode();
-	}
-	// 모드 활성 중이면 숫자 입력 처리
-	if (_airdropMode) {
-		Request_Air_Drop(); // 한 번 선택되면 Exit_AirDropMode()에서 빠져나감
+		if (m_GameInstance->Key_Down('T')) {
+			Enter_Air_DropMode();
+		}
+		// 모드 활성 중이면 숫자 입력 처리
+		if (_airdropMode) {
+			Request_Air_Drop(); // 한 번 선택되면 Exit_AirDropMode()에서 빠져나감
+		}
 	}
 }
 

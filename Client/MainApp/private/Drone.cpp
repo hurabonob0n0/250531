@@ -49,7 +49,7 @@ void CDrone::Tick(float fTimeDelta)
 
     //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 
-    if (_myDrone) {
+    if (_myDrone&&Network_Manager::GetInstance()->MyPosMode != POS_DRIVER) {
         if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
             Update_Speed_and_Rot(fTimeDelta);
             Update_Rot_and_Pos(fTimeDelta);
@@ -200,7 +200,7 @@ void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
 
 void CDrone::SetOtherDroneMat(float PosX, float PosY,float PosZ, float Yaw, float Roll, float pitch)
 {
-    if (!_myDrone) {
+    if (!_myDrone||Network_Manager::GetInstance()->MyPosMode == POS_DRIVER) {
         m_vPos = { PosX , PosY, PosZ, 1.f };
         m_fYawRot = Yaw;
         m_fRollRot = Roll;

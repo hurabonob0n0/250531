@@ -482,9 +482,10 @@ void ClientPacketHandler::Handle_S_RESPAWN(BYTE* buffer, int32 len)
 		uint8 TankIndex;
 		br >> header;
 		br >> TankIndex;
-		if(Network_Manager::GetInstance()->MyPosMode == POS_POSU)
+		if (Network_Manager::GetInstance()->MyPosMode == POS_POSU) {
 			dynamic_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", TankIndex))->setRespawnForPosinMode();
-		//add UI
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI", 6)))->set_render_off();
+		}
 	});
 
 
@@ -592,7 +593,7 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 			uint8 myDroneIndex = Network_Manager::GetInstance()->GetMyTankIndex();
 			 
 			Client::CDrone* drone = dynamic_cast<Client::CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", static_cast<int>(DroneIndex)));
-			if (DroneIndex != myDroneIndex)
+			if (DroneIndex != myDroneIndex || Network_Manager::GetInstance()->MyPosMode == POS_DRIVER)
 			{
 				if (drone)
 				{

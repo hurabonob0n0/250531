@@ -23,7 +23,7 @@ HRESULT CCamera_Drone::Initialize_Prototype()
 HRESULT CCamera_Drone::Initialize(void* pArg)
 {
 	__super::Initialize(pArg);
-
+	m_PS = FPS;
 	Set_RenderGroup(CRenderer::RG_PRIORITY);
 
 	m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
@@ -69,11 +69,13 @@ void CCamera_Drone::Tick(float fTimeDelta)
 			SetDroneRender(true);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
 			CStateMgr::Set_GameMode(GM_Drone);
+			m_PS = FPS;
 		}
 		else if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
 			SetDroneRender(false);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
 			CStateMgr::Set_GameMode(GM_FPS);
+			m_PS = FPS;
 		}
 	}
 
