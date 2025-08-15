@@ -4,7 +4,7 @@
 
 #ifdef _DEBUG
 #pragma comment(lib, "Debug\\ServerCore.lib")
-#pragma comment(lib, "Debug\\fmodL_vc.lib")
+//#pragma comment(lib, "Debug\\fmodL_vc.lib")
 #else
 #pragma comment(lib, "Release\\ServerCore.lib")
 #endif

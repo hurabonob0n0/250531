@@ -23,10 +23,19 @@ public:
 	virtual void Render();
 
 public:
+	void Set_World_Identity();
+
+public:
+	void Set_On_CBBinding();
+
+public:
 	void Set_Number(int num) {
 		m_Number = num;
 		m_TexCoordTransformCom->Identity();
-		__super::Set_TexPos(0.1f * m_Number, 0.f);
+
+		int calcNum = (m_Number == 0) ? 10 : m_Number;
+
+		__super::Set_TexPos(0.1f * (calcNum - 1), 0.f);
 		__super::Set_TexScale(0.1f, 1.f);
 	}
 

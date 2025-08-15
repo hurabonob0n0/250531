@@ -40,18 +40,28 @@ HRESULT CUINumber::Initialize(void* pArg)
 
 void CUINumber::Tick(float fTimeDelta)
 {
-    __super::Tick(fTimeDelta);
+    //__super::Tick(fTimeDelta);
 }
 
 void CUINumber::LateTick(float fTimeDelta)
 {
-    __super::LateTick(fTimeDelta);
+    //__super::LateTick(fTimeDelta);
 }
 
 void CUINumber::Render()
 {
     __super::Render();
     m_VIBuffer->Render();
+}
+
+void CUINumber::Set_World_Identity()
+{
+    m_TransformCom->Identity();
+}
+
+void CUINumber::Set_On_CBBinding()
+{
+    m_CBBinding->Set_World_TexCoord_And_Update(m_TransformCom,m_TexCoordTransformCom);
 }
 
 void CUINumber::Free()

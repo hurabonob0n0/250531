@@ -25,6 +25,7 @@
 #include "UI_DEFEAT.h"
 #include "UI_VICTORY.h"
 #include "FMOD_Manager.h"
+#include "UITime.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -147,7 +148,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("UIAirDrop", CUI_AirDrop::Create());
 	m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
 	m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
-
+	m_GameInstance->Add_PrototypeObject("UITime", CUITime::Create());
 
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
@@ -319,7 +320,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	//TODOUI -> (Drone모드) -> FOLLW TANK UI, Drone화면UI, Drone모드에서 탱크 조준UI 지우기
 
 	m_GameInstance->AddObject("UICrossHair", "UI", nullptr);
-	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
 	m_GameInstance->AddObject("UIReloading", "UI", nullptr);
 	m_GameInstance->AddObject("UIKill", "UI", nullptr);
 	m_GameInstance->AddObject("UIDamaged", "UI", nullptr); //TODOUI Damaged와 Kill UI 줄이고, 이미지가 서로 바뀌어야 함
@@ -329,6 +329,16 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIAirDrop", "UI", nullptr);
 	m_GameInstance->AddObject("VictoryUI", "UI", nullptr);
 	m_GameInstance->AddObject("DefeatUI", "UI", nullptr);
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr); // 10	min
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 1	min
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 10	sec
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 1	sec
+	m_GameInstance->AddObject("UITime", "UI", nullptr);
+
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 100	hp
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 10	hp
+	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 1	hp
+	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
