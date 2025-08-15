@@ -1027,12 +1027,40 @@ void CTank::SendShootDataToServer()
 	_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
 	float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	_matrix Posinmat = m_VIBuffer->Get_TransformMatrix(50);
-	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP)* 2.f;
-	_vector vDir = XMVector3Transform(XMVector3Transform(XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK)),
-		XMMatrixRotationY( XMConvertToRadians(m_fPotapRotation - XMConvertToDegrees(yaw)))),
-		XMMatrixRotationX(XMConvertToRadians(m_fPosinRotation)));
+	//_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP)* 2.f;
+	//_vector vDir = XMVector3Transform(XMVector3Transform(XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK)),
+	//	XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_UP),  XMConvertToRadians(m_fPotapRotation - XMConvertToDegrees(yaw)))),
+	//	XMMatrixRotationX(/*m_TransformCom->Get_State(CTransform::STATE_RIGHT), */XMConvertToRadians(m_fPosinRotation)));
 
+	//_float3 fPos, fDir;
+	//XMStoreFloat3(&fPos, vPos);
+	//XMStoreFloat3(&fDir, vDir);
+
+	// 발사 시작 위치 계산 (기존과 동일)
+
+
+	// 1. 기준이 될 탱크의 순수 전방 벡터를 가져옵니다.
+	_vector vBaseLook = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));
+
+	// 2. 포탑의 좌우 회전(Yaw) 행렬을 만듭니다.
+	_matrix matYaw = XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_UP),
+		XMConvertToRadians(m_fPotapRotation - XMConvertToDegrees(yaw)));
+
+	// 3. 포신의 상하 회전(Pitch) 행렬을 만듭니다.
+	_matrix matPitch = XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_RIGHT),
+		XMConvertToRadians(m_fPosinRotation));
+
+	// 4. 최종 회전 행렬 계산 (중요: Pitch를 먼저 곱하고 Yaw를 곱합니다)
+	// 로컬 축 기준의 Pitch 변환이 먼저 적용되고, 그 결과가 Yaw 변환됩니다.
+	_matrix matTotalRotation = matPitch * matYaw;
+
+	// 5. 최종 방향 벡터를 계산합니다.
+	// 방향 벡터에는 이동(Translation) 정보가 포함되면 안 되므로 XMVector3TransformNormal을 사용하는 것이 더 안전합니다.
+	_vector vDir = XMVector3TransformNormal(vBaseLook, matTotalRotation);
+
+	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP) * 1.25f + vDir * 5.f;
+
+	// 최종 결과를 _float3로 저장 (기존과 동일)
 	_float3 fPos, fDir;
 	XMStoreFloat3(&fPos, vPos);
 	XMStoreFloat3(&fDir, vDir);
