@@ -17,7 +17,7 @@
 #include "UI_VICTORY.h"
 #include "BulletPath.h"
 #include "Zet.h"
-
+#include "FMOD_Manager.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -102,6 +102,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 
 	case S_AIRDROP_INDEX:
 		Handle_S_AIRDROP(buffer, len);
+		break;
+	case S_TANK_RESPAWN:
+		Handle_S_RESPAWN(buffer, len);
 		break;
 	default:
 		break;
@@ -316,6 +319,16 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 		Hit_Matrix.r[3] = hitPos;
 
 		CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		AudioVec3 p{ X, Y, Z };
+		AudioVec3 v{ 0, 0, 0 };
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play3D_ReturnChannel("Explosion", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+			float pitch = 0.97f + (rand() / (float)RAND_MAX) * (1.03f - 0.97f); // 0.97~1.03
+			ch->setPitch(pitch);
+		}
+
 		});
 }
 
@@ -342,6 +355,17 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
 		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
 		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
+
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		AudioVec3 p{ PosX, PosY, PosZ };
+		AudioVec3 v{ 0, 0, 0 };
+		// 약간의 피치 랜덤으로 더 자연스럽게
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+			float pitch = 0.98f + (rand() / (float)RAND_MAX) * (1.02f - 0.98f); // 0.98~1.02
+			ch->setPitch(pitch);
+		}
 
 		});
 }
@@ -468,6 +492,26 @@ void ClientPacketHandler::Handle_S_AIRDROP(BYTE* buffer, int32 len)
 
 }
 
+void ClientPacketHandler::Handle_S_RESPAWN(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		uint8 TankIndex;
+		br >> header;
+		br >> TankIndex;
+		if (Network_Manager::GetInstance()->MyPosMode == POS_POSU) {
+			dynamic_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", TankIndex))->setRespawnForPosinMode();
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI", 6)))->set_render_off();
+		}
+	});
+
+
+}
+
 void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
 {
 
@@ -536,7 +580,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 					tank->Set_DriverModeData(potapAngle, posinAngle);
 				}
 				else {
-				
+				//마스터 포지션
 				}
 			}
 
@@ -570,7 +614,7 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 			uint8 myDroneIndex = Network_Manager::GetInstance()->GetMyTankIndex();
 			 
 			Client::CDrone* drone = dynamic_cast<Client::CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", static_cast<int>(DroneIndex)));
-			if (DroneIndex != myDroneIndex)
+			if (DroneIndex != myDroneIndex || Network_Manager::GetInstance()->MyPosMode == POS_DRIVER)
 			{
 				if (drone)
 				{

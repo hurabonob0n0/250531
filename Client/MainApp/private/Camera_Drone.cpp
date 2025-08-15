@@ -23,7 +23,7 @@ HRESULT CCamera_Drone::Initialize_Prototype()
 HRESULT CCamera_Drone::Initialize(void* pArg)
 {
 	__super::Initialize(pArg);
-
+	m_PS = FPS;
 	Set_RenderGroup(CRenderer::RG_PRIORITY);
 
 	m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
@@ -61,7 +61,7 @@ HRESULT CCamera_Drone::Initialize(void* pArg)
 
 void CCamera_Drone::Tick(float fTimeDelta)
 {
-	//TODO ¿©±â Å° º¯°æ Y + DroneÀÇ 3ÀÎÄªÀº ¹ö¸®±â
+	//TODO ì—¬ê¸° í‚¤ ë³€ê²½ Y + Droneì˜ 3ì¸ì¹­ì€ ë²„ë¦¬ê¸°
 	//
 	if (m_GameInstance->Key_Down('Y')) {
 
@@ -69,11 +69,13 @@ void CCamera_Drone::Tick(float fTimeDelta)
 			SetDroneRender(true);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
 			CStateMgr::Set_GameMode(GM_Drone);
+			m_PS = FPS;
 		}
 		else if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
 			SetDroneRender(false);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
 			CStateMgr::Set_GameMode(GM_FPS);
+			m_PS = FPS;
 		}
 	}
 
@@ -83,6 +85,7 @@ void CCamera_Drone::Tick(float fTimeDelta)
 
 	if (!m_isPaused) {
 		
+
 		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
 			if (m_GameInstance->Mouse_Down(1))
 			{

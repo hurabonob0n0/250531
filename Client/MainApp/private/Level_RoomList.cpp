@@ -20,6 +20,7 @@ Level_RoomList::~Level_RoomList()
 void Level_RoomList::Initialize()
 {
 	if(!Network_Manager::GetInstance()->isConnected())
+
 		Network_Manager::GetInstance()->Initialize(L"127.0.0.1", 7777);
 
 	Object_Manager::Get_Instance()->LevelChange = true;
@@ -86,19 +87,19 @@ void Level_RoomList::Render(HDC hDC)
 
 	if (CurRoomData != nullptr)
 	{
-		// Ãâ·Â À§Ä¡ (¿À¸¥ÂÊ »ó´Ü ROOM INFO ¹Ú½º ¾È)
+		// ì¶œë ¥ ìœ„ì¹˜ (ì˜¤ë¥¸ìª½ ìƒë‹¨ ROOM INFO ë°•ìŠ¤ ì•ˆ)
 		int infoX = 700;
 		int infoY = 175;
 
 		wchar_t szBuffer[128] = {};
 
-		swprintf_s(szBuffer, L"¹æ ¹øÈ£ : %d", CurRoomData->RoomID);
+		swprintf_s(szBuffer, L"ë°© ë²ˆí˜¸ : %d", CurRoomData->RoomID);
 		TextOut(hDC, infoX, infoY, szBuffer, wcslen(szBuffer));
 
-		swprintf_s(szBuffer, L"ÀÎ¿ø : %d / %d", CurRoomData->CurPlayer, CurRoomData->MaxPlayer);
+		swprintf_s(szBuffer, L"ì¸ì› : %d / %d", CurRoomData->CurPlayer, CurRoomData->MaxPlayer);
 		TextOut(hDC, infoX, infoY + 30, szBuffer, wcslen(szBuffer));
 
-		swprintf_s(szBuffer, L"»óÅÂ : %s", CurRoomData->isActive ? L"È°¼ºÈ­" : L"ºñÈ°¼ºÈ­");
+		swprintf_s(szBuffer, L"ìƒíƒœ : %s", CurRoomData->isActive ? L"í™œì„±í™”" : L"ë¹„í™œì„±í™”");
 		TextOut(hDC, infoX, infoY + 60, szBuffer, wcslen(szBuffer));
 	}
 }
@@ -132,7 +133,7 @@ void Level_RoomList::Set_RoomList()
 
 	//for (size_t i = 0; i < m_vecRoomBars.size(); ++i)
 	//{
-	//	// RoomListBar °´Ã¼ »ı¼º
+	//	// RoomListBar ê°ì²´ ìƒì„±
 	//	GameObject* pBar = CAbstractFactory<RoomListBar>::Create(startX, startY + i * gapY);
 	//	dynamic_cast<RoomListBar*>(pBar)->SetRoomData(m_vecRoomBars[i]);
 	//	Object_Manager::Get_Instance()->Add_Object(OBJ_ROOMLISTBAR, pBar);
@@ -145,7 +146,7 @@ void Level_RoomList::Set_RoomList()
 	const float startY = 190.f;
 	const float gapY = 63.f;
 
-	m_vecRoomRects.clear(); // Å¬¸¯ ¿µ¿ª ÃÊ±âÈ­
+	m_vecRoomRects.clear(); // í´ë¦­ ì˜ì—­ ì´ˆê¸°í™”
 
 	for (size_t i = 0, visualIdx = 0; i < m_vecRoomBars.size(); ++i)
 	{
@@ -156,7 +157,7 @@ void Level_RoomList::Set_RoomList()
 		dynamic_cast<RoomListBar*>(pBar)->SetRoomData(m_vecRoomBars[i]);
 		Object_Manager::Get_Instance()->Add_Object(OBJ_ROOMLISTBAR, pBar);
 
-		// Å¬¸¯ ¿µ¿ª ÀúÀå
+		// í´ë¦­ ì˜ì—­ ì €ì¥
 		RECT rc = {
 			static_cast<LONG>(startX - 105),                // x - width/2
 			static_cast<LONG>(startY + visualIdx * gapY - 30), // y - height/2
