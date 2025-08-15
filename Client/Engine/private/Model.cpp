@@ -158,9 +158,19 @@ void CModel::Multiply_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
 	m_Bones[iMeshIndex]->Mul_TransformationMatrix(WorldMat);
 }
 
+void CModel::Set_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat)
+{
+	m_Meshes[iMeshIndex]->m_Bone->Set_CombinedMatrix(WorldMat);
+}
+
 _float4x4 CModel::Get_CombinedMatrix(_uint index)
 { 
 	return m_Meshes[index]->Get_CombinedMatrix(); 
+}
+
+_matrix CModel::Get_TransformMatrix(_uint index)
+{
+	return m_Meshes[index]->m_Bone->Get_TransformMatrix();
 }
 
 void CModel::Save_For_Tank_Bones()

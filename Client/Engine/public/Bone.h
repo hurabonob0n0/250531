@@ -28,6 +28,11 @@ public:
 		return m_CombindTransformationMatrix;
 	}
 
+	_matrix Get_TransformMatrix() {
+		_matrix transformMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
+		return transformMatrix;
+	}
+
 	_matrix Get_BoneMatrix() const {
 		return XMLoadFloat4x4(&m_TransformationMatrix);
 	}
