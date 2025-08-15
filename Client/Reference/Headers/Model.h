@@ -39,7 +39,9 @@ public:
 	void Multiply_Mesh_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
 	void Set_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
 	void Multiply_Transform_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
+	void Set_Combined_Matrix(_uint iMeshIndex, _fmatrix WorldMat = XMMatrixIdentity());
 	_float4x4 Get_CombinedMatrix(_uint index);
+	_matrix Get_TransformMatrix(_uint index);
 
 public:
 	void Save_For_Tank_Bones();

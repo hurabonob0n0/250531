@@ -93,20 +93,20 @@ void CCamera_Drone::Tick(float fTimeDelta)
 				m_PS = FPS;
 			}
 		}
+		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+			switch (m_PS)
+			{
+			case Client::CCamera_Drone::FPS:
+				Tick_For_FPS(fTimeDelta);
+				break;
+			case Client::CCamera_Drone::TPS:
+				Tick_For_TPS(fTimeDelta);
+				break;
 
-		switch (m_PS)
-		{
-		case Client::CCamera_Drone::FPS:
-			Tick_For_FPS(fTimeDelta);
-			break;
-		case Client::CCamera_Drone::TPS:
-			Tick_For_TPS(fTimeDelta);
-			break;
-
-		default:
-			break;
+			default:
+				break;
+			}
 		}
-
 	}
 
 }

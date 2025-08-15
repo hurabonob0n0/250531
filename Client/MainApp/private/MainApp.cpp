@@ -253,6 +253,9 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		m_GameInstance->AddObject("Tank", "Tank", &mat1);
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 
+		mat1 = XMMatrixTranslation(20.f, 40.f, 20.f);
+		m_GameInstance->AddObject("Tank", "Tank", &mat1);
+
 
 		_matrix mat3 = XMMatrixTranslation(-2048.f, 90.f, -2048.f);
 		m_GameInstance->AddObject("Drone", "Drone", &mat3);

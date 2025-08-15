@@ -20,6 +20,8 @@ public:
 	}
 	_float4x4 Get_CombinedMatrix();
 
+	//_float4x4 Get_TransformMatrix() { return m_Bone->Get_TransformMatrix(); }
+
 public:
 	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);

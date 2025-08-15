@@ -234,7 +234,7 @@ void CTank::Render()
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget==CONTROL_POSIN) {
 
-				Render_For_Posin_Image();
+				//Render_For_Posin_Image();
 			}
 			else
 			{
@@ -256,7 +256,7 @@ void CTank::Render()
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
 
-				Render_For_Posin_Image();
+				//Render_For_Posin_Image();
 			}
 			else {
 				for (int i = 0; i < 55; ++i)
@@ -804,45 +804,31 @@ void CTank::Set_Tank_Element_from_ServerData()
 	m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
 	//m_VIBuffer->Set_Transform_Matrix(2, matPosin); // Posin
 
-	m_VIBuffer->Multiply_Transform_Matrix(26 + 3, m_TransformCom->Get_WorldMatrix()); // Left Second Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(28 + 3, m_TransformCom->Get_WorldMatrix()); // Left Third Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(24 + 3, m_TransformCom->Get_WorldMatrix()); // Left First Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(30 + 3, m_TransformCom->Get_WorldMatrix()); // Left Fourth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(32 + 3, m_TransformCom->Get_WorldMatrix()); // Left Fifth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(34 + 3, m_TransformCom->Get_WorldMatrix()); // Left Sixth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(36 + 3, m_TransformCom->Get_WorldMatrix()); // Left Seventh Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(46 + 3, m_TransformCom->Get_WorldMatrix()); // Right First Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(37 + 3, m_TransformCom->Get_WorldMatrix()); // Right Second Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(35 + 3, m_TransformCom->Get_WorldMatrix()); // Right Third Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(33 + 3, m_TransformCom->Get_WorldMatrix()); // Right Fourth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(44 + 3, m_TransformCom->Get_WorldMatrix()); // Right Fifth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(48 + 3, m_TransformCom->Get_WorldMatrix()); // Right Sixth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(42 + 3, m_TransformCom->Get_WorldMatrix()); // Right Seventh Wheel
-
 	//여기서 받은 데이터로 매트릭스 바꿔줌
 	m_VIBuffer->Invalidate_Bones();
 
-	m_VIBuffer->Multiply_Transform_Matrix(26 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Second Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(28 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Third Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(24 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left First Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(30 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Fourth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(32 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Fifth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(34 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Sixth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(36 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Left Seventh Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(46 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right First Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(37 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Second Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(35 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Third Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(33 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Fourth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(44 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Fifth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(48 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Sixth Wheel
-	m_VIBuffer->Multiply_Transform_Matrix(42 + 3, m_TransformCom->Get_WorldMatrix_Inverse()); // Right Seventh Wheel
+	m_VIBuffer->Set_Combined_Matrix(26, m_VIBuffer->Get_TransformMatrix(26) * m_TransformCom->Get_WorldMatrix()); // Left Second Wheel
+	m_VIBuffer->Set_Combined_Matrix(28, m_VIBuffer->Get_TransformMatrix(28) * m_TransformCom->Get_WorldMatrix()); // Left Third Wheel
+	m_VIBuffer->Set_Combined_Matrix(24, m_VIBuffer->Get_TransformMatrix(24) * m_TransformCom->Get_WorldMatrix()); // Left First Wheel
+	m_VIBuffer->Set_Combined_Matrix(30, m_VIBuffer->Get_TransformMatrix(30) * m_TransformCom->Get_WorldMatrix()); // Left Fourth Wheel
+	m_VIBuffer->Set_Combined_Matrix(32, m_VIBuffer->Get_TransformMatrix(32) * m_TransformCom->Get_WorldMatrix()); // Left Fifth Wheel
+	m_VIBuffer->Set_Combined_Matrix(34, m_VIBuffer->Get_TransformMatrix(34) * m_TransformCom->Get_WorldMatrix()); // Left Sixth Wheel
+	m_VIBuffer->Set_Combined_Matrix(36, m_VIBuffer->Get_TransformMatrix(36) * m_TransformCom->Get_WorldMatrix()); // Left Seventh Wheel
+	m_VIBuffer->Set_Combined_Matrix(46, m_VIBuffer->Get_TransformMatrix(46) * m_TransformCom->Get_WorldMatrix()); // Right First Wheel
+	m_VIBuffer->Set_Combined_Matrix(37, m_VIBuffer->Get_TransformMatrix(37) * m_TransformCom->Get_WorldMatrix()); // Right Second Wheel
+	m_VIBuffer->Set_Combined_Matrix(35, m_VIBuffer->Get_TransformMatrix(35) * m_TransformCom->Get_WorldMatrix()); // Right Third Wheel
+	m_VIBuffer->Set_Combined_Matrix(33, m_VIBuffer->Get_TransformMatrix(33) * m_TransformCom->Get_WorldMatrix()); // Right Fourth Wheel
+	m_VIBuffer->Set_Combined_Matrix(44, m_VIBuffer->Get_TransformMatrix(44) * m_TransformCom->Get_WorldMatrix()); // Right Fifth Wheel
+	m_VIBuffer->Set_Combined_Matrix(48, m_VIBuffer->Get_TransformMatrix(48) * m_TransformCom->Get_WorldMatrix()); // Right Sixth Wheel
+	m_VIBuffer->Set_Combined_Matrix(42, m_VIBuffer->Get_TransformMatrix(42) * m_TransformCom->Get_WorldMatrix()); // Right Seventh Wheel
 
+	//i == 24 || i == 26 || i == 28 || i == 30 || i == 32 || i == 34 || i == 36 || i == 46 || i == 37 || i == 35 || i == 33 || i == 44 || i == 48 || i == 42
 
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
-	m_VIBuffer->Update();
+	((CModel*)m_VIBuffer)->Update();
 }
 
 void CTank::ErrorRespawn()
@@ -894,10 +880,14 @@ void CTank::SendPosData() {
 
 void CTank::SendShootDataToServer()
 {
-	_float4x4 TempMat;
-	XMStoreFloat4x4(&TempMat, ShotMatrix);
-	_vector vPos = ShotMatrix.r[3];
-	_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
+	_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
+	float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
+
+	_matrix Posinmat = m_VIBuffer->Get_TransformMatrix(50);
+	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP)* 2.f;
+	_vector vDir = XMVector3Transform(XMVector3Transform(XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK)),
+		XMMatrixRotationY( XMConvertToRadians(m_fPotapRotation - XMConvertToDegrees(yaw)))),
+		XMMatrixRotationX(XMConvertToRadians(m_fPosinRotation)));
 
 	_float3 fPos, fDir;
 	XMStoreFloat3(&fPos, vPos);
@@ -912,8 +902,6 @@ void CTank::SendShootDataToServer()
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
-
-
 }
 
 void CTank::PushBulletMatrix(const _matrix& mat)
