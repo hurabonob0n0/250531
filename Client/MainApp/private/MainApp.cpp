@@ -300,6 +300,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 		CTank* tank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0));
 		_matrix mat3 = XMMatrixTranslation(10.f, 80.f, 10.f);
+
 		m_GameInstance->AddObject("Drone", "Drone", &mat3);
 		dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", 0))->Set_My_Drone();
 		XMFLOAT4X4 worldFloat4x4;

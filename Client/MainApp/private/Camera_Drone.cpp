@@ -61,7 +61,7 @@ HRESULT CCamera_Drone::Initialize(void* pArg)
 
 void CCamera_Drone::Tick(float fTimeDelta)
 {
-	//TODO ¿©±â Å° º¯°æ Y + DroneÀÇ 3ÀÎÄªÀº ¹ö¸®±â
+	//TODO ì—¬ê¸° í‚¤ ë³€ê²½ Y + Droneì˜ 3ì¸ì¹­ì€ ë²„ë¦¬ê¸°
 	//
 	if (m_GameInstance->Key_Down('Y')) {
 
@@ -85,16 +85,18 @@ void CCamera_Drone::Tick(float fTimeDelta)
 
 	if (!m_isPaused) {
 		
-		//if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
-		//	if (m_GameInstance->Mouse_Down(1))
-		//	{
-		//	if (m_PS == FPS)
-		//		m_PS = TPS;
 
-		//	else if (m_PS == TPS)
-		//		m_PS = FPS;
-		//	}
-		//}
+
+		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
+			if (m_GameInstance->Mouse_Down(1))
+			{
+			if (m_PS == FPS)
+				m_PS = TPS;
+
+			else if (m_PS == TPS)
+				m_PS = FPS;
+			}
+		}
 		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
 			switch (m_PS)
 			{
