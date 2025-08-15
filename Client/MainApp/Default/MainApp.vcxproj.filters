@@ -160,6 +160,12 @@
     <Filter Include="01.DefaultObj\UI\UIVICTORY">
       <UniqueIdentifier>{f3acf15f-4bd3-417b-942f-4ff553252d25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96.ForSound">
+      <UniqueIdentifier>{1ed05ea0-c998-4cdb-91ec-f13835008f38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.ForSound\FMod_Manager">
+      <UniqueIdentifier>{dc5d6c9d-cb4d-4837-9f90-18f1e60faaae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -303,14 +309,17 @@
     <ClInclude Include="..\public\AirDrop.h">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\UI_DEFEAT.h">
-      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\UI_VICTORY.h">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UISkillBox.h">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_DEFEAT.h">
+      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FMOD_Manager.h">
+      <Filter>96.ForSound\FMod_Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -446,14 +455,17 @@
     <ClCompile Include="..\private\AirDrop.cpp">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\UI_DEFEAT.cpp">
-      <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\UI_VICTORY.cpp">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UISkillBox.cpp">
       <Filter>01.DefaultObj\UI\UIAirDrop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_DEFEAT.cpp">
+      <Filter>01.DefaultObj\UI\UIDEFEAT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FMOD_Manager.cpp">
+      <Filter>96.ForSound\FMod_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

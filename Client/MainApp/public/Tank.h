@@ -9,6 +9,8 @@ class CBBinding;
 class CVIBuffer_Quad;
 END
 
+namespace FMOD { class Channel; }
+class FMOD_Manager;
 
 BEGIN(Client)
 
@@ -171,6 +173,38 @@ public:
 	void Free() override;
 	static CTank* Create();
 	CRenderObject* Clone(void* pArg);
+
+
+
+
+	/*for Sound*/
+public:
+
+	void OnSpawnAudio();           // 루프 재생 시작(채널 생성)
+	void OnDespawnAudio();         // 루프 정리
+	void UpdateAudio(float dt);    // 매 프레임 볼륨/피치/3D 업데이트
+	void SetRpmInput01(float v) { _rpmInput = v < 0 ? 0.f : (v > 1 ? 1.f : v); }
+	void SetIsMoving(bool b) { _isMoving = b; }
+
+private:
+	FMOD::Channel* _engineCh = nullptr; // 엔진 루프
+	FMOD::Channel* _trackCh = nullptr; // 궤도 루프
+	float _rpmInput = 0.f;              // 0~1, 키 인풋 기반 목표값
+	float _rpmSm = 0.f;              // 0~1, 스무딩된 RPM
+	bool  _isMoving = false;            // 움직임 여부(키 인풋 기반)
+
+	// [튜닝값] 필요 시 조정
+	const float _rpmRise = 1.7f;      // RPM 상승 속도(초당)
+	const float _rpmFall = 2.0f;      // RPM 하강 속도(초당)
+	const float _engineVolBase = 0.35f; // 엔진 최소 볼륨
+	const float _engineVolGain = 0.45f; // 엔진 RPM 볼륨 가산
+	const float _enginePitchLo = 0.95f; // 엔진 피치 하한
+	const float _enginePitchHi = 1.30f; // 엔진 피치 상한
+	const float _trackVolBase = 0.0f;  // 궤도 최소 볼륨(정지=0)
+	const float _trackVolGain = 0.9; // 궤도 RPM 볼륨 가산
+	const float _trackPitchLo = 0.95f; // 궤도 피치 하한
+	const float _trackPitchHi = 1.15f; // 궤도 피치 상한
+	float _trackMixGain = 0.3f;
 };
 
 END

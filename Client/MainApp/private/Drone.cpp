@@ -4,6 +4,7 @@
 #include "ClientPacketHandler.h"
 #include "ServiceManager.h"
 #include "Network_Manager.h"
+#include "FMOD_Manager.h"
 
 CDrone::CDrone() : CRenderObject()
 {
@@ -40,6 +41,14 @@ HRESULT CDrone::Initialize(void* pArg)
     m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("DroneMat", MD));
     m_CBBindingCom->Set_TexCoordMatrix(XMMatrixIdentity());
 
+ 
+
+    AudioVec3 startPos{ m_vPos.m128_f32[0], m_vPos.m128_f32[1], m_vPos.m128_f32[2] };
+    AudioVec3 vel{ 0,0,0 };
+    FMOD_Manager::Get_Instance()->Play3D_ReturnChannel("Drone_Fly_Sound", startPos, vel, &m_pFlyChannel, 1.0f, false);
+
+ 
+
     return S_OK;
 }
 
@@ -49,17 +58,41 @@ void CDrone::Tick(float fTimeDelta)
 
     //m_TransformCom->Go_Straight(fTimeDelta * 10.f);
 
-    if (_myDrone&&Network_Manager::GetInstance()->MyPosMode != POS_DRIVER) {
-        if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
-            Update_Speed_and_Rot(fTimeDelta);
-            Update_Rot_and_Pos(fTimeDelta);
+    if (Network_Manager::GetInstance()->isConnected()) {
 
-            if (Network_Manager::GetInstance()->isConnected())
-                SendMyPosToServer();
+        if (_myDrone && Network_Manager::GetInstance()->MyPosMode != POS_DRIVER) {
+            if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+                Update_Speed_and_Rot(fTimeDelta);
+                Update_Rot_and_Pos(fTimeDelta);
+
+                if (Network_Manager::GetInstance()->isConnected())
+                    SendMyPosToServer();
+            }
+        }
+        else {
+            Update_Rot_and_Pos(fTimeDelta);
         }
     }
     else {
+
+
+        if(_myDrone && Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE)
+        Update_Speed_and_Rot(fTimeDelta);
         Update_Rot_and_Pos(fTimeDelta);
+
+
+    }
+
+   
+
+    if (m_pFlyChannel) {
+        AudioVec3 pos{
+            XMVectorGetX(m_vPos),
+            XMVectorGetY(m_vPos),
+            XMVectorGetZ(m_vPos)
+        };
+        AudioVec3 vel{ 0,0,0 }; // 필요시 속도 계산해서 전달
+        m_pFlyChannel->set3DAttributes((FMOD_VECTOR*)&pos, (FMOD_VECTOR*)&vel);
     }
 
 }
@@ -168,6 +201,12 @@ void CDrone::Update_Rot_and_Pos(float fTimeDelta)
 
 void CDrone::Free()
 {
+
+    if (m_pFlyChannel) {
+        m_pFlyChannel->stop();
+        m_pFlyChannel = nullptr;
+    }
+
     Safe_Release(m_VIBuffer);
     Safe_Release(m_CBBindingCom);
 
