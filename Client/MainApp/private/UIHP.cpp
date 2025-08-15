@@ -2,6 +2,7 @@
 #include "UIHP.h"
 #include "GameInstance.h"
 #include "Network_Manager.h"
+#include "UINumber.h"
 
 CUIHP::CUIHP() : CUIObject()
 {
@@ -38,7 +39,9 @@ HRESULT CUIHP::Initialize(void* pArg)
     __super::Set_Scale(0.75f, 0.1f);
     __super::Set_Pos(480, 100.f);
 
-
+    _100Hp =    (CUINumber*)m_GameInstance->GetGameObject("UINumber", 4);
+    _10Hp =     (CUINumber*)m_GameInstance->GetGameObject("UINumber", 5);
+    _1Hp =      (CUINumber*)m_GameInstance->GetGameObject("UINumber", 6);
 
     return S_OK;
 }
@@ -59,11 +62,42 @@ void CUIHP::Render()
 {
     __super::Render();
     m_VIBuffer->Render();
+
+    int Hp = Network_Manager::GetInstance()->MyHp;
+    int hundred = Hp / 100;
+    Hp -= 100 * hundred;
+    int ten = Hp / 10;
+    Hp -= Hp * ten;
+    int one = Hp;
+
+    _100Hp->Set_World_Identity();
+    _100Hp->Set_Pos(180, 100.f);
+    _100Hp->Set_Scale(0.035f, 0.035f * 2.2f);
+    _100Hp->Set_Number(hundred);
+    _100Hp->Set_On_CBBinding();
+    _100Hp->Render();
+
+    _10Hp->Set_World_Identity();
+    _10Hp->Set_Pos(205, 100.f);
+    _10Hp->Set_Scale(0.035f, 0.035f * 2.2f);
+    _10Hp->Set_Number(ten);
+    _10Hp->Set_On_CBBinding();
+    _10Hp->Render();
+
+    _1Hp->Set_World_Identity();
+    _1Hp->Set_Pos(230, 100.f);
+    _1Hp->Set_Scale(0.035f, 0.035f * 2.2f);
+    _1Hp->Set_Number(one);
+    _1Hp->Set_On_CBBinding();
+    _1Hp->Render();
 }
 
 void CUIHP::Free()
 {
     Safe_Release(m_VIBuffer);
+    Safe_Release(_100Hp);
+    Safe_Release(_10Hp);
+    Safe_Release(_1Hp);
 
     __super::Free();
 }

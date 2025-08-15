@@ -86,6 +86,7 @@ void CCamera_Drone::Tick(float fTimeDelta)
 	if (!m_isPaused) {
 		
 
+
 		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
 			if (m_GameInstance->Mouse_Down(1))
 			{

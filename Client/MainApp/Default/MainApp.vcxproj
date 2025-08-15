@@ -103,7 +103,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,7 +124,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,7 +141,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -162,7 +162,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -230,10 +230,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\UITime.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\UI_DEFEAT.h" />
     <ClInclude Include="..\public\UI_VICTORY.h" />
@@ -307,10 +307,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\UITime.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\UI_DEFEAT.cpp" />
     <ClCompile Include="..\private\UI_VICTORY.cpp" />

@@ -1,10 +1,10 @@
 #pragma once
-#include "C:\Users\sangh\OneDrive\πŸ≈¡ »≠∏È\New\250531\Client\Reference\Headers\GameObject.h"
+#include "C:\Users\sangh\OneDrive\πŸ≈¡ »≠∏È\New\250531\Client\Reference\Headers\RenderObject.h"
 #include "UINumber.h"
 
 BEGIN(Client)
 
-class CUITime : public CGameObject
+class CUITime : public CRenderObject
 {
 public:
 	CUITime();
@@ -19,7 +19,7 @@ public:
 	virtual void Render();
 
 public:
-	void Update_Time();
+	void Update_Time(float fTimeDelta);
 
 private:
 	float fGameTime = 0.f;

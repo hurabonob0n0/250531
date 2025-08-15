@@ -23,9 +23,9 @@ VertexOut VS(VertexIn vin)
 {
     VertexOut vout;
 
-    vout.PosH = mul(mul(float4(vin.PosL, 1.0f), gWorld), gTexTransform);
-    //float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
-    vout.TexC = vin.TexC;
+    vout.PosH = mul(float4(vin.PosL, 1.0f), gWorld);
+    float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
+    vout.TexC = texC.xy;
     
     return vout;
 }
@@ -36,7 +36,9 @@ float4 PS(VertexOut pin) : SV_Target
     
     uint diffuseMapIndex = matData.DiffuseMapIndex;
     
-    float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC) /*+ float4(0.1f, 0.1f, 0.1f, 0.f)*/; /*float4(1.f, 1.f, 1.f, 1.f);*/
+    float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC);
+    
+    color.rgb = pow(color.rgb, 1.0 / 2.2);
     
     
    if (gObjPad0 == 2) // Á¡·ÉÁö

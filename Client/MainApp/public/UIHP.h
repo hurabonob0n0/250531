@@ -25,6 +25,9 @@ public:
 
 private:
 	CVIBuffer_Quad* m_VIBuffer;
+	class CUINumber* _100Hp;
+	class CUINumber* _10Hp;
+	class CUINumber* _1Hp;
 	
 private:
 	int HP = 100;
