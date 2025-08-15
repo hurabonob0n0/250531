@@ -182,6 +182,7 @@
     <ClInclude Include="..\public\Define.h" />
     <ClInclude Include="..\public\Drone.h" />
     <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\public\FMOD_Manager.h" />
     <ClInclude Include="..\public\GameLobby.h" />
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\Key_Manager.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="..\private\DefaultObj.cpp" />
     <ClCompile Include="..\private\Drone.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\private\FMOD_Manager.cpp" />
     <ClCompile Include="..\private\GameLobby.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\Key_Manager.cpp" />

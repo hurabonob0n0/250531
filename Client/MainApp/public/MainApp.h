@@ -7,6 +7,9 @@
 #include "MyPhysicsEngine.h"
 #include "StateMgr.h"
 
+
+
+
 BEGIN(Client)
 
 class CMainApp : public CBase
@@ -38,8 +41,11 @@ public://---For Server_Connect
 	void ConnectServer();
 
 	bool CanStart = false;
-
-
+	void UpdateFMODListener();
+	static void ExtractFMODPoseFromWorld(const DirectX::XMMATRIX& world,
+		FMOD_VECTOR& outPos,
+		FMOD_VECTOR& outForward,
+		FMOD_VECTOR& outUp);
 
 private:
 	HINSTANCE	m_hAppInst = nullptr;
@@ -65,6 +71,5 @@ private:
 public:
 	virtual void Free() override;
 };
-
 
 END

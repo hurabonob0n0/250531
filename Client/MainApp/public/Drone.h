@@ -7,6 +7,10 @@ class CMeshModel;
 class CBBinding;
 END
 
+
+namespace FMOD { class Channel; }
+class FMOD_Manager;
+
 BEGIN(Client)
 
 class CDrone : public CRenderObject
@@ -78,6 +82,8 @@ public:
 
 	void SetOtherDroneMat(float PosX, float PosY, float PosZ, float Yaw, float Roll, float pitch);
 	void SendMyPosToServer();
+
+	FMOD::Channel* m_pFlyChannel = nullptr;
 };
 
 END

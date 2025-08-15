@@ -4,6 +4,7 @@
 
 #ifdef _DEBUG
 #pragma comment(lib, "Debug\\ServerCore.lib")
+#pragma comment(lib, "Debug\\fmodL_vc.lib")
 #else
 #pragma comment(lib, "Release\\ServerCore.lib")
 #endif
@@ -23,6 +24,9 @@
 #include <chrono>
 #include <functional>
 #include <algorithm>
+
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
 /*--------------------------
 	For Server Connection

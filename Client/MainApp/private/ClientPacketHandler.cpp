@@ -17,7 +17,7 @@
 #include "UI_VICTORY.h"
 #include "BulletPath.h"
 #include "Zet.h"
-
+#include "FMOD_Manager.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -319,6 +319,16 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 		Hit_Matrix.r[3] = hitPos;
 
 		CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		AudioVec3 p{ X, Y, Z };
+		AudioVec3 v{ 0, 0, 0 };
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play3D_ReturnChannel("Explosion", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+			float pitch = 0.97f + (rand() / (float)RAND_MAX) * (1.03f - 0.97f); // 0.97~1.03
+			ch->setPitch(pitch);
+		}
+
 		});
 }
 
@@ -345,6 +355,17 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
 		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
 		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
+
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		AudioVec3 p{ PosX, PosY, PosZ };
+		AudioVec3 v{ 0, 0, 0 };
+		// 약간의 피치 랜덤으로 더 자연스럽게
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+			float pitch = 0.98f + (rand() / (float)RAND_MAX) * (1.02f - 0.98f); // 0.98~1.02
+			ch->setPitch(pitch);
+		}
 
 		});
 }

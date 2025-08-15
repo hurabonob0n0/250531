@@ -24,6 +24,7 @@
 #include "AirDrop.h"
 #include "UI_DEFEAT.h"
 #include "UI_VICTORY.h"
+#include "FMOD_Manager.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -45,6 +46,8 @@ IMPLEMENT_SINGLETON(CMainApp)
 bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd);
 LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 HWND g_hWnd;
+
+
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -153,6 +156,43 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Camera_Drone", CCamera_Drone::Create());
 	m_GameInstance->Add_PrototypeObject("BulletPath", CBulletPath::Create());
 	
+	auto* FM = FMOD_Manager::Get_Instance();
+	if (!FM->Initialize(512, /*distanceScale*/1.0f)) {
+		MessageBox(nullptr, L"FMOD init failed", L"Error", MB_OK);
+		return E_FAIL;
+	}
+
+
+	FM->LoadSound("Tank_Engine_Sound", "../bin/Sounds/Engine.wav",  true, true, true);
+	FM->LoadSound("Tank_Track_Sound", "../bin/Sounds/Track.wav",   true, true, true);
+
+	// 3D 원샷 = 발사/폭발
+	FM->LoadSound("Tank_Shot", "../bin/Sounds/CannonShot.wav", true, false, false);
+	FM->LoadSound("Explosion", "../bin/Sounds/WeaponHit.wav", true, false, false);
+
+	// 감쇠 세팅(필요에 맞게 조정)
+	FM->SetSound3DDistance("Tank_Engine_Sound", 3.0f, 70.0f);
+	FM->SetSound3DRolloff("Tank_Engine_Sound", AudioRolloff::Inverse);
+
+	FM->SetSound3DDistance("Tank_Track_Sound", 3.0f, 30.0f);
+	FM->SetSound3DRolloff("Tank_Track_Sound", AudioRolloff::Linear);
+
+	FM->SetSound3DDistance("Tank_Shot",3.0f, 20.0f);
+	FM->SetSound3DRolloff("Tank_Shot", AudioRolloff::Linear);
+
+	FM->SetSound3DDistance("Explosion", 7.0f, 200.0f);
+	FM->SetSound3DRolloff("Explosion", AudioRolloff::Inverse);
+
+
+
+	FM->LoadSound("Drone_Fly_Sound", "../bin/Sounds/DroneFly.wav", true, true, true);
+	FM->SetSound3DDistance("Drone_Fly_Sound", 3.0f, 70.0f);
+	FM->SetSound3DRolloff("Drone_Fly_Sound", AudioRolloff::Inverse);
+
+
+
+
+
 	m_GameInstance->AddObject("Terrain", "Terrain", nullptr);
 
 	if (Network_Manager::GetInstance()->isConnected()) {
@@ -255,11 +295,15 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		_matrix mat1 = XMMatrixTranslation(10.f, 40.f, 10.f);
 		m_GameInstance->AddObject("Tank", "Tank", &mat1);
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
+		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->Set_MyPos(10.f, 40.f, 10.f);
 
-
-		_matrix mat3 = XMMatrixTranslation(-2048.f, 90.f, -2048.f);
+		CTank* tank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0));
+		_matrix mat3 = XMMatrixTranslation(10.f, 80.f, 10.f);
 		m_GameInstance->AddObject("Drone", "Drone", &mat3);
 		dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", 0))->Set_My_Drone();
+		XMFLOAT4X4 worldFloat4x4;
+		XMStoreFloat4x4(&worldFloat4x4, tank->Get_WorldMatrix());
+		dynamic_cast<CDrone*>(m_GameInstance->GetGameObject("Drone", 0))->Set_My_DronePos_OnTank(worldFloat4x4);
 	}
 
 
@@ -352,6 +396,8 @@ int CMainApp::Run()
 				Update(m_Timer);
 				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
 				Late_Update(m_Timer);
+				UpdateFMODListener();
+				FMOD_Manager::Get_Instance()->Update();
 				Draw();
 
 				m_Input_Dev->UpdateKeyStates();
@@ -632,4 +678,68 @@ LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+
+void CMainApp::UpdateFMODListener()
+{
+    const bool isDrone = (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE);
+
+    XMMATRIX worldMat;
+    if (isDrone) {
+        auto* cam = static_cast<CCamera_Drone*>(m_GameInstance->GetGameObject("Camera", 1));
+        if (!cam) return;
+        worldMat = cam->Get_WorldMatrix();
+    } else {
+        auto* cam = static_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0));
+        if (!cam) return;
+        worldMat = cam->Get_WorldMatrix();
+    }
+
+    // 2) 월드 행렬 → 오디오 포즈 (FMOD_VECTOR)
+    FMOD_VECTOR pos{}, fwd{}, up{};
+    ExtractFMODPoseFromWorld(worldMat, pos, fwd, up);
+
+    // 3) 도플러용 속도 (카메라 전환 시 스파이크 방지)
+    static FMOD_VECTOR prevPos{0,0,0};
+    static bool hasPrev = false;
+    static bool prevDrone = isDrone;
+    FMOD_VECTOR vel{0,0,0};
+
+    if (prevDrone != isDrone) {
+        prevPos = pos;
+        hasPrev = true;
+        prevDrone = isDrone;
+    }
+
+    float dt = m_Timer->DeltaTime();
+    if (hasPrev && dt > 0.f) {
+        vel.x = (pos.x - prevPos.x) / dt;
+        vel.y = (pos.y - prevPos.y) / dt;
+        vel.z = (pos.z - prevPos.z) / dt;
+    }
+    prevPos = pos; hasPrev = true;
+
+    // 4) FMOD 리스너 갱신 (오버로드 추가 필요)
+    FMOD_Manager::Get_Instance()->SetListener(pos, vel, fwd, up);
+}
+
+
+void CMainApp::ExtractFMODPoseFromWorld(const XMMATRIX& world,
+	FMOD_VECTOR& outPos,
+	FMOD_VECTOR& outForward,
+	FMOD_VECTOR& outUp)
+{
+	XMFLOAT4X4 m; XMStoreFloat4x4(&m, world);
+	outPos = { m._41, m._42, m._43 };
+	outForward = { m._31, m._32, m._33 }; // +Z forward 기준
+	outUp = { m._21, m._22, m._23 };
+
+	// 필요시 정규화:
+	auto norm = [](FMOD_VECTOR& v) {
+		float L = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+		if (L > 1e-6f) { v.x /= L; v.y /= L; v.z /= L; }
+		};
+	norm(outForward);
+	norm(outUp);
 }

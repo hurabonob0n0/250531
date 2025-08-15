@@ -4,6 +4,7 @@
 
 namespace Client {
 	enum GameMode { GM_TPS, GM_FPS, GM_Drone, GM_END };
+
 };
 using namespace Client;
 using namespace std;

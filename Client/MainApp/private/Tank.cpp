@@ -10,6 +10,14 @@
 #include "BulletPath.h"
 #include "Drone.h"
 #include "AirDrop.h"
+#include "FMOD_Manager.h"
+
+
+
+static inline AudioVec3 ToAudio(const XMFLOAT3& v) { return AudioVec3(v.x, v.y, v.z); }
+static inline AudioVec3 ToAudio(const XMVECTOR& v) { XMFLOAT3 t; XMStoreFloat3(&t, v); return ToAudio(t); }
+
+
 
 CTank::CTank() : CRenderObject()
 {
@@ -219,6 +227,9 @@ void CTank::LateTick(float fTimeDelta)
 	}
 
 
+
+	UpdateAudio(fTimeDelta);
+
 }
 
 
@@ -349,6 +360,90 @@ CRenderObject* CTank::Clone(void* pArg)
 	CTank* pInstance = new CTank(*this);
 	pInstance->Initialize(pArg);
 	return pInstance;
+}
+
+void CTank::OnSpawnAudio()
+{
+	if (!_myPlayer) {
+		// 혹시 복제/상태 전환으로 남아있던 채널 정리
+		if (_engineCh) { _engineCh->stop(); _engineCh = nullptr; }
+		if (_trackCh) { _trackCh->stop();  _trackCh = nullptr; }
+		return;
+	}
+
+	if (_engineCh && _trackCh) return; // 이미 생성됨
+
+	// 현재 위치
+	_vector posV = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	XMFLOAT3 cur; XMStoreFloat3(&cur, posV);
+	AudioVec3 p{ cur.x, cur.y, cur.z };
+	AudioVec3 v{ 0,0,0 };
+
+	// 엔진/궤도 루프 채널 생성(0 볼륨으로 시작 후 UpdateAudio에서 조절)
+	if (!_engineCh)
+		FMOD_Manager::Get_Instance()->Play3D_ReturnChannel("Tank_Engine_Sound", p, v, &_engineCh, 0.0f, false);
+	if (!_trackCh)
+		FMOD_Manager::Get_Instance()->Play3D_ReturnChannel("Tank_Track_Sound", p, v, &_trackCh, 0.0f, false);
+
+}
+
+void CTank::OnDespawnAudio()
+{
+	if (_engineCh) { _engineCh->stop(); _engineCh = nullptr; }
+	if (_trackCh) { _trackCh->stop();  _trackCh = nullptr; }
+}
+
+void CTank::UpdateAudio(float dt)
+{
+	if (!_myPlayer || !_isSpawn) return;
+
+	// 내 오디오 채널이 아직 없으면 생성(최초 1회)
+	if (!_engineCh || !_trackCh) OnSpawnAudio();
+
+	// 1) 키 인풋 기반 RPM 목표값 / 이동 여부 갱신
+	//    (이미 Master/Driver 입력에서 m_TankConsrolState를 채우고 있으므로 여기서 해석)
+	bool anyDrive = (m_TankConsrolState.leftThrust || m_TankConsrolState.rightThrust ||
+		m_TankConsrolState.leftReverse || m_TankConsrolState.rightReverse);
+	SetIsMoving(anyDrive);
+	SetRpmInput01(anyDrive ? 1.0f : 0.0f); // 누르는 동안 1로 올라가고 떼면 0으로 내려가게
+
+	// 2) RPM 스무딩
+	float target = _rpmInput;
+	const float up = _rpmRise * dt;
+	const float down = _rpmFall * dt;
+
+	if (_rpmSm < target) {
+		_rpmSm = (std::min)(_rpmSm + up, target);     // 상승: target을 넘지 않게
+	}
+	else if (_rpmSm > target) {
+		_rpmSm = (std::max)(_rpmSm - down, target);   // 감속: target 밑으로 떨어지지 않게
+	}
+
+	// 3) 현재 3D 위치/속도 적용
+	AudioVec3 p = ToAudio(m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	AudioVec3 v = AudioVec3(0, 0, 0); // 물리 속도 벡터가 있으면 대입
+	if (_engineCh) { FMOD_VECTOR fp{ p.x,p.y,p.z }, fv{ v.x,v.y,v.z }; _engineCh->set3DAttributes(&fp, &fv); }
+	if (_trackCh) { FMOD_VECTOR fp{ p.x,p.y,p.z }, fv{ v.x,v.y,v.z }; _trackCh->set3DAttributes(&fp, &fv); }
+
+	// 4) 엔진: 볼륨/피치는 RPM 기반
+	if (_engineCh) {
+		float vol = _engineVolBase + _engineVolGain * _rpmSm;                         // 0.35 ~ 0.80
+		float pitch = _enginePitchLo + (_enginePitchHi - _enginePitchLo) * _rpmSm;      // 0.95 ~ 1.30
+		_engineCh->setVolume(vol);
+		_engineCh->setPitch(pitch);
+	}
+
+	// 5) 궤도: 움직일 때만 들리게(볼륨/피치도 RPM 기반)
+	if (_trackCh) {
+		float moveGate = _isMoving ? 1.0f : 0.0f;
+		float drive = moveGate * (0.25f + 0.75f * _rpmSm); // 이동 중 최소 볼륨 보장
+		float vol = (_trackVolBase + _trackVolGain * drive) * _trackMixGain;
+		float pitch = _trackPitchLo + (_trackPitchHi - _trackPitchLo) * _rpmSm;
+
+
+		_trackCh->setVolume(vol);
+		_trackCh->setPitch(pitch);
+	}
 }
 
 
@@ -501,10 +596,34 @@ void CTank::Master_Pos_KeyInput()
 			{
 				if (Network_Manager::GetInstance()->isConnected()) {
 					SendShootDataToServer(); // 실제 슈팅
-
 					((CUIReloading*)m_GameInstance->GetGameObject("UI", 2))->Set_Reloading();
 
 				}
+				else {
+
+
+					_float4x4 TempMat;
+					XMStoreFloat4x4(&TempMat, ShotMatrix);
+					_vector vPos = ShotMatrix.r[3];
+					_vector vDir = XMVector3Normalize(ShotMatrix.r[2]);
+
+					_float3 fPos;
+					XMStoreFloat3(&fPos, vPos);
+
+
+
+					auto* FM = FMOD_Manager::Get_Instance();
+					
+					AudioVec3 p{ fPos.x, fPos.y,  fPos.z};
+					AudioVec3 v{ 0, 0, 0 };
+					// 약간의 피치 랜덤으로 더 자연스럽게
+					FMOD::Channel* ch = nullptr;
+					if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+						float pitch = 0.98f + (rand() / (float)RAND_MAX) * (1.02f - 0.98f); // 0.98~1.02
+						ch->setPitch(pitch);
+					}
+				}
+
 				_shootTimer = 0.f; // 타이머 초기화
 			}
 
@@ -520,6 +639,13 @@ void CTank::Master_Pos_KeyInput()
 	}
 	
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
+
+	const bool anyDrive =
+		m_TankConsrolState.leftThrust || m_TankConsrolState.rightThrust ||
+		m_TankConsrolState.leftReverse || m_TankConsrolState.rightReverse;
+
+	SetIsMoving(anyDrive);                 // 궤도 소리 on/off 기준
+	SetRpmInput01(anyDrive ? 1.0f : 0.0f);// 엔진/궤도 RPM 타깃(0~1, UpdateAudio에서 스무딩)
 
 }
 
@@ -564,6 +690,14 @@ void CTank::Driver_Pos_KeyInput()
 
 
 	m_pPhysicsEngine->Set_Tank_ControlState(m_TankConsrolState);
+
+
+	const bool anyDrive =
+		m_TankConsrolState.leftThrust || m_TankConsrolState.rightThrust ||
+		m_TankConsrolState.leftReverse || m_TankConsrolState.rightReverse;
+
+	SetIsMoving(anyDrive);                 // 궤도 소리 on/off 기준
+	SetRpmInput01(anyDrive ? 1.0f : 0.0f);// 엔진/궤도 RPM 타깃(0~1, UpdateAudio에서 스무딩)
 }
 
 void CTank::POSU_Pos_KeyInput()
