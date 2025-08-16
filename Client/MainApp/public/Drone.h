@@ -83,7 +83,15 @@ public:
 	void SetOtherDroneMat(float PosX, float PosY, float PosZ, float Yaw, float Roll, float pitch);
 	void SendMyPosToServer();
 
+	void Update_Follow_Tank(float dt);
+
+
 	FMOD::Channel* m_pFlyChannel = nullptr;
+
+public:
+
+	bool m_followTank = false;   // Z로 토글
+	float m_followHeight = 30.f; // 탱크 위 고정 높이
 };
 
 END

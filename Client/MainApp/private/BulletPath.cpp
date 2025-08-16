@@ -1,6 +1,8 @@
 #include "Client_pch.h"
 #include "BulletPath.h"
 #include "GameInstance.h"
+#include "Terrain.h"
+#include "Tank.h"
 
 CBulletPath::CBulletPath() : CRenderObject()
 {
@@ -22,6 +24,7 @@ HRESULT CBulletPath::Initialize(void* pArg)
     m_RG = CRenderer::RG_BULLETPATH; // 바꿔야함.
 
 	BulletPathstr* Info = (BulletPathstr*)pArg;
+	OwnerTankIndex = Info->OwnerTankIndex;
 	m_Dir = Info->Dir * 150.f;
 	m_Pos1 = Info->Pos;
 	m_Pos2 = Info->Pos;
@@ -33,7 +36,7 @@ HRESULT CBulletPath::Initialize(void* pArg)
     m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &cylinder);
 	
 	//m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom");
-
+	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
     return S_OK;
 }
 
@@ -47,6 +50,20 @@ void CBulletPath::Tick(float fTimeDelta)
 
 	m_Pos2 += m_Dir * fTimeDelta + XMVectorSet(0.f,m_fYSpeed * fTimeDelta,0.f,0.f);
 
+	if(CheckCollisionWithTank()) {
+		isDead = true;
+		return;
+	}
+
+
+	if (CheckCollisionWithTerrain())
+	{
+		isDead = true;
+		return;
+	}
+
+
+
 	if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000)
 	{
 		BulletDatas.push_back(CreateBulletTrailInstance(m_Pos1, m_Pos2));
@@ -57,6 +74,10 @@ void CBulletPath::Tick(float fTimeDelta)
 		m_Pos1 = m_Pos2;
 		m_fDeltaTime = 0.f;
 	}
+
+
+
+
 
 	if (BulletDatas.size() >= 1000)
 		isDead = true;
@@ -135,7 +156,46 @@ InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, cons
 	return data;
 }
 
+bool CBulletPath::CheckCollisionWithTerrain()
+{
+	float x = XMVectorGetX(m_Pos2);
+	float z = XMVectorGetZ(m_Pos2);
 
+	if (x < -2000.f || x > 2000.f || z < -2000.f || z > 2000.f)
+		return true;
+
+	float terrainY = m_Terrain->Get_Terrain_Heights(x, z);
+
+	float bulletY = XMVectorGetY(m_Pos2);
+
+	return (bulletY <= terrainY);
+}
+
+bool CBulletPath::CheckCollisionWithTank()
+{
+
+	int targetTankIndex = (OwnerTankIndex == 0) ? 1 : 0;
+
+	// 상대 탱크 가져오기
+	CTank* pTank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", targetTankIndex));
+	if (!pTank) return false;
+
+	// 탱크 월드 행렬에서 위치 추출
+	XMMATRIX tankWorld = pTank->Get_WorldMatrix();
+	XMFLOAT4X4 tm; XMStoreFloat4x4(&tm, tankWorld);
+	XMVECTOR tankPos = XMVectorSet(tm._41, tm._42, tm._43, 1.0f);
+
+	// 총알 현재 위치(m_Pos2)와 탱크 중심 거리
+	XMVECTOR d = XMVectorSubtract(m_Pos2, tankPos);
+	float distSq = XMVectorGetX(XMVector3LengthSq(d));
+
+	// 구 충돌 반지름 (5.0f)
+	constexpr float R = 5.0f;
+	constexpr float R2 = R * R;
+
+	return (distSq <= R2);
+	//_matrix (XMATRIX)리턴
+}
 
 void CBulletPath::Free()
 {

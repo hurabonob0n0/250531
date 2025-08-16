@@ -18,6 +18,8 @@
 #include "BulletPath.h"
 #include "Zet.h"
 #include "FMOD_Manager.h"
+#include "Camera_Free.h"
+#include "BulletPath.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -105,6 +107,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 		break;
 	case S_TANK_RESPAWN:
 		Handle_S_RESPAWN(buffer, len);
+		break;
+	case S_TANK_SOUND:
+		Handle_S_SOUND(buffer,len);
 		break;
 	default:
 		break;
@@ -324,7 +329,7 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 		AudioVec3 p{ X, Y, Z };
 		AudioVec3 v{ 0, 0, 0 };
 		FMOD::Channel* ch = nullptr;
-		if (FM->Play3D_ReturnChannel("Explosion", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+		if (FM->Play3D_ReturnChannel("Explosion", p, v, &ch, /*volume=*/2.f, /*paused=*/false) && ch) {
 			float pitch = 0.97f + (rand() / (float)RAND_MAX) * (1.03f - 0.97f); // 0.97~1.03
 			ch->setPitch(pitch);
 		}
@@ -341,6 +346,7 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		PacketHeader header;
 		br >> header;
 
+		uint8 TankIndex;
 		float DirX;
 		float DirY;
 		float DirZ;
@@ -349,9 +355,10 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		float PosY;
 		float PosZ;
 
-		br >> DirX >> DirY >> DirZ >> PosX >> PosY >> PosZ;
+		br>> TankIndex >> DirX >> DirY >> DirZ >> PosX >> PosY >> PosZ;
 
 		CBulletPath::BulletPathstr bps;
+		bps.OwnerTankIndex = TankIndex;
 		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
 		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
 		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
@@ -362,7 +369,7 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		AudioVec3 v{ 0, 0, 0 };
 		// 약간의 피치 랜덤으로 더 자연스럽게
 		FMOD::Channel* ch = nullptr;
-		if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/1.0f, /*paused=*/false) && ch) {
+		if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/0.4f, /*paused=*/false) && ch) {
 			float pitch = 0.98f + (rand() / (float)RAND_MAX) * (1.02f - 0.98f); // 0.98~1.02
 			ch->setPitch(pitch);
 		}
@@ -386,9 +393,9 @@ void ClientPacketHandler::Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		//add Damaged UI
 		Network_Manager::GetInstance()->Im_damaged();
-		});
+		dynamic_cast<CCamera_Free*>(CGameInstance::Get_Instance()->GetGameObject("Camera", 0))->StartShake(1.3f, 0.9f, 50.f);
+	});
 }
 
 void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
@@ -406,8 +413,13 @@ void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
 		if (index == Network_Manager::GetInstance()->GetMyTankIndex()) {
 			tank->set_Spawn(false);
 			tank->_respawnTimer = 0.f;
-			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI",6)))->set_render();
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_SELECT_POS)))->set_render();
 			//TODOUI -> UISelectPos UI바꾸기, MasterMode와 Driver가 선택지 선택, POSU일때는 선택 불가능 UI 띄우기
+
+			auto* FM = FMOD_Manager::Get_Instance();
+			FMOD::Channel* ch = nullptr;
+			if (FM->Play2D_ReturnChannel("DeadSound", &ch, /*volume=*/0.6f, /*paused=*/false) && ch) {
+			}
 		}
 		});
 }
@@ -418,8 +430,14 @@ void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", 4)))->set_Hit();
+		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_KILL)))->set_Hit();
 		Network_Manager::GetInstance()->add_MyKillCount();
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play2D_ReturnChannel("KillSound", &ch, /*volume=*/0.6f, /*paused=*/false) && ch) {
+		}
+
 	});
 }
 
@@ -429,7 +447,7 @@ void ClientPacketHandler::Handle_S_GAME_WIN(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		dynamic_cast<CUI_VICTORY*>((CGameInstance::Get_Instance()->GetGameObject("UI", 10)))->set_render();
+		dynamic_cast<CUI_VICTORY*>((CGameInstance::Get_Instance()->GetGameObject("UI", UI_VICTORY)))->set_render();
 		});
 }
 
@@ -439,7 +457,7 @@ void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		dynamic_cast<CUI_DEFEAT*>((CGameInstance::Get_Instance()->GetGameObject("UI", 9)))->set_render();
+		dynamic_cast<CUI_DEFEAT*>((CGameInstance::Get_Instance()->GetGameObject("UI", UI_DEFEAT)))->set_render();
 	});
 }
 
@@ -488,6 +506,11 @@ void ClientPacketHandler::Handle_S_AIRDROP(BYTE* buffer, int32 len)
 		br >> AreaIndex;
 
 		dynamic_cast<CZet*>(CGameInstance::Get_Instance()->GetGameObject("Zet", 0))->Set_StartPos_And_Move(AreaIndex);
+
+		auto* FM = FMOD_Manager::Get_Instance();
+		FMOD::Channel* ch = nullptr;
+		if (FM->Play2D_ReturnChannel("AirDrop", &ch, /*volume=*/0.6f, /*paused=*/false) && ch) {
+		}
 	});
 
 }
@@ -505,10 +528,30 @@ void ClientPacketHandler::Handle_S_RESPAWN(BYTE* buffer, int32 len)
 		br >> TankIndex;
 		if (Network_Manager::GetInstance()->MyPosMode == POS_POSU) {
 			dynamic_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", TankIndex))->setRespawnForPosinMode();
-			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI", 6)))->set_render_off();
+			((CUISelectPos*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_SELECT_POS)))->set_render_off();
 		}
 	});
 
+
+}
+
+void ClientPacketHandler::Handle_S_SOUND(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+
+		PacketHeader header;
+		uint8 TankIndex;
+		float engvol, engpit, trackvol, trackpit;
+		br >> header;
+		br >> TankIndex;
+		br >> engvol >> engpit >> trackvol >> trackpit;
+		if (Network_Manager::GetInstance()->MyPosMode == POS_POSU) {
+			dynamic_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", TankIndex))->SetSoundData(engvol, engpit, trackvol, trackpit);
+		}
+	});
 
 }
 
@@ -853,6 +896,22 @@ SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
 
 	header->size = bw.WriteSize();
 	header->id = C_AIRDROP;
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
+SendBufferRef ClientPacketHandler::Make_C_SOUND(float EngineVol, float EnginePitch, float TrackVol, float TrackPitch)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << EngineVol << EnginePitch << TrackVol << TrackPitch;
+
+	header->size = bw.WriteSize();
+	header->id = C_TANK_SOUND;
 	sendBuffer->Close(bw.WriteSize());
 
 	return sendBuffer;

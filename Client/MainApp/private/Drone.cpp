@@ -5,6 +5,7 @@
 #include "ServiceManager.h"
 #include "Network_Manager.h"
 #include "FMOD_Manager.h"
+#include "Tank.h"
 
 CDrone::CDrone() : CRenderObject()
 {
@@ -61,13 +62,31 @@ void CDrone::Tick(float fTimeDelta)
     if (Network_Manager::GetInstance()->isConnected()) {
 
         if (_myDrone && Network_Manager::GetInstance()->MyPosMode != POS_DRIVER) {
-            if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
-                Update_Speed_and_Rot(fTimeDelta);
-                Update_Rot_and_Pos(fTimeDelta);
 
-                if (Network_Manager::GetInstance()->isConnected())
-                    SendMyPosToServer();
+            if (m_followTank) {
+                Update_Follow_Tank(fTimeDelta);
             }
+
+            if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+
+               
+
+                if (m_GameInstance->Key_Down('G')) {
+                    m_followTank = !m_followTank;
+                }
+
+                if (m_followTank) {
+
+                }
+                else {
+                    Update_Speed_and_Rot(fTimeDelta);
+                    Update_Rot_and_Pos(fTimeDelta);
+                }
+
+               
+            } 
+
+            SendMyPosToServer();
         }
         else {
             Update_Rot_and_Pos(fTimeDelta);
@@ -75,11 +94,28 @@ void CDrone::Tick(float fTimeDelta)
     }
     else {
 
+        if (m_followTank) {
+            Update_Follow_Tank(fTimeDelta);
+        }
 
-        if(_myDrone && Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE)
-        Update_Speed_and_Rot(fTimeDelta);
-        Update_Rot_and_Pos(fTimeDelta);
 
+        if (_myDrone && Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+
+            if (m_GameInstance->Key_Down('G')) {
+                m_followTank = !m_followTank;
+            }
+
+
+            if (m_followTank) {
+                
+            }
+            else {
+                Update_Speed_and_Rot(fTimeDelta);
+                Update_Rot_and_Pos(fTimeDelta);
+            }
+
+
+        }
 
     }
 
@@ -138,10 +174,18 @@ void CDrone::Update_Speed_and_Rot(float fTimeDelta)
         if (m_fUpAxisSpeed >= m_fMaxSpeed)
             m_fUpAxisSpeed = m_fMaxSpeed;
     }
+
     if (m_GameInstance->Key_Pressing(VK_CONTROL)) {
-        m_fUpAxisSpeed -= fTimeDelta * 30.f;
-        if (m_fUpAxisSpeed <= -m_fMaxSpeed)
-            m_fUpAxisSpeed = -m_fMaxSpeed;
+        // 드론 높이가 최소 40.f 이상일 때만 하강 허용
+        if (XMVectorGetY(m_vPos) > 50.f) {
+            m_fUpAxisSpeed -= fTimeDelta * 30.f;
+            if (m_fUpAxisSpeed <= -m_fMaxSpeed)
+                m_fUpAxisSpeed = -m_fMaxSpeed;
+        }
+        else {
+            // 최소 높이에 걸리면 하강 속도 0으로 고정
+            m_fUpAxisSpeed = 0.f;
+        }
     }
 
     if (!m_GameInstance->Key_Pressing('D') && !m_GameInstance->Key_Pressing('A'))
@@ -257,3 +301,46 @@ void CDrone::SendMyPosToServer()
 
 }
 
+void CDrone::Update_Follow_Tank(float dt)
+{
+    // 내 탱크 가져오기
+    CTank* myTank = nullptr;
+    if (Network_Manager::GetInstance()->isConnected())
+        myTank = static_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", Network_Manager::GetInstance()->GetMyTankIndex()));
+    else
+        myTank = static_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", 0));
+    if (!myTank) return;
+
+    // 2) 탱크 위치
+    const DirectX::XMMATRIX tankWorld = myTank->Get_WorldMatrix();
+    DirectX::XMFLOAT4X4 m; DirectX::XMStoreFloat4x4(&m, tankWorld);
+    DirectX::XMVECTOR tankPos = DirectX::XMVectorSet(m._41, m._42, m._43, 1.f);
+
+    // 3) 목표 위치(위로 m_followHeight)
+    const DirectX::XMVECTOR targetPos = DirectX::XMVectorAdd(tankPos, DirectX::XMVectorSet(0.f, m_followHeight, 0.f, 0.f));
+
+    {
+        // 목표까지의 벡터/거리
+        DirectX::XMVECTOR delta = DirectX::XMVectorSubtract(targetPos, m_vPos);
+        float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(delta));
+
+        if (dist > 1e-4f) {
+            DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(delta);
+
+            const float maxSpeed = 15.f;     // ★ 초당 이동 속도(원하는 값으로 조절)
+            float step = maxSpeed * dt;      // 이번 프레임 이동량
+
+            if (step > dist) step = dist;    // 목표 근처에서 overshoot 방지
+
+            m_vPos = DirectX::XMVectorAdd(m_vPos, DirectX::XMVectorScale(dir, step));
+        }
+    }
+
+    // 5) (옵션) 회전 유지/갱신이 필요하면 여기서 처리
+
+    // 6) 트랜스폼 반영
+    const DirectX::XMMATRIX rot =
+        DirectX::XMMatrixRotationRollPitchYaw(m_fPitchRot, m_fYawRot, m_fRollRot);
+    m_TransformCom->Set_WorldMatrix(rot);
+    m_TransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
+}

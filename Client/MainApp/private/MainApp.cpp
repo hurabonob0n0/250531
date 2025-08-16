@@ -171,6 +171,15 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	FM->LoadSound("Tank_Shot", "../bin/Sounds/CannonShot.wav", true, false, false);
 	FM->LoadSound("Explosion", "../bin/Sounds/WeaponHit.wav", true, false, false);
 
+	FM->LoadSound("AirDrop", "../bin/Sounds/AirDrop.wav",
+		/*is3D=*/false, /*loop=*/false, /*stream=*/false);
+
+
+	FM->LoadSound("KillSound", "../bin/Sounds/KILL.wav",
+		/*is3D=*/false, /*loop=*/false, /*stream=*/false);
+	FM->LoadSound("DeadSound", "../bin/Sounds/DEAD.wav",
+		/*is3D=*/false, /*loop=*/false, /*stream=*/false);
+
 	// 감쇠 세팅(필요에 맞게 조정)
 	FM->SetSound3DDistance("Tank_Engine_Sound", 3.0f, 70.0f);
 	FM->SetSound3DRolloff("Tank_Engine_Sound", AudioRolloff::Inverse);
@@ -287,6 +296,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 			++tankIndex;
 		}
+
 	}
 	else {
 		Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
@@ -297,6 +307,11 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		m_GameInstance->AddObject("Tank", "Tank", &mat1);
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->set_MyPlayer();
 		dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0))->Set_MyPos(10.f, 40.f, 10.f);
+
+		_matrix mat2 = XMMatrixTranslation(30.f, 40.f, 10.f);
+		m_GameInstance->AddObject("Tank", "Tank", &mat2);
+
+
 
 		CTank* tank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", 0));
 		_matrix mat3 = XMMatrixTranslation(10.f, 80.f, 10.f);
