@@ -13,8 +13,11 @@ class CBulletPath : public CRenderObject
 {
 public:
 	struct BulletPathstr {
+		
+		uint8 OwnerTankIndex;
 		XMVECTOR Dir;
 		XMVECTOR Pos;
+		
 	};
 
 public:
@@ -32,6 +35,11 @@ public:
 public:
 	InstanceData CreateBulletTrailInstance(const XMVECTOR& oldPos, const XMVECTOR& newPos);
 
+	bool CheckCollisionWithTerrain();
+
+	bool CheckCollisionWithTank();
+
+	uint8 OwnerTankIndex;
 private:
 	CVIBuffer_Geos* m_VIBuffer;
 	vector<InstanceData> BulletDatas;
@@ -42,7 +50,6 @@ private:
 	XMVECTOR m_Pos1;
 	XMVECTOR m_Pos2;
 	float m_fYSpeed = 0.f;
-
 
 public:
 	void Free() override;

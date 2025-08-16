@@ -29,6 +29,7 @@ enum
 	S_BULLET_ADD = 19,
 	S_AIRDROP_INDEX = 20,
 	S_TANK_RESPAWN = 21,
+	S_TANK_SOUND = 22,
 
 	C_LOGIN = 1001,
 	C_FINISH_LOADING = 1002,
@@ -46,7 +47,8 @@ enum
 	C_MYPOS = 1014,
 	C_MYPOSIN = 1015,
 	C_MYDRONEMOVE = 1016,
-	C_AIRDROP = 1017
+	C_AIRDROP = 1017,
+	C_TANK_SOUND = 1018
 
 };
 
@@ -88,6 +90,7 @@ public:
 	static void Handle_S_CAPTURE(BYTE* buffer, int32 len);
 	static void Handle_S_AIRDROP(BYTE* buffer, int32 len);
 	static void Handle_S_RESPAWN(BYTE* buffer, int32 len);
+	static void Handle_S_SOUND(BYTE* buffer, int32 len);
 
 	//static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
 
@@ -116,6 +119,7 @@ public:
 	static SendBufferRef Make_C_TANK_POSMOVE(_float4x4& worldMatrix);
 
 	static SendBufferRef Make_C_AIRDROP(uint8 AreaNum);
+	static SendBufferRef Make_C_SOUND(float EngineVol,float EnginePitch, float TrackVol, float TrackPitch);
 	//For GamePlay
 
 

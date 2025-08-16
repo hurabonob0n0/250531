@@ -171,9 +171,6 @@
     <ClInclude Include="..\public\Client_Defines.h">
       <Filter>99.Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\MainApp.h">
-      <Filter>00.MainApp</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Camera_Free.h">
       <Filter>02.Camera</Filter>
     </ClInclude>
@@ -320,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="..\public\FMOD_Manager.h">
       <Filter>96.ForSound\FMod_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MainApp.h">
+      <Filter>00.MainApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -80,8 +80,8 @@ public:
 	float _airdropTimer = 0.f;    // 경과 시간
 
 	float GetCoolScale() {
-		if (_airdropTimer >= AIRDROP_COOLDOWN_SEC)
-			return 0.0f;
+		if (_airdropReady)
+			return 0;
 
 		// 스킬 직후(타이머 0초) → 1,  
 		// 시간이 지날수록 0에 가까워지게
@@ -186,6 +186,8 @@ public:
 	void SetRpmInput01(float v) { _rpmInput = v < 0 ? 0.f : (v > 1 ? 1.f : v); }
 	void SetIsMoving(bool b) { _isMoving = b; }
 
+	void SetSoundData(float engVol, float engPit, float trkVol, float trkPit);
+
 private:
 	FMOD::Channel* _engineCh = nullptr; // 엔진 루프
 	FMOD::Channel* _trackCh = nullptr; // 궤도 루프
@@ -205,6 +207,14 @@ private:
 	const float _trackPitchLo = 0.95f; // 궤도 피치 하한
 	const float _trackPitchHi = 1.15f; // 궤도 피치 상한
 	float _trackMixGain = 0.3f;
+
+
+	bool  _useNetMix = false;
+	float _netEngVol = 0.f;
+	float _netEngPit = 1.f;
+	float _netTrkVol = 0.f;
+	float _netTrkPit = 1.f;
+	float _netHoldT = 0.f;
 };
 
 END

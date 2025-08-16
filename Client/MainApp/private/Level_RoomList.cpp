@@ -99,8 +99,6 @@ void Level_RoomList::Render(HDC hDC)
 		swprintf_s(szBuffer, L"인원 : %d / %d", CurRoomData->CurPlayer, CurRoomData->MaxPlayer);
 		TextOut(hDC, infoX, infoY + 30, szBuffer, wcslen(szBuffer));
 
-		swprintf_s(szBuffer, L"상태 : %s", CurRoomData->isActive ? L"활성화" : L"비활성화");
-		TextOut(hDC, infoX, infoY + 60, szBuffer, wcslen(szBuffer));
 	}
 }
 

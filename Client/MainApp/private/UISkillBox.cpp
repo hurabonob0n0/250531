@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "StateMgr.h"
 #include "Tank.h"
+#include "Drone.h"
 #include "Network_Manager.h"
 CUISkillBox::CUISkillBox()
 {
@@ -89,6 +90,7 @@ void CUISkillBox::Render()
 		m_CBBinding->Update_CBView();
 		m_CBBinding->Set_On_Shader();
 		m_VIBuffer->Render();
+
 		m_TransformCom->Identity();
 		__super::Set_Scale(SkillboxScaleX, defaultScaleY * SkillboxScaleX);
 		__super::Set_Pos(150.f, 400.f);
@@ -112,8 +114,22 @@ void CUISkillBox::Render()
 		m_CBBinding->Update_CBView();
 		m_CBBinding->Set_On_Shader();
 		m_VIBuffer->Render();
+		
+		
+		
+		if (dynamic_cast<CDrone*>((m_GameInstance->Get_Instance()->GetGameObject("Drone", Network_Manager::GetInstance()->GetMyTankIndex())))->m_followTank) {
 
-		//if(ÆÈ·Î¿ì¸ğµå)
+			m_TransformCom->Identity();
+			__super::Set_Scale(SkillboxScaleX, defaultScaleY * SkillboxScaleX);
+			__super::Set_Pos(150.f, 600.f);
+			m_CBBinding->Set_CBIndex();
+			m_CBBinding->Set_MaterialIndex(COLLTIME_BoxMat);
+			m_CBBinding->Set_WorldMatrix(m_TransformCom);
+			m_CBBinding->Update_CBView();
+			m_CBBinding->Set_On_Shader();
+			m_VIBuffer->Render();
+		}
+	
 
 		break;
 	}

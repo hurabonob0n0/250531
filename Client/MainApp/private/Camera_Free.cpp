@@ -119,6 +119,8 @@ void CCamera_Free::Tick(float fTimeDelta)
 
 	}
 
+	ApplyCameraShake(fTimeDelta);
+
 }
 
 void CCamera_Free::LateTick(float fTimeDelta)
@@ -237,6 +239,64 @@ void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 	m_Tank->Set_ShotMatrix(matforBox);
 	m_Tank->Set_PotapRotation(m_fYRot_FPS);
 	m_Tank->Set_PoSinpRotation(m_fXRot_FPS);
+
+}
+
+void CCamera_Free::StartShake(float duration, float amplitude, float frequency)
+{
+	if (m_IsShaking) return; // 이미 진행 중이면 무시
+
+	m_IsShaking = true;
+	m_ShakeTime = 0.f;
+	m_ShakeDur = duration;
+	m_ShakeAmp = amplitude;
+	m_ShakeFreq = frequency;
+
+	// 프레임마다 동일 결과 방지용 위상 시드(간단히 난수 대용)
+	// (진짜 난수 쓰고 싶으면 std::mt19937 등 사용)
+	m_ShakeSeed += 37.123f;
+}
+
+void CCamera_Free::ApplyCameraShake(float dt)
+{
+	if (!m_IsShaking)
+		return;
+
+	m_ShakeTime += dt;
+	float t = m_ShakeTime / m_ShakeDur;
+	if (t >= 1.f)
+	{
+		// 종료
+		m_IsShaking = false;
+		m_ShakeOfs = { 0,0,0 };
+		return;
+	}
+
+	// 부드러운 감쇠(끝으로 갈수록 줄어듦)
+	// (지수 감쇠 + (1-t) 가중, 취향에 맞게 조절)
+	float decay = expf(-3.5f * t) * (1.f - t);
+
+	// 간단한 2축/3축 신호(위상 분리)
+	float w = m_ShakeFreq * (m_ShakeTime + m_ShakeSeed);
+	float ox = sinf(w) * m_ShakeAmp * decay;
+	float oy = cosf(w * 1.2f + 1.73f) * m_ShakeAmp * 0.6f * decay; // 수직은 살짝 약하게
+	float oz = sinf(w * 0.8f + 3.11f) * m_ShakeAmp * 0.4f * decay; // 전후 흔들림은 더 약하게
+
+	m_ShakeOfs = { ox, oy, oz };
+
+	// 카메라-공간 오프셋을 월드 위치에 적용
+	using namespace DirectX;
+	XMVECTOR pos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	XMVECTOR right = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_RIGHT));
+	XMVECTOR up = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_UP));
+	XMVECTOR look = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));
+
+	XMVECTOR ofs =
+		right * m_ShakeOfs.x +
+		up * m_ShakeOfs.y +
+		look * m_ShakeOfs.z;
+
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, pos + ofs);
 
 }
 

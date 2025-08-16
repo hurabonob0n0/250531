@@ -5,6 +5,7 @@
 #include "Terrain.h"
 #include "Network_Manager.h"
 #include "StateMgr.h"
+#include "AirDrop.h"
 CCamera_Drone::CCamera_Drone() : CCamera()
 {
 }
@@ -68,6 +69,7 @@ void CCamera_Drone::Tick(float fTimeDelta)
 		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
 			SetDroneRender(true);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
+			((CUI_AirDrop*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_AIRDROP)))->set_render_off();
 			CStateMgr::Set_GameMode(GM_Drone);
 			m_PS = FPS;
 		}
