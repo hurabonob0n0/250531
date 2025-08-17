@@ -56,7 +56,14 @@ void CPing::Tick(float fTimeDelta)
 void CPing::LateTick(float fTimeDelta)
 {
 	m_TransformCom->Identity();
-	_vector Look = m_DroneCamera->Get_State(CTransform::STATE_POSITION) - LayContactPos;
+	
+	_vector Look;
+	
+	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE)
+		Look= m_DroneCamera->Get_State(CTransform::STATE_POSITION) - LayContactPos;
+	else
+		Look = m_CameraFree->Get_State(CTransform::STATE_POSITION) - LayContactPos;
+
 	m_TransformCom->Adjust_Axis(XMVector4Normalize(-Look));
 	m_TransformCom->Set_Scale(XMVectorGetX(0.08f * XMVector3Length(Look)));
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, LayContactPos);

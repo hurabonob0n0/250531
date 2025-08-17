@@ -169,6 +169,9 @@
     <Filter Include="01.DefaultObj\Ping">
       <UniqueIdentifier>{b9868416-62c3-4726-9f03-5d740639f90a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\UI\UICompass">
+      <UniqueIdentifier>{617479a7-3c82-4e89-b3b9-394a9bcb7620}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -327,6 +330,9 @@
     <ClInclude Include="..\public\Ping.h">
       <Filter>01.DefaultObj\Ping</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UICompass.h">
+      <Filter>01.DefaultObj\UI\UICompass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -475,6 +481,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Ping.cpp">
       <Filter>01.DefaultObj\Ping</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UICompass.cpp">
+      <Filter>01.DefaultObj\UI\UICompass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

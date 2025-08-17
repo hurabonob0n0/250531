@@ -67,28 +67,28 @@ void CUITime::Render()
     _uint Onesecs = iGameTime;
 
     TenMinutes->Set_World_Identity();
-    TenMinutes->Set_Pos(960.f - 100.f - 20.f, 1000.f);
+    TenMinutes->Set_Pos(1800.f - 50.f - 20.f, 1040.f);
     TenMinutes->Set_Scale(0.05f, 0.05f * 2.f);
     TenMinutes->Set_Number(Tenmins);
     TenMinutes->Set_On_CBBinding();
     TenMinutes->Render();
 
     OneMinutes->Set_World_Identity();
-    OneMinutes->Set_Pos(960.f - 100.f + 20.f, 1000.f);
+    OneMinutes->Set_Pos(1800.f - 50.f + 20.f, 1040.f);
     OneMinutes->Set_Scale(0.05f, 0.05f * 2.f);
     OneMinutes->Set_Number(Onemins);
     OneMinutes->Set_On_CBBinding();
     OneMinutes->Render();
 
     TenSeconds->Set_World_Identity();
-    TenSeconds->Set_Pos(960.f + 100.f - 20.f, 1000.f);
+    TenSeconds->Set_Pos(1800.f + 50.f - 20.f, 1040.f);
     TenSeconds->Set_Scale(0.05f, 0.05f * 2.f);
     TenSeconds->Set_Number(Tensecs);
     TenSeconds->Set_On_CBBinding();
     TenSeconds->Render();                                                                              
 
     OneSeconds->Set_World_Identity();            
-    OneSeconds->Set_Pos(960.f + 100.f + 20.f, 1000.f);
+    OneSeconds->Set_Pos(1800.f + 50.f + 20.f, 1040.f);
     OneSeconds->Set_Scale(0.05f, 0.05f * 2.f);
     OneSeconds->Set_Number(Onesecs);
     OneSeconds->Set_On_CBBinding();
