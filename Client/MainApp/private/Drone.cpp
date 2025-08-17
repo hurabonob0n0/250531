@@ -69,14 +69,12 @@ void CDrone::Tick(float fTimeDelta)
 
             if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
 
-               
-
                 if (m_GameInstance->Key_Down('G')) {
                     m_followTank = !m_followTank;
                 }
 
                 if (m_followTank) {
-
+                    m_fRollRot = m_fPitchRot = m_fYawRot =m_fLookAxisSpeed = m_fRightAxisSpeed = m_fUpAxisSpeed = 0.f;
                 }
                 else {
                     Update_Speed_and_Rot(fTimeDelta);
@@ -107,7 +105,7 @@ void CDrone::Tick(float fTimeDelta)
 
 
             if (m_followTank) {
-                
+                m_fRollRot = m_fPitchRot = m_fYawRot = m_fLookAxisSpeed = m_fRightAxisSpeed = m_fUpAxisSpeed = 0.f;
             }
             else {
                 Update_Speed_and_Rot(fTimeDelta);
