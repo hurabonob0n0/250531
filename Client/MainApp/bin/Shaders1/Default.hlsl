@@ -123,7 +123,7 @@ float4 PS(VertexOut pin) : SV_Target
     if (gObjPad0 == 1)
     {
         float dist = length(pin.PosW.xz);
-        float radius = 500.f;
+        float radius = 300.f;
 	
         //if (dist < radius)
         //{
