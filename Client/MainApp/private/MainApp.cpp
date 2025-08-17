@@ -27,6 +27,7 @@
 #include "FMOD_Manager.h"
 #include "UITime.h"
 #include "Ping.h"
+#include "UICompass.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -150,6 +151,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("DefeatUI", CUI_DEFEAT::Create());
 	m_GameInstance->Add_PrototypeObject("VictoryUI", CUI_VICTORY::Create());
 	m_GameInstance->Add_PrototypeObject("UITime", CUITime::Create());
+	m_GameInstance->Add_PrototypeObject("UICompass", CUICompass::Create());
 
 	m_GameInstance->Add_PrototypeObject("WinningTeam", CWinningTeam::Create());
 	m_GameInstance->Add_PrototypeObject("Tree", CTree::Create());
@@ -355,11 +357,11 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 10	sec
 	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 1	sec
 	m_GameInstance->AddObject("UITime", "UI", nullptr);
-
 	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 100	hp
 	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 10	hp
 	m_GameInstance->AddObject("UINumber", "UINumber", nullptr);	// 1	hp
 	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
+	m_GameInstance->AddObject("UICompass", "UI", nullptr);//TODOUI -> 알파값 만들기
 
 	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
 	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
@@ -388,6 +390,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		Network_Manager::GetInstance()->Send(sendBuffer);
 	}
 
+	ShowCursor(FALSE);
 
 	return S_OK;
 }

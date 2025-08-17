@@ -38,11 +38,10 @@ float4 PS(VertexOut pin) : SV_Target
     
     float4 color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicClamp, pin.TexC);
     
+    if(gObjPad0 == 3)
+        color = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+    
     color.rgb = pow(color.rgb, 1.0 / 2.2);
-    
-    //if (color.rgb == float3(0.f, 0.f, 0.f))
-    //    discard;
-    
     
    if (gObjPad0 == 2) // Á¡·ÉÁö
     {

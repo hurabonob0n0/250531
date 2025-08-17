@@ -42,7 +42,7 @@ HRESULT CDrone::Initialize(void* pArg)
     m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("DroneMat", MD));
     m_CBBindingCom->Set_TexCoordMatrix(XMMatrixIdentity());
 
- 
+    
 
     AudioVec3 startPos{ m_vPos.m128_f32[0], m_vPos.m128_f32[1], m_vPos.m128_f32[2] };
     AudioVec3 vel{ 0,0,0 };
