@@ -166,6 +166,9 @@
     <Filter Include="96.ForSound\FMod_Manager">
       <UniqueIdentifier>{dc5d6c9d-cb4d-4837-9f90-18f1e60faaae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.DefaultObj\Ping">
+      <UniqueIdentifier>{b9868416-62c3-4726-9f03-5d740639f90a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Defines.h">
@@ -321,6 +324,9 @@
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00.MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Ping.h">
+      <Filter>01.DefaultObj\Ping</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -466,6 +472,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FMOD_Manager.cpp">
       <Filter>96.ForSound\FMod_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Ping.cpp">
+      <Filter>01.DefaultObj\Ping</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

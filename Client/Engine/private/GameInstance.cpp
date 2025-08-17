@@ -104,6 +104,16 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		//set_Disable_Depth_Test()->
 		Create_PSO());
 
+	m_PSOMgr->AddPSO("PingPSO", CPSO::Create()->
+		SetInputLayout(CPSO::IT_MESH)->
+		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		set_Blend_Enable()->
+		set_Disable_Depth_Write()->
+		set_Disable_Depth_Test()->
+		Create_PSO());			//그리는 순서는 유아이보다 먼저 그리는 방법은 PosinImage처럼
+
 	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("ShadowVS"))->

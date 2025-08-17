@@ -26,6 +26,7 @@
 #include "UI_VICTORY.h"
 #include "FMOD_Manager.h"
 #include "UITime.h"
+#include "Ping.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -156,6 +157,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Zet", CZet::Create());
 	m_GameInstance->Add_PrototypeObject("Camera_Drone", CCamera_Drone::Create());
 	m_GameInstance->Add_PrototypeObject("BulletPath", CBulletPath::Create());
+
+	m_GameInstance->Add_PrototypeObject("Ping", CPing::Create());
 	
 	auto* FM = FMOD_Manager::Get_Instance();
 	if (!FM->Initialize(512, /*distanceScale*/1.0f)) {

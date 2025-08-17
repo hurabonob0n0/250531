@@ -74,7 +74,11 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 void CCamera_Free::Tick(float fTimeDelta)
 {
-
+	/*if (m_GameInstance->Mouse_Down(2))
+	{
+		_uint CamIndex = 0;
+		m_GameInstance->AddObject("Ping", "Ping", &CamIndex);
+	}*/
 
 	//__super::Tick(fTimeDelta);
 	if (m_GameInstance->Key_Down(VK_PAUSE))
