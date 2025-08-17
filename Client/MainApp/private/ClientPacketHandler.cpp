@@ -573,9 +573,11 @@ void ClientPacketHandler::Handle_S_ADD_PING(BYTE* buffer, int32 len)
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
+		uint8 tankindex; 
 		float X, Y, Z;
+		br >> header;
+		br>>tankindex >> X >> Y >> Z;
 
-		br >> X >> Y >> Z;
 		if (Network_Manager::GetInstance()->MyPosMode == POS_DRIVER) {
 
 			CGameInstance::Get_Instance()->AddObject("Ping", "Ping", nullptr);
