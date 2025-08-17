@@ -432,17 +432,17 @@ int CMainApp::Run()
 				m_Input_Dev->ResetPerFrame();
 
 
-				//RECT rect;
-				//GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
-				//POINT center = {
-				//	(rect.right - rect.left) / 2,
-				//	(rect.bottom - rect.top) / 2
-				//};
-				// 
-				//// 클라이언트 좌표 → 스크린 좌표로 변환
-				//ClientToScreen(m_hMainWnd, &center);
+				RECT rect;
+				GetClientRect(m_hMainWnd, &rect);         // 클라이언트 영역 좌표
+				POINT center = {
+					(rect.right - rect.left) / 2,
+					(rect.bottom - rect.top) / 2
+				};
+				 
+				// 클라이언트 좌표 → 스크린 좌표로 변환
+				ClientToScreen(m_hMainWnd, &center);
 
-				//SetCursorPos(center.x, center.y);
+				SetCursorPos(center.x, center.y);
 			}
 			else
 			{
@@ -541,23 +541,23 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 	}
 
 	// 클라이언트의 크기를 기반으로 윈도우 사각형을 계산합니다.
-	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
-	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-	int width = R.right - R.left;
-	int height = R.bottom - R.top;*/
-
-	/*DWORD style = WS_VISIBLE | WS_POPUP;
-
-	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);*/
-
 	RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
 	int height = R.bottom - R.top;
 
+	DWORD style = WS_VISIBLE | WS_POPUP;
+
 	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
+		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);
+
+	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
+	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+	int width = R.right - R.left;
+	int height = R.bottom - R.top;
+
+	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);*/
 
 	if (!m_hMainWnd)
 	{

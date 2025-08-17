@@ -67,7 +67,7 @@ void CUIHP::Render()
     int hundred = Hp / 100;
     Hp -= 100 * hundred;
     int ten = Hp / 10;
-    Hp -= Hp * ten;
+    Hp -= 10 * ten;
     int one = Hp;
 
     _100Hp->Set_World_Identity();

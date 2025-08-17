@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Terrain.h"
 #include "Tank.h"
+#include "Network_Manager.h"
 
 CBulletPath::CBulletPath() : CRenderObject()
 {
@@ -14,30 +15,30 @@ CBulletPath::CBulletPath(CBulletPath& rhs) : CRenderObject(rhs)
 
 HRESULT CBulletPath::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+	__super::Initialize_Prototype();
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CBulletPath::Initialize(void* pArg)
 {
-    m_RG = CRenderer::RG_BULLETPATH; // ¹Ù²ã¾ßÇÔ.
+	m_RG = CRenderer::RG_BULLETPATH; // ¹Ù²ã¾ßÇÔ.
 
 	BulletPathstr* Info = (BulletPathstr*)pArg;
 	OwnerTankIndex = Info->OwnerTankIndex;
 	m_Dir = Info->Dir * 150.f;
 	m_Pos1 = Info->Pos;
 	m_Pos2 = Info->Pos;
-	XMMATRIX mat = XMMatrixTranslation(XMVectorGetX( Info->Pos), XMVectorGetY(Info->Pos), XMVectorGetZ(Info->Pos));
+	XMMATRIX mat = XMMatrixTranslation(XMVectorGetX(Info->Pos), XMVectorGetY(Info->Pos), XMVectorGetZ(Info->Pos));
 
-    __super::Initialize(&mat);
+	__super::Initialize(&mat);
 
 	CVIBuffer_Geos::BASIC_SUBMESHES cylinder = CVIBuffer_Geos::BASIC_SUBMESHES::BS_CYLINDER;
-    m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &cylinder);
-	
+	m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom", &cylinder);
+
 	//m_VIBuffer = (CVIBuffer_Geos*)m_GameInstance->Get_Component("VIBuffer_GeosCom");
 	m_Terrain = (CTerrain*)m_GameInstance->GetGameObject("Terrain", 0);
-    return S_OK;
+	return S_OK;
 }
 
 
@@ -48,9 +49,9 @@ void CBulletPath::Tick(float fTimeDelta)
 
 	m_fYSpeed -= 6.8 * fTimeDelta;
 
-	m_Pos2 += m_Dir * fTimeDelta + XMVectorSet(0.f,m_fYSpeed * fTimeDelta,0.f,0.f);
+	m_Pos2 += m_Dir * fTimeDelta + XMVectorSet(0.f, m_fYSpeed * fTimeDelta, 0.f, 0.f);
 
-	
+
 
 
 
@@ -84,22 +85,22 @@ void CBulletPath::Tick(float fTimeDelta)
 
 void CBulletPath::LateTick(float fTimeDelta)
 {
-	/*if(CheckCollisionWithTank()) {
-		isDead = true;
-		return;
-	}*/
-
+	if (Network_Manager::GetInstance()->isConnected())
+	{
+		/*if (CheckCollisionWithTank()) {
+			isCollision = true;
+		}*/
+	}
 
 	if (CheckCollisionWithTerrain())
 	{
 		isCollision = true;
 	}
 
-
 	if (m_fCollisionDeltatime > 5.f)
 		isDead = true;
-		
-    __super::LateTick(fTimeDelta);
+
+	__super::LateTick(fTimeDelta);
 }
 
 void CBulletPath::Render()
@@ -109,7 +110,7 @@ void CBulletPath::Render()
 		m_GameInstance->Get_Current_FrameResource()->m_InstanceCB->CopyData(i, BulletDatas[i]);
 	}
 	GETCOMMANDLIST->SetGraphicsRootShaderResourceView(6, m_GameInstance->Get_Current_FrameResource()->m_InstanceCB->Resource()->GetGPUVirtualAddress());
-    (CVIBuffer_Geos*)m_VIBuffer->Render((int)BulletDatas.size()); // ÀÎ½ºÅÏ½Ì¿ëÀ¸·Î ¹Ù²ã¾ßÇÔ.
+	(CVIBuffer_Geos*)m_VIBuffer->Render((int)BulletDatas.size()); // ÀÎ½ºÅÏ½Ì¿ëÀ¸·Î ¹Ù²ã¾ßÇÔ.
 }
 
 InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, const XMVECTOR& newPos)
@@ -158,7 +159,7 @@ InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, cons
 	XMVECTOR midPoint = XMVectorScale(XMVectorAdd(oldPos, newPos), 0.5f);
 	XMMATRIX translationMatrix = XMMatrixTranslationFromVector(midPoint);
 
-	
+
 	// ÃÖÁ¾ World Çà·Ä: Scale -> Rotate -> Translate ¼ø¼­·Î °ö¼À
 	worldMatrix = XMMatrixMultiply(scaleMatrix, worldMatrix);
 	worldMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(90.f)), worldMatrix);
@@ -213,21 +214,21 @@ bool CBulletPath::CheckCollisionWithTank()
 
 void CBulletPath::Free()
 {
-    Safe_Release(m_VIBuffer);
+	Safe_Release(m_VIBuffer);
 
-    __super::Free();
+	__super::Free();
 }
 
 CBulletPath* CBulletPath::Create()
 {
-    CBulletPath* pInstance = new CBulletPath;
-    pInstance->Initialize_Prototype();
-    return pInstance;
+	CBulletPath* pInstance = new CBulletPath;
+	pInstance->Initialize_Prototype();
+	return pInstance;
 }
 
 CRenderObject* CBulletPath::Clone(void* pArg)
 {
-    CBulletPath* pInstance = new CBulletPath(*this);
-    pInstance->Initialize(pArg);
-    return pInstance;
+	CBulletPath* pInstance = new CBulletPath(*this);
+	pInstance->Initialize(pArg);
+	return pInstance;
 }
