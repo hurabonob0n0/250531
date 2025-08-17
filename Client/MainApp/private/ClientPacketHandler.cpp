@@ -388,7 +388,7 @@ void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
 		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", 3)))->set_Hit();
+		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_DAMAGE)))->set_Hit();
 		});
 }
 
@@ -618,10 +618,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 			{
 				if (Network_Manager::GetInstance()->MyPosMode == POS_POSU)
 				{
-					float x = mat.m[3][0];
-					float y = mat.m[3][1];
-					float z = mat.m[3][2];
-					tank->Set_MyPos(x, y, z);
+					tank->SetMyMatrix(mat);
 				}
 				else if(Network_Manager::GetInstance()->MyPosMode == POS_DRIVER)
 				{

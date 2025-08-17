@@ -123,6 +123,8 @@ public:
 
 	void Set_MyPos(float x, float y, float z);
 
+	void SetMyMatrix(_float4x4 mat);
+
 private:		//For PosinCrosshair
 	CBBinding* m_CBBindingQuad;
 	CVIBuffer_Quad* m_VIBufferQuad;

@@ -412,8 +412,10 @@ void CTank::UpdateAudio(float dt)
 	// 내 오디오 채널이 아직 없으면 생성(최초 1회)
 	if (!_engineCh || !_trackCh) OnSpawnAudio();
 
+	
 
-	if (Network_Manager::GetInstance()->myPosition == POS_POSU && _useNetMix)
+
+	if (Network_Manager::GetInstance()->MyPosMode == POS_POSU && _useNetMix)
 	{
 		_netHoldT += dt;
 		if (_netHoldT > 0.25f) {
@@ -1151,6 +1153,11 @@ void CTank::Set_MyPos(float x, float y, float z)
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, safePos);
 
 
+}
+
+void CTank::SetMyMatrix(_float4x4 mat) {
+
+	m_TransformCom->Set_WorldMatrix(mat);
 }
 
 
