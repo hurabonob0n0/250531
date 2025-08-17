@@ -64,8 +64,19 @@ void CCamera_Drone::Tick(float fTimeDelta)
 {
 	//TODO 여기 키 변경 Y + Drone의 3인칭은 버리기
 	//
-	if (m_GameInstance->Key_Down('Y')) {
+	if (m_GameInstance->Key_Down('G'))
+	{
+		isRotation = !isRotation;
 
+		if (isRotation)
+		{
+			m_fYRot_TPS = m_fXRot_TPS = 0.f;
+			m_TransformCom->Identity();
+			m_TransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&LastPos));
+		}
+	}
+
+	if (m_GameInstance->Key_Down('Y')) {
 		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
 			SetDroneRender(true);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_DRONE;
@@ -80,6 +91,12 @@ void CCamera_Drone::Tick(float fTimeDelta)
 			m_PS = FPS;
 		}
 	}
+
+	if (isRotation == false)
+	{
+		XMStoreFloat4(&LastPos, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	}
+	
 
 	//__super::Tick(fTimeDelta);
 	if (m_GameInstance->Key_Down(VK_PAUSE))

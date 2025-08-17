@@ -114,7 +114,7 @@ void CTank::Initialize_For_PosinQuad()
 	m_CBBindingQuad = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Posin", CTexture::Create(L"../bin/Models/Posin/Posin.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Posin", CTexture::Create(L"../bin/Models/Posin/cross.dds"));
 
 	m_CBBindingQuad->Set_MaterialIndex(m_GameInstance->Add_Material("PosinMat", mat));
 
@@ -1161,23 +1161,23 @@ void CTank::Tick_For_Posin_Image(float fTimeDelta)
 	float angleDiffX = m_fPotapRotation - m_fCamPotapRot;
 	float angleDiffY = m_fCamPosinRot - m_fPosinRotation;
 
-	// 스케일링.
-	if (angleDiffX == 0.f && angleDiffY == 0.f) {
-		m_fSameTime += fTimeDelta;
-		if (m_fSameTime > 3.f)
-			m_fSameTime = 3.f;
-	}
-	else
-	{
-		/*m_fSameTime -= fTimeDelta;
-		if (m_fSameTime < 0)
-			m_fSameTime = 0.f;*/
-		m_fSameTime = 0.f;
-	}
+	//// 스케일링.
+	//if (angleDiffX == 0.f && angleDiffY == 0.f) {
+	//	m_fSameTime += fTimeDelta;
+	//	if (m_fSameTime > 3.f)
+	//		m_fSameTime = 3.f;
+	//}
+	//else
+	//{
+	//	/*m_fSameTime -= fTimeDelta;
+	//	if (m_fSameTime < 0)
+	//		m_fSameTime = 0.f;*/
+	//	m_fSameTime = 0.f;
+	//}
 
-	float fScale = 1.f - m_fSameTime * 0.29f;
+	//float fScale = 1.f - m_fSameTime * 0.29f;
 
-	m_QuadWorldTransform->Set_Scale(fScale * 0.5f);
+	m_QuadWorldTransform->Set_Scale(0.05f);
 
 	// 위치 바꾸기
 	angleDiffX /= 30.f;

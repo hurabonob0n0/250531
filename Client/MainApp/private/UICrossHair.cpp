@@ -31,7 +31,7 @@ HRESULT CUICrossHair::Initialize(void* pArg)
 
     TPSMatIndex = m_GameInstance->Add_Material("TPSAIM", mat);
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FPSCrossHair", CTexture::Create(L"../bin/Models/FinalUI/FPSUI.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FPSCrossHair", CTexture::Create(L"../bin/Models/FinalUI/FPSCrossHair.dds"));
 
     FPSMatIndex = m_GameInstance->Add_Material("FPSCrossHair", mat);
 

@@ -45,7 +45,11 @@ private:
 	
 	PERSPECTIVE m_PS = TPS;
 
+	bool isRotation = true;
+
 	bool isDroneRender = false;
+
+	_float4 LastPos;
 public:
 	void SetDroneRender(bool tf) {
 
