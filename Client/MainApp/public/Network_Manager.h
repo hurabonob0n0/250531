@@ -133,13 +133,14 @@ public:
 	PosMode MyPosMode;
 	ControlTarget MyControlTarget;
 
+	bool PingAdded = false;
 private:
 
 	ClientServiceRef _service;
 	bool _connected = false;
 	int MyClientID;
 
-	bool GameStart;
+	bool GameStart = false;
 
 	Room_Ready_Data myData;
 

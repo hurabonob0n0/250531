@@ -39,6 +39,16 @@ public:
         return m_Layers[LayerName][ID]->Get_Object_Component(ComponentTag);
 	}
 
+
+    int GetLayerSize(string LayerName)
+    {
+        auto it = m_Layers.find(LayerName);
+        if (it == m_Layers.end())
+            return 0;
+
+        return static_cast<int>(it->second.size());
+    }
+
 private:
     unordered_map<string, Layer> m_Layers;
     unordered_map<string, CGameObject*> m_Prototypes;

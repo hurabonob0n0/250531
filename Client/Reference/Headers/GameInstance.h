@@ -86,6 +86,11 @@ public:
 		return m_ObjectMgr->GetGameObject(LayerName, ID);
 	}
 
+	int GetLayerSize(string LayerName) {
+
+		return m_ObjectMgr->GetLayerSize(LayerName);
+	}
+
 public: //For MaterialMgr
 	int Add_Material(string matName, MaterialData matInstance) { return m_MaterialMgr->Add_Material(matName, matInstance); }
 	_uint Get_Mat_Size() { return m_MaterialMgr->Get_Mat_Size(); }

@@ -41,7 +41,13 @@ HRESULT CUITime::Initialize(void* pArg)
 
 void CUITime::Tick(float fTimeDelta)
 {
-    Update_Time(fTimeDelta);
+
+    if(Active == true)
+        Update_Time(fTimeDelta);
+    else {
+        if (Network_Manager::GetInstance()->GetGameStart())
+            Active = true;
+    }
 }
 
 void CUITime::LateTick(float fTimeDelta)

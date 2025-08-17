@@ -23,6 +23,7 @@ public:
 
 private:
 	float fGameTime = 0.f;
+	bool Active = false;
 
 private:
 	CUINumber* TenMinutes;
