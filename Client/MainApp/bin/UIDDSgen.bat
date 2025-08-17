@@ -1,7 +1,7 @@
 @echo off
 set TEXCONV=texconv.exe
-set INPUT_DIR=.\Models\FinalUI\
-set OUTPUT_DIR=.\Models\FinalUI\
+set INPUT_DIR=.\Models\Effect\
+set OUTPUT_DIR=.\Models\Effect\
 
 echo [텍스처 변환 시작]
 

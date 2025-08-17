@@ -28,6 +28,7 @@
 #include "UITime.h"
 #include "Ping.h"
 #include "UICompass.h"
+#include "SmokeEffect.h"
 /*-----------------
 	For Server
 -----------------*/
@@ -136,6 +137,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Add_PrototypeObject("Camera", CCamera_Free::Create());
 	m_GameInstance->Add_PrototypeObject("DefaultObject", CDefaultObj::Create());
 	m_GameInstance->Add_PrototypeObject("Effect", CEffect::Create());
+	m_GameInstance->Add_PrototypeObject("SmokeEffect", CSmokeEffect::Create());
 	m_GameInstance->Add_PrototypeObject("Tank", CTank::Create());
 	m_GameInstance->Add_PrototypeObject("Terrain", CTerrain::Create());
 	m_GameInstance->Add_PrototypeObject("UICrossHair", CUICrossHair::Create());

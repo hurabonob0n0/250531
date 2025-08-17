@@ -333,6 +333,9 @@
     <ClInclude Include="..\public\UICompass.h">
       <Filter>01.DefaultObj\UI\UICompass</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SmokeEffect.h">
+      <Filter>01.DefaultObj\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Free.cpp">
@@ -484,6 +487,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UICompass.cpp">
       <Filter>01.DefaultObj\UI\UICompass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SmokeEffect.cpp">
+      <Filter>01.DefaultObj\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
