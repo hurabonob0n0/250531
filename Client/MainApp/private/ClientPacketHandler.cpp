@@ -20,6 +20,7 @@
 #include "FMOD_Manager.h"
 #include "Camera_Free.h"
 #include "BulletPath.h"
+#include "Ping.h"
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
@@ -111,6 +112,9 @@ void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 	case S_TANK_SOUND:
 		Handle_S_SOUND(buffer,len);
 		break;
+	case S_ADD_PING:
+		Handle_S_ADD_PING(buffer, len);
+		break;
 	default:
 		break;
 	}
@@ -179,6 +183,8 @@ void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 		br >> ID;
 
 		Level_Manager::Get_Instance()->SetGamePlayMode();
+
+
 		});
 
 
@@ -560,6 +566,29 @@ void ClientPacketHandler::Handle_S_SOUND(BYTE* buffer, int32 len)
 
 }
 
+void ClientPacketHandler::Handle_S_ADD_PING(BYTE* buffer, int32 len)
+{
+	std::vector<uint8_t> data(buffer, buffer + len);
+	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
+
+		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		PacketHeader header;
+		float X, Y, Z;
+
+		br >> X >> Y >> Z;
+		if (Network_Manager::GetInstance()->MyPosMode == POS_DRIVER) {
+
+			CGameInstance::Get_Instance()->AddObject("Ping", "Ping", nullptr);
+			int index = CGameInstance::Get_Instance()->GetLayerSize("Ping")- 1;
+			dynamic_cast<CPing*>(CGameInstance::Get_Instance()->GetGameObject("Ping", index))->Set_Position(X,Y,Z);
+
+		}
+
+	});
+
+
+}
+
 void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, int32 len)
 {
 
@@ -570,6 +599,7 @@ void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, 
 	br >> header;
 
 	Network_Manager::GetInstance()->SetGamstart();
+
 
 }
 
@@ -919,6 +949,23 @@ SendBufferRef ClientPacketHandler::Make_C_SOUND(float EngineVol, float EnginePit
 	return sendBuffer;
 }
 
+SendBufferRef ClientPacketHandler::Make_C_PING(float X, float Y, float Z)
+{
+	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	PacketHeader* header = bw.Reserve<PacketHeader>();
+
+	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
+	bw << X << Y << Z;
+
+	header->size = bw.WriteSize();
+	header->id = C_ADD_PING;
+
+	sendBuffer->Close(bw.WriteSize());
+
+	return sendBuffer;
+}
+
 #pragma endregion Packet_to_Server
 
 #pragma region ForIngame
@@ -1027,5 +1074,7 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(float x, float y, float z)
 	return sendBuffer;
 
 }
+
+
 
 #pragma endregion Packet_to_Server

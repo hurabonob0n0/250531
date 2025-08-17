@@ -6,6 +6,10 @@
 #include "Network_Manager.h"
 #include "StateMgr.h"
 #include "AirDrop.h"
+#include "Ping.h"
+#include "ClientPacketHandler.h"
+#include "ServiceManager.h"
+
 CCamera_Drone::CCamera_Drone() : CCamera()
 {
 }
@@ -65,6 +69,23 @@ void CCamera_Drone::Tick(float fTimeDelta)
 	if (m_GameInstance->Mouse_Down(2))
 	{
 		m_GameInstance->AddObject("Ping", "Ping", nullptr);
+		int index = m_GameInstance->GetLayerSize("Ping")-1;
+
+		CPing* pingObj = dynamic_cast<CPing*>(m_GameInstance->GetGameObject("Ping", index));
+		if (!pingObj) return;
+
+		XMVECTOR Temp = pingObj->Get_Pos();
+
+		float x = XMVectorGetX(Temp);
+		float y = XMVectorGetY(Temp);
+		float z = XMVectorGetZ(Temp);
+
+		if (Network_Manager::GetInstance()->isConnected()) {
+			auto sendBuffer = ClientPacketHandler::Make_C_PING(x, y, z);
+			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+		}
+
+
 	}
 
 	//TODO 여기 키 변경 Y + Drone의 3인칭은 버리기

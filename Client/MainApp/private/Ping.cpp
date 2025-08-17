@@ -105,6 +105,11 @@ void CPing::Set_Position()
 	m_TransformCom->Set_State(CTransform::STATE_POSITION, LayContactPos);
 }
 
+_vector CPing::Get_Pos()
+{
+	return LayContactPos;
+}
+
 void CPing::Set_Position(float x, float y, float z)
 {
 	LayContactPos = XMVectorSet(x, y, z, 1.f);

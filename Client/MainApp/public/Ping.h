@@ -33,6 +33,7 @@ private:
 
 public:
 	void Set_Position(float x, float y, float z);
+	_vector Get_Pos();
 
 private:
 	CVIBuffer_Quad* m_VIBuffer;
