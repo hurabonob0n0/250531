@@ -23,7 +23,7 @@ public:
 	//_float4x4 Get_TransformMatrix() { return m_Bone->Get_TransformMatrix(); }
 
 public:
-	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 
 public:
@@ -54,9 +54,12 @@ private:
 	HRESULT Ready_Anim_Mesh(const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);
 
 public:
-	static CMesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);
+	static CMesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext);
 	virtual CComponent* Clone(void* pArg);
 	virtual void Free() override;
+
+public:
+	static int g_MeshIndex;
 };
 
 END
