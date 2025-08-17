@@ -374,6 +374,11 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 			ch->setPitch(pitch);
 		}
 
+		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_TANK && Network_Manager::GetInstance()->GetMyTankIndex() == TankIndex) {
+			dynamic_cast<CCamera_Free*>(CGameInstance::Get_Instance()->GetGameObject("Camera", 0))->StartShake(0.7f, 0.7f, 40.f);
+		}
+
+
 		});
 }
 
