@@ -50,7 +50,6 @@ void CUINumber::LateTick(float fTimeDelta)
 
 void CUINumber::Render()
 {
-    __super::Render();
     m_VIBuffer->Render();
 }
 
@@ -62,6 +61,7 @@ void CUINumber::Set_World_Identity()
 void CUINumber::Set_On_CBBinding()
 {
     m_CBBinding->Set_World_TexCoord_And_Update(m_TransformCom,m_TexCoordTransformCom);
+    m_CBBinding->Set_On_Shader();
 }
 
 void CUINumber::Free()

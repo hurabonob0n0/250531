@@ -272,7 +272,6 @@ void CTank::Render()
 		{
 			for (int i = 0; i < 55; ++i)
 				m_VIBuffer->Render(i);
-
 		}
 			break;
 		case POS_POSU:
