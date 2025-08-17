@@ -42,6 +42,8 @@ private:
 	CTransform* m_CameraFree;
 	CTransform* m_DroneCamera;
 
+
+	float m_TimeDelta = 0;
 private:
 	_uint m_MatIndex = 0;
 	_vector LayContactPos;

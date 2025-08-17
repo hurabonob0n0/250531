@@ -68,23 +68,25 @@ void CCamera_Drone::Tick(float fTimeDelta)
 {
 	if (m_GameInstance->Mouse_Down(2))
 	{
-		m_GameInstance->AddObject("Ping", "Ping", nullptr);
-		int index = m_GameInstance->GetLayerSize("Ping")-1;
 
-		CPing* pingObj = dynamic_cast<CPing*>(m_GameInstance->GetGameObject("Ping", index));
-		if (!pingObj) return;
+		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+			m_GameInstance->AddObject("Ping", "Ping", nullptr);
+			int index = m_GameInstance->GetLayerSize("Ping") - 1;
 
-		XMVECTOR Temp = pingObj->Get_Pos();
+			CPing* pingObj = dynamic_cast<CPing*>(m_GameInstance->GetGameObject("Ping", index));
+			if (!pingObj) return;
 
-		float x = XMVectorGetX(Temp);
-		float y = XMVectorGetY(Temp);
-		float z = XMVectorGetZ(Temp);
+			XMVECTOR Temp = pingObj->Get_Pos();
 
-		if (Network_Manager::GetInstance()->isConnected()) {
-			auto sendBuffer = ClientPacketHandler::Make_C_PING(x, y, z);
-			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+			float x = XMVectorGetX(Temp);
+			float y = XMVectorGetY(Temp);
+			float z = XMVectorGetZ(Temp);
+
+			if (Network_Manager::GetInstance()->isConnected()) {
+				auto sendBuffer = ClientPacketHandler::Make_C_PING(x, y, z);
+				ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+			}
 		}
-
 
 	}
 

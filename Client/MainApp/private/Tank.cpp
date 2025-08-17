@@ -1101,14 +1101,7 @@ void CTank::SendShootDataToServer()
 		fDir.x, fDir.y, fDir.z);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
 
-	_matrix mat = XMMatrixTranslation(fPos.x, fPos.y+0.5f, fPos.z);
-	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
 
-	mat = XMMatrixTranslation(fPos.x + 0.1f, fPos.y + 0.6f, fPos.z + 0.1f);
-	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
-
-	mat = XMMatrixTranslation(fPos.x - 0.1f, fPos.y + 0.6f, fPos.z - 0.1f);
-	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
 }
 
 void CTank::PushBulletMatrix(const _matrix& mat)

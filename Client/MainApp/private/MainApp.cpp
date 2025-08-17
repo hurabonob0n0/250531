@@ -290,7 +290,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 						Network_Manager::GetInstance()->SetMyTankIndex(tankIndex);
 						if (tankIndex >= 0 && tankIndex < 8)
 						{
-
 							const XMFLOAT3& pos = g_RespawnPositions[tankIndex];
 							tank->Set_MyPos(pos.x, pos.y, pos.z);
 							XMFLOAT4X4 worldFloat4x4;

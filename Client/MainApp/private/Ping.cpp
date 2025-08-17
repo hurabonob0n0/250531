@@ -51,6 +51,8 @@ HRESULT CPing::Initialize(void* pArg)
 void CPing::Tick(float fTimeDelta)
 {
 
+	m_TimeDelta += fTimeDelta;
+
 }
 
 void CPing::LateTick(float fTimeDelta)
@@ -71,6 +73,11 @@ void CPing::LateTick(float fTimeDelta)
 	m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
 
 	__super::LateTick(fTimeDelta);
+
+
+	if (m_TimeDelta > 5.f)
+		isDead = true;
+
 }
 
 void CPing::Render()

@@ -370,6 +370,16 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
 
 
+		_matrix mat = XMMatrixTranslation(PosX, PosY + 0.5f, PosZ);
+		CGameInstance::Get_Instance()->AddObject("SmokeEffect", "Effect", &mat);
+
+		mat = XMMatrixTranslation(PosX + 0.1f, PosY + 0.6f, PosZ + 0.1f);
+		CGameInstance::Get_Instance()->AddObject("SmokeEffect", "Effect", &mat);
+
+		mat = XMMatrixTranslation(PosX - 0.1f, PosY + 0.6f, PosZ - 0.1f);
+		CGameInstance::Get_Instance()->AddObject("SmokeEffect", "Effect", &mat);
+
+
 		auto* FM = FMOD_Manager::Get_Instance();
 		AudioVec3 p{ PosX, PosY, PosZ };
 		AudioVec3 v{ 0, 0, 0 };
