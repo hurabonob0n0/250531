@@ -5,8 +5,8 @@
 
 #define UI_CROSSHAIR	0
 #define UI_RELOADING	1
-#define UI_DAMAGE			2
-#define UI_KILL		3
+#define UI_DAMAGE		2
+#define UI_KILL		    3
 #define UI_TEAMPERCENT  4
 #define UI_SELECT_POS	5
 #define UI_SKILLBOX		6

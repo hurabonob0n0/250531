@@ -297,6 +297,8 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 			++tankIndex;
 		}
 
+
+		uint8 MyPos = Network_Manager::GetInstance()->myPosition;
 	}
 	else {
 		Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
