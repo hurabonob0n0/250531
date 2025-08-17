@@ -50,21 +50,11 @@ void CBulletPath::Tick(float fTimeDelta)
 
 	m_Pos2 += m_Dir * fTimeDelta + XMVectorSet(0.f,m_fYSpeed * fTimeDelta,0.f,0.f);
 
-	if(CheckCollisionWithTank()) {
-		isDead = true;
-		return;
-	}
-
-
-	if (CheckCollisionWithTerrain())
-	{
-		isDead = true;
-		return;
-	}
+	
 
 
 
-	if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000)
+	if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000 && !isCollision)
 	{
 		BulletDatas.push_back(CreateBulletTrailInstance(m_Pos1, m_Pos2));
 		for (int i = 0; i < BulletDatas.size(); ++i)
@@ -74,9 +64,18 @@ void CBulletPath::Tick(float fTimeDelta)
 		m_Pos1 = m_Pos2;
 		m_fDeltaTime = 0.f;
 	}
+	else if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000 && isCollision)
+	{
+		for (int i = 0; i < BulletDatas.size(); ++i)
+		{
+			BulletDatas[i].ObjPad2 += m_fDeltaTime;
+		}
+		m_fDeltaTime = 0.f;
+	}
 
 
-
+	if (isCollision)
+		m_fCollisionDeltatime += fTimeDelta;
 
 
 	if (BulletDatas.size() >= 1000)
@@ -85,6 +84,21 @@ void CBulletPath::Tick(float fTimeDelta)
 
 void CBulletPath::LateTick(float fTimeDelta)
 {
+	/*if(CheckCollisionWithTank()) {
+		isDead = true;
+		return;
+	}*/
+
+
+	if (CheckCollisionWithTerrain())
+	{
+		isCollision = true;
+	}
+
+
+	if (m_fCollisionDeltatime > 5.f)
+		isDead = true;
+		
     __super::LateTick(fTimeDelta);
 }
 
@@ -138,7 +152,7 @@ InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, cons
 
 	// 스케일 행렬 생성 (궤적 두께 0.1, 길이는 distance)
 	// Z축으로 길어지도록 설정합니다. VIBuffer의 정육면체 모델이 Z축을 바라보도록 제작되어야 합니다.
-	XMMATRIX scaleMatrix = XMMatrixScaling(0.5f, 0.5f, distance);
+	XMMATRIX scaleMatrix = XMMatrixScaling(0.1f, 0.1f, distance);
 
 	// 위치 행렬 생성 (두 위치의 중간 지점)
 	XMVECTOR midPoint = XMVectorScale(XMVectorAdd(oldPos, newPos), 0.5f);

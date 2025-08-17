@@ -27,6 +27,9 @@ public:
 	virtual void Render();
 
 private:
+	void PassCBSetting();
+
+private:
 	void Tick_For_TPS(float fTimeDelta);
 	void Tick_For_FPS(float fTimeDelta);
 
@@ -41,11 +44,11 @@ private:
 
 	float		m_fYRot_TPS;
 	float		m_fXRot_TPS;
-	float		m_Distance_TPS;
+	float		m_Distance_TPS = 60.f;
 
 	float		m_fYRot_FPS;
 	float		m_fXRot_FPS;
-	float		m_Distance_FPS;
+	float		m_Distance_FPS = 60.f;
 
 	class CTerrain* m_Terrain;
 	

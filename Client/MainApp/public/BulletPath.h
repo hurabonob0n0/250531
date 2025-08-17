@@ -45,11 +45,13 @@ private:
 	vector<InstanceData> BulletDatas;
 	XMVECTOR m_Dir;
 	class CTerrain* m_Terrain;
-	float m_fAddBulletTime = 0.016f;
+	float m_fAddBulletTime = 0.0016f;
 	float m_fDeltaTime = 0.f;
 	XMVECTOR m_Pos1;
 	XMVECTOR m_Pos2;
 	float m_fYSpeed = 0.f;
+	bool isCollision = false;
+	float m_fCollisionDeltatime = 0.f;
 
 public:
 	void Free() override;
