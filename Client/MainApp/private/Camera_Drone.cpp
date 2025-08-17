@@ -62,6 +62,11 @@ HRESULT CCamera_Drone::Initialize(void* pArg)
 
 void CCamera_Drone::Tick(float fTimeDelta)
 {
+	if (m_GameInstance->Mouse_Down(2))
+	{
+		m_GameInstance->AddObject("Ping", "Ping", nullptr);
+	}
+
 	//TODO 여기 키 변경 Y + Drone의 3인칭은 버리기
 	//
 	if (m_GameInstance->Key_Down('G'))
@@ -84,7 +89,7 @@ void CCamera_Drone::Tick(float fTimeDelta)
 			CStateMgr::Set_GameMode(GM_Drone);
 			m_PS = FPS;
 		}
-		else if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
+		else if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
 			SetDroneRender(false);
 			Network_Manager::GetInstance()->MyControlTarget = CONTROL_POSIN;
 			CStateMgr::Set_GameMode(GM_FPS);
@@ -96,24 +101,24 @@ void CCamera_Drone::Tick(float fTimeDelta)
 	{
 		XMStoreFloat4(&LastPos, m_TransformCom->Get_State(CTransform::STATE_POSITION));
 	}
-	
+
 
 	//__super::Tick(fTimeDelta);
 	if (m_GameInstance->Key_Down(VK_PAUSE))
 		m_isPaused = !m_isPaused;
 
 	if (!m_isPaused) {
-		
+
 
 
 		if (Network_Manager::GetInstance()->MyControlTarget != CONTROL_DRONE) {
 			if (m_GameInstance->Mouse_Down(1))
 			{
-			if (m_PS == FPS)
-				m_PS = TPS;
+				if (m_PS == FPS)
+					m_PS = TPS;
 
-			else if (m_PS == TPS)
-				m_PS = FPS;
+				else if (m_PS == TPS)
+					m_PS = FPS;
 			}
 		}
 		if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE) {
@@ -157,7 +162,7 @@ void CCamera_Drone::LateTick(float fTimeDelta)
 	m_CBBindingCom->Set_TexCoordMatrix(textransform);
 	m_CBBindingCom->Update_CBView();
 
-	if(isDroneRender)
+	if (isDroneRender)
 		__super::LateTick(fTimeDelta);
 }
 
@@ -171,7 +176,7 @@ void CCamera_Drone::Render()
 
 		m_CBBindingCom->Set_On_Shader();
 
-		m_VIBuffer->Render();		
+		m_VIBuffer->Render();
 	}
 }
 

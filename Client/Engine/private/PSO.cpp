@@ -168,7 +168,7 @@ CPSO* CPSO::set_Blend_Enable()
 
 CPSO* CPSO::set_Disable_Depth_Test()
 {
-    m_PsoDesc.DepthStencilState.DepthEnable = true;
+    m_PsoDesc.DepthStencilState.DepthEnable = false;
     return this;
 }
 

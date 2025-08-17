@@ -195,6 +195,7 @@
     <ClInclude Include="..\public\MyBmp.h" />
     <ClInclude Include="..\public\Network_Manager.h" />
     <ClInclude Include="..\public\Object_Manager.h" />
+    <ClInclude Include="..\public\Ping.h" />
     <ClInclude Include="..\public\RoomListBar.h" />
     <ClInclude Include="..\public\Room_Manager.h" />
     <ClInclude Include="..\public\ServerSession.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\private\MyBmp.cpp" />
     <ClCompile Include="..\private\Network_Manager.cpp" />
     <ClCompile Include="..\private\Object_Manager.cpp" />
+    <ClCompile Include="..\private\Ping.cpp" />
     <ClCompile Include="..\private\RoomListBar.cpp" />
     <ClCompile Include="..\private\Room_Manager.cpp" />
     <ClCompile Include="..\private\ServerSession.cpp" />
