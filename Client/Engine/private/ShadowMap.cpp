@@ -68,7 +68,7 @@ void CShadowMap::Late_Update()
 	m_TankTransform = (CTransform*)pGameInstance->Get_Object_Component("Tank", myTankIndex, "TransformCom");
 
 	XMVECTOR lightDir = XMVectorSet(0.57735f, -0.57735f, 0.57735f, 0.f);
-	XMVECTOR lightPos = -2.0f * 500.f* lightDir;
+	XMVECTOR lightPos = -2.0f * 300.f* lightDir;
 	XMVECTOR targetPos = m_TankTransform->Get_State(CTransform::STATE_POSITION);//XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
@@ -80,12 +80,12 @@ void CShadowMap::Late_Update()
 	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, lightView));
 
 	// Ortho frustum in light space encloses scene.
-	float l = sphereCenterLS.x - 500.f;
-	float b = sphereCenterLS.y - 500.f;
-	float n = sphereCenterLS.z - 500.f;
-	float r = sphereCenterLS.x + 500.f;
-	float t = sphereCenterLS.y + 500.f;
-	float f = sphereCenterLS.z + 500.f;
+	float l = sphereCenterLS.x - 300.f;
+	float b = sphereCenterLS.y - 300.f;
+	float n = sphereCenterLS.z - 300.f;
+	float r = sphereCenterLS.x + 300.f;
+	float t = sphereCenterLS.y + 300.f;
+	float f = sphereCenterLS.z + 300.f;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 

@@ -3,6 +3,8 @@
 #include "Shader.h"
 #include "GameInstance.h"
 
+int CMesh::g_MeshIndex = 0;
+
 CMesh::CMesh(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext)
 	: CVIBuffer(pDevice, pContext)
 {
@@ -15,55 +17,54 @@ CMesh::CMesh(CMesh & rhs)
 	m_iMaterialIndex = rhs.m_iMaterialIndex;
 }
 
-HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh * pAIMesh, const vector< class CBone*>& Bones, _fmatrix PivotMatrix)
+HRESULT CMesh::Initialize_Prototype()
 {
-	m_iMaterialIndex = pAIMesh->mMaterialIndex;
-	strcpy_s(m_szName, pAIMesh->mName.data);
+	char szFileName[MAX_PATH] = "";
+	sprintf_s(szFileName, "../bin/Models/Tank/TankMeshInfo_%d.bin", g_MeshIndex++);
 
-	//std::ofstream fout("../bin/MeshInfo.txt", std::ios::app); // append 모드
-	//if (fout.is_open())
-	//{
-	//	fout << g_MeshNum++ << ". " << "MeshName: " << m_szName << ", MaterialIndex: " << m_iMaterialIndex << std::endl;
-	//	fout.close();
-	//}
-
-	m_VertexNum = pAIMesh->mNumVertices;
-	m_IndexNum = pAIMesh->mNumFaces * 3;
-	m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	m_IndexBufferByteSize = m_IndexNum * sizeof(std::uint32_t);
-
-	//47872 * 3
-
-#pragma region VERTEX_BUFFER
-
-	HRESULT		hr = eModelType == CModel::TYPE_NONANIM ? Ready_NonAnim_Mesh(pAIMesh, PivotMatrix) : Ready_Anim_Mesh(pAIMesh, Bones, PivotMatrix);
-	if (FAILED(hr))
-		return E_FAIL;
-	
-#pragma endregion
-
-
-#pragma region INDEX_BUFFER
-	_ulong* pIndices = new _ulong[m_IndexNum];
-	ZeroMemory(pIndices, m_IndexBufferByteSize);
-
-	_uint		iNumIndices = 0;
-
-	for (size_t i = 0; i < pAIMesh->mNumFaces; ++i)
+	// 2. 바이너리 읽기 모드로 파일 열기
+	std::ifstream fin(szFileName, std::ios::binary);
+	if (!fin.is_open())
 	{
-		aiFace	AIFace = pAIMesh->mFaces[i];
-
-		pIndices[iNumIndices++] = AIFace.mIndices[0];
-		pIndices[iNumIndices++] = AIFace.mIndices[1];
-		pIndices[iNumIndices++] = AIFace.mIndices[2];
+		// 파일을 열지 못했을 경우, 디버깅을 위해 어떤 파일을 못 열었는지 메시지 박스로 표시
+		char szErrorMsg[MAX_PATH + 50];
+		sprintf_s(szErrorMsg, "Failed to open Mesh file for reading:\n%s", szFileName);
+		MessageBoxA(nullptr, szErrorMsg, "Error", MB_OK);
+		return E_FAIL;
 	}
 
+	// 3. 메시 기본 정보(헤더)를 파일에서 읽어와 멤버 변수에 저장
+	fin.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(_uint));
+	fin.read(m_szName, sizeof(char) * MAX_PATH);
+	fin.read(reinterpret_cast<char*>(&m_VertexNum), sizeof(_uint));
+	fin.read(reinterpret_cast<char*>(&m_IndexNum), sizeof(_uint));
+	fin.read(reinterpret_cast<char*>(&m_IndexFormat), sizeof(DXGI_FORMAT));
+	// 저장 시 D3D11_PRIMITIVE_TOPOLOGY로 저장했으므로 동일한 타입으로 읽어야 합니다.
+	fin.read(reinterpret_cast<char*>(&m_PrimitiveType), sizeof(D3D11_PRIMITIVE_TOPOLOGY));
+	fin.read(reinterpret_cast<char*>(&m_VertexBufferByteSize), sizeof(_uint));
+	fin.read(reinterpret_cast<char*>(&m_IndexBufferByteSize), sizeof(_uint));
+
+	m_VertexByteStride = sizeof(VTXMESH);
+
+	// 4. 정점 데이터를 담을 메모리를 동적 할당하고 파일에서 데이터 읽기
+	VTXMESH* pVertices = new VTXMESH[m_VertexNum];
+	fin.read(reinterpret_cast<char*>(pVertices), m_VertexBufferByteSize);
+
+	// 5. 인덱스 데이터를 담을 메모리를 동적 할당하고 파일에서 데이터 읽기
+	_ulong* pIndices = new _ulong[m_IndexNum];
+	fin.read(reinterpret_cast<char*>(pIndices), m_IndexBufferByteSize);
+
+	fin.close();
+
+	// 6. 읽어온 데이터로 GPU 버퍼 생성
+	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
 	__super::Create_Buffer(&m_IndexBufferGPU, &m_IndexBufferUploader, pIndices, m_IndexBufferByteSize);
 
+	// 7. 사용이 끝난 동적 할당 메모리 해제
+	delete[] pVertices;
+	pVertices = nullptr;
 	delete[] pIndices;
 	pIndices = nullptr;
-#pragma endregion
 
 	return S_OK;
 }
@@ -179,31 +180,7 @@ HRESULT CMesh::Ready_Anim_Mesh(const aiMesh * pAIMesh, const vector<class CBone*
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 	}
 
-	/* 메시의 뼈의 갯수(mNumBones). (전체뼈의 갯수( x), 이 메시에게 영향ㅇ르 주는 뼈의 갯수(o) */
-	/* vBlendIndices : 이 메시에게 영향ㅇ르 주는 뼈기준의 인덱스들 */
-	/* vBlendWeights : */
-	
-	/*for (auto& pBone : Bones) {
-		if (strcmp(m_szName, pBone->Get_BoneName()) == 0) {
-			m_Bone = pBone;
-			break;
-		}
-	}
-	
-	Safe_AddRef(m_Bone);*/
-
 	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
-
-	/*std::ofstream fout("../bin/Models/Tank/TankVertecies", std::ios::binary);
-	if (fout.is_open())
-	{
-		fout.write(reinterpret_cast<const char*>(pVertices), m_VertexBufferByteSize);
-		fout.close();
-	}
-	else
-	{
-		MessageBoxA(nullptr, "Failed to open TankVertecies file for writing.", "Error", MB_OK);
-	}*/
 
 	delete[] pVertices;
 	pVertices = nullptr;
@@ -211,11 +188,11 @@ HRESULT CMesh::Ready_Anim_Mesh(const aiMesh * pAIMesh, const vector<class CBone*
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix)
+CMesh* CMesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, pAIMesh, Bones, PivotMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CMesh");
 		Safe_Release(pInstance);

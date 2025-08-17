@@ -262,7 +262,12 @@ void CTank::Render()
 			else
 			{
 				for (int i = 0; i < 55; ++i)
-					m_VIBuffer->Render(i);
+				{
+					if (!((i >= 6 && i <= 12) || (i >= 15 && i <= 21)))
+					{
+						m_VIBuffer->Render(i);
+					}
+				}
 			}
 
 
@@ -271,7 +276,12 @@ void CTank::Render()
 		case POS_DRIVER:
 		{
 			for (int i = 0; i < 55; ++i)
-				m_VIBuffer->Render(i);
+			{
+				if (!((i >= 6 && i <= 12) || (i >= 15 && i <= 21)))
+				{
+					m_VIBuffer->Render(i);
+				}
+			}
 		}
 			break;
 		case POS_POSU:
@@ -281,7 +291,13 @@ void CTank::Render()
 			}
 			else {
 				for (int i = 0; i < 55; ++i)
-					m_VIBuffer->Render(i);
+				{
+					if (!((i >= 6 && i <= 12) || (i >= 15 && i <= 21)))
+					{
+						m_VIBuffer->Render(i);
+					}
+				
+				}
 			}
 		}
 			break;
@@ -293,7 +309,12 @@ void CTank::Render()
 	else {
 
 		for (int i = 0; i < 55; ++i)
-			m_VIBuffer->Render(i);
+		{
+			if (!((i >= 6 && i <= 12) || (i >= 15 && i <= 21)))
+			{
+				m_VIBuffer->Render(i);
+			}
+		}
 	}
 
 }

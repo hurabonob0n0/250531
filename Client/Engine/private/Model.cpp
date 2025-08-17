@@ -4,6 +4,8 @@
 #include "Texture.h"
 #include "Animation.h"
 
+
+
 CModel::CModel(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
 	: CComponent(pDevice, pCommandList)
 {
@@ -44,11 +46,6 @@ HRESULT CModel::Initialize_Prototype(TYPE eModelType, const string& strModelFile
 
 	if (TYPE_NONANIM == eModelType)
 		iFlag |= aiProcess_PreTransformVertices;
-
-	/* m_pAIScene안에 .fbx파일에 담겨있던 정보들이 담긴다.  */	
-	m_pAIScene = m_Importer.ReadFile(strModelFilePath, iFlag);
-	if (nullptr == m_pAIScene)
-		return E_FAIL;
 
 	XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix);
 
@@ -291,14 +288,14 @@ void CModel::Load_Tank_Bones()
 HRESULT CModel::Ready_Meshes()
 {
 	/* 현재 모델을 구성하는 메시의 갯수. */
-	m_iNumMeshes = m_pAIScene->mNumMeshes;
+	m_iNumMeshes = 55;
 
 	m_Meshes.reserve(m_iNumMeshes);
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
 		/* VB, IB를 만든다. */
-		CMesh*			pMesh = CMesh::Create(m_Device, m_CommandList, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PivotMatrix));
+		CMesh*			pMesh = CMesh::Create(m_Device, m_CommandList);
 		if (nullptr == pMesh)
 			return E_FAIL;
 

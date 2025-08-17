@@ -47,7 +47,6 @@ public:
 	void Save_For_Tank_Bones();
 	void Load_Tank_Bones();
 
-
 private:
 	/* .fbx파일로부터 읽어온 정보를 1차적으로 저장한다.*/
 	Assimp::Importer			m_Importer;
