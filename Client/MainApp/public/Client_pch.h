@@ -47,15 +47,15 @@ using PlayerRef = shared_ptr<class Player>;
 #define ROBBY	999
 
 
-#define RESPAWNPOS_0 0.f, 38.f, 0.f
-#define RESPAWNPOS_1 369.f, 38.f, 153.f
-#define RESPAWNPOS_2 153.f, 38.f, 369.f
-#define RESPAWNPOS_3 -153.f, 38.f, 369.f
-#define RESPAWNPOS_4 -369.f, 38.f, 153.f
-#define RESPAWNPOS_5 -369.f, 38.f, -153.f
-#define RESPAWNPOS_6 -153.f, 38.f, -369.f
-#define RESPAWNPOS_7 153.f, 38.f, -369.f
-#define RESPAWNPOS_8 369.f, 38.f, -153.f
+#define RESPAWNPOS_0 0.f, 42.f, 0.f
+#define RESPAWNPOS_1 369.f, 42.f, 153.f
+#define RESPAWNPOS_2 153.f, 42.f, 369.f
+#define RESPAWNPOS_3 -153.f, 42.f, 369.f
+#define RESPAWNPOS_4 -369.f, 42.f, 153.f
+#define RESPAWNPOS_5 -369.f, 42.f, -153.f
+#define RESPAWNPOS_6 -153.f, 42.f, -369.f
+#define RESPAWNPOS_7 153.f, 42.f, -369.f
+#define RESPAWNPOS_8 369.f, 42.f, -153.f
 
 
 #define DRONE_RESPAWNPOS_0 0.f, 80.f, 0.f

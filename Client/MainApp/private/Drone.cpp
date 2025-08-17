@@ -277,6 +277,9 @@ void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
 
     m_vPos = { posX, posY, posZ, 1.f };
 
+    m_TransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
+
+
 }
 
 void CDrone::SetOtherDroneMat(float PosX, float PosY,float PosZ, float Yaw, float Roll, float pitch)

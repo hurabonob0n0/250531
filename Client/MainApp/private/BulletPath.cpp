@@ -53,8 +53,6 @@ void CBulletPath::Tick(float fTimeDelta)
 
 
 
-
-
 	if (m_fDeltaTime >= m_fAddBulletTime && BulletDatas.size() < 1000 && !isCollision)
 	{
 		BulletDatas.push_back(CreateBulletTrailInstance(m_Pos1, m_Pos2));
@@ -83,13 +81,13 @@ void CBulletPath::Tick(float fTimeDelta)
 		isDead = true;
 }
 
-void CBulletPath::LateTick(float fTimeDelta)
-{
-	if (Network_Manager::GetInstance()->isConnected())
+void CBulletPath::LateTick(float fTimeDelta){
+
+	if (Network_Manager::GetInstance()->isConnected() && (m_GameInstance->GetLayerSize("Tank") > 1))
 	{
-		/*if (CheckCollisionWithTank()) {
+		if (CheckCollisionWithTank()) {
 			isCollision = true;
-		}*/
+		}
 	}
 
 	if (CheckCollisionWithTerrain())
@@ -195,21 +193,40 @@ bool CBulletPath::CheckCollisionWithTank()
 	CTank* pTank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", targetTankIndex));
 	if (!pTank) return false;
 
-	// 탱크 월드 행렬에서 위치 추출
-	XMMATRIX tankWorld = pTank->Get_WorldMatrix();
-	XMFLOAT4X4 tm; XMStoreFloat4x4(&tm, tankWorld);
-	XMVECTOR tankPos = XMVectorSet(tm._41, tm._42, tm._43, 1.0f);
+	const int tankCount = m_GameInstance->GetLayerSize("Tank");
+	if (tankCount <= 1) return false;
 
-	// 총알 현재 위치(m_Pos2)와 탱크 중심 거리
-	XMVECTOR d = XMVectorSubtract(m_Pos2, tankPos);
-	float distSq = XMVectorGetX(XMVector3LengthSq(d));
-
-	// 구 충돌 반지름 (5.0f)
 	constexpr float R = 5.0f;
 	constexpr float R2 = R * R;
 
-	return (distSq <= R2);
-	//_matrix (XMATRIX)리턴
+	// 탱크 월드 행렬에서 위치 추출
+	for (int i = 0; i < tankCount; ++i)
+	{
+		if (i == OwnerTankIndex && OwnerTankIndex >= 0)  // 내(발사자) 탱크 제외
+			continue;
+
+		CTank* pTank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", i));
+		if (!pTank) continue;
+
+
+		// 탱크 중심 위치
+		XMMATRIX tankWorld;
+		tankWorld = pTank->Get_WorldMatrix();
+		XMFLOAT4X4 m; XMStoreFloat4x4(&m, tankWorld);
+		XMVECTOR tankPos = XMVectorSet(m._41, m._42, m._43, 1.0f);
+
+		// 총알 현재 위치와의 거리 제곱
+		XMVECTOR d = XMVectorSubtract(m_Pos2, tankPos);
+		float distSq = XMVectorGetX(XMVector3LengthSq(d));
+
+		if (distSq <= R2)
+		{
+			return true; // 충돌!
+		}
+	}
+
+	return false; // 충돌 없음
+
 }
 
 void CBulletPath::Free()
