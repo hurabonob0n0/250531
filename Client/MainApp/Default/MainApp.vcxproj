@@ -200,6 +200,7 @@
     <ClInclude Include="..\public\Room_Manager.h" />
     <ClInclude Include="..\public\ServerSession.h" />
     <ClInclude Include="..\public\ServiceManager.h" />
+    <ClInclude Include="..\public\SmokeEffect.h" />
     <ClInclude Include="..\public\StateMgr.h" />
     <ClInclude Include="..\public\Tank.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -279,6 +280,7 @@
     <ClCompile Include="..\private\Room_Manager.cpp" />
     <ClCompile Include="..\private\ServerSession.cpp" />
     <ClCompile Include="..\private\ServiceManager.cpp" />
+    <ClCompile Include="..\private\SmokeEffect.cpp" />
     <ClCompile Include="..\private\StateMgr.cpp" />
     <ClCompile Include="..\private\Tank.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

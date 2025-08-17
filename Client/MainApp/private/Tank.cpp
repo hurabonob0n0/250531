@@ -658,7 +658,7 @@ void CTank::Master_Pos_KeyInput()
 					SendShootDataToServer(); // 실제 슈팅
 					((CUIReloading*)m_GameInstance->GetGameObject("UI", UI_RELOADING))->Set_Reloading();
 					dynamic_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0))->StartShake(0.7f, 0.7f, 40.f);
-
+					
 				}
 				_shootTimer = 0.f; // 타이머 초기화
 			}
@@ -1100,6 +1100,15 @@ void CTank::SendShootDataToServer()
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
 	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+
+	_matrix mat = XMMatrixTranslation(fPos.x, fPos.y+0.5f, fPos.z);
+	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
+
+	mat = XMMatrixTranslation(fPos.x + 0.1f, fPos.y + 0.6f, fPos.z + 0.1f);
+	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
+
+	mat = XMMatrixTranslation(fPos.x - 0.1f, fPos.y + 0.6f, fPos.z - 0.1f);
+	m_GameInstance->AddObject("SmokeEffect", "Effect", &mat);
 }
 
 void CTank::PushBulletMatrix(const _matrix& mat)

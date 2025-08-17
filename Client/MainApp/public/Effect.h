@@ -28,6 +28,7 @@ private:
 	CVIBuffer_Quad* m_VIBuffer;
 	CBBinding* m_CBBindingCom;
 	CTransform* m_CameraTransform;
+	CTransform* m_DroneCamera;
 
 	MaterialData MD{};
 

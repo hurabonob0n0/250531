@@ -1,6 +1,7 @@
 #include "Client_pch.h"
 #include "Effect.h"
 #include "GameInstance.h"
+#include "Network_Manager.h"
 
 CEffect::CEffect() : CRenderObject()
 {
@@ -30,14 +31,17 @@ HRESULT CEffect::Initialize(void* pArg)
 
 	m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 
-	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("EffectMat", MD));
+	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("SmokeEffectMat", MD));
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 
 	m_CameraTransform = (CTransform*)m_GameInstance->Get_Object_Component("Camera", 0, "TransformCom");
+
+	m_DroneCamera = (CTransform*)m_GameInstance->Get_Object_Component("Camera", 1, "TransformCom");
+
 	Safe_AddRef(m_CameraTransform);
 
-
+	Safe_AddRef(m_DroneCamera);
 
 	return S_OK;
 }
@@ -46,7 +50,11 @@ void CEffect::Tick(float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	_vector vecreversepos = m_TransformCom->Get_State(CTransform::STATE_POSITION) - m_CameraTransform->Get_State(CTransform::STATE_POSITION);
+	_vector vecreversepos;
+	if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_DRONE)
+		vecreversepos = m_TransformCom->Get_State(CTransform::STATE_POSITION) - m_DroneCamera->Get_State(CTransform::STATE_POSITION);
+	else
+		vecreversepos = m_TransformCom->Get_State(CTransform::STATE_POSITION) - m_CameraTransform->Get_State(CTransform::STATE_POSITION);
 
 	_vector finalpos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + vecreversepos;
 
@@ -61,7 +69,7 @@ void CEffect::LateTick(float fTimeDelta)
 	{
 		__super::LateTick(fTimeDelta);
 
-		m_AccumulatedTime += fTimeDelta;
+		m_AccumulatedTime += fTimeDelta*2.f;
 
 		// ÃÑ ÇÁ·¹ÀÓ ¼ö
 		const int totalFrames = 64;
@@ -88,6 +96,9 @@ void CEffect::LateTick(float fTimeDelta)
 
 		m_CBBindingCom->Set_World_TexCoord_And_Update(m_TransformCom, m_TexCoordTransformCom);
 
+
+		if (currentFrame > totalFrames)
+			isDead = true;
 	}
 	//if (m_AccumulatedTime >= 3)
 	//    return;
@@ -138,6 +149,7 @@ void CEffect::Free()
 	Safe_Release(m_VIBuffer);
 	Safe_Release(m_CBBindingCom);
 	Safe_Release(m_CameraTransform);
+	Safe_Release(m_DroneCamera);
 
 	__super::Free();
 }
