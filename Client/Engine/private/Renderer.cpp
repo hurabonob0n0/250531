@@ -53,6 +53,11 @@ void CRenderer::ResetRenderObjects()
     m_vRenderObjects[RG_BULLETPATH].clear();
 }
 
+void CRenderer::ChangePSO(const string& PSOName)
+{
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO(PSOName));
+}
+
 void CRenderer::Resize_RenderGroups()
 {
     for (int i = 0; i < (int)RG_BULLETPATH; ++i)

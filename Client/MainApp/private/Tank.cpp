@@ -245,7 +245,9 @@ void CTank::Render()
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget==CONTROL_POSIN) {
 
-				//Render_For_Posin_Image();
+				m_RendererCom->ChangePSO("UIPSO");
+				Render_For_Posin_Image();
+				m_RendererCom->ChangePSO("DefaultPSO");
 				m_VIBuffer->Render(50);
 			}
 			else
@@ -268,7 +270,9 @@ void CTank::Render()
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
 
-				//Render_For_Posin_Image();
+				m_RendererCom->ChangePSO("UIPSO");
+				Render_For_Posin_Image();
+				m_RendererCom->ChangePSO("DefaultPSO");
 			}
 			else {
 				for (int i = 0; i < 55; ++i)
@@ -1146,7 +1150,7 @@ void CTank::Set_MyPos(float x, float y, float z)
 
 void CTank::Tick_For_Posin_Image(float fTimeDelta)
 {
-	m_RendererCom->AddtoRenderObjects(m_RGQuad, this);
+	//m_RendererCom->AddtoRenderObjects(m_RGQuad, this);
 
 	m_QuadWorldTransform->Identity();
 
@@ -1173,7 +1177,7 @@ void CTank::Tick_For_Posin_Image(float fTimeDelta)
 
 	float fScale = 1.f - m_fSameTime * 0.29f;
 
-	m_QuadWorldTransform->Set_Scale(fScale);
+	m_QuadWorldTransform->Set_Scale(fScale * 0.5f);
 
 	// 위치 바꾸기
 	angleDiffX /= 30.f;

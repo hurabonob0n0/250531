@@ -20,6 +20,9 @@ public:
 	void ResetRenderObjects();
 
 public:
+	void ChangePSO(const string& PSOName);
+
+public:
 	void Resize_RenderGroups();
 
 public:
