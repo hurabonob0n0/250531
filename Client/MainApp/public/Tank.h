@@ -129,7 +129,7 @@ private:		//For PosinCrosshair
 	CRenderer::RENDERGROUP	m_RGQuad = CRenderer::RENDERGROUP::RG_UI;
 	CTransform* m_QuadWorldTransform;
 	CTransform* m_QuadTexTransform;
-	bool					m_isQuadTurn = false;
+	_uint m_isQuadTurn = 0;
 	float					m_fSameTime = 0.f;
 	bool					m_isFPS = false;
 

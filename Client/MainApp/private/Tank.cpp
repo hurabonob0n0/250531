@@ -245,10 +245,19 @@ void CTank::Render()
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget==CONTROL_POSIN) {
 
-				m_RendererCom->ChangePSO("UIPSO");
-				Render_For_Posin_Image();
-				m_RendererCom->ChangePSO("DefaultPSO");
-				m_VIBuffer->Render(50);
+				//m_RendererCom->ChangePSO("UIPSO");
+				if (m_isQuadTurn < 2)
+				{
+					m_VIBuffer->Render(50);
+					m_isQuadTurn += 1;
+				}
+				
+				//m_RendererCom->ChangePSO("DefaultPSO");
+				else
+				{
+					Render_For_Posin_Image();
+					m_isQuadTurn = 0;
+				}
 			}
 			else
 			{
@@ -269,10 +278,7 @@ void CTank::Render()
 		case POS_POSU:
 		{
 			if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN) {
-
-				m_RendererCom->ChangePSO("UIPSO");
 				Render_For_Posin_Image();
-				m_RendererCom->ChangePSO("DefaultPSO");
 			}
 			else {
 				for (int i = 0; i < 55; ++i)
@@ -1150,7 +1156,7 @@ void CTank::Set_MyPos(float x, float y, float z)
 
 void CTank::Tick_For_Posin_Image(float fTimeDelta)
 {
-	//m_RendererCom->AddtoRenderObjects(m_RGQuad, this);
+	m_RendererCom->AddtoRenderObjects(m_RGQuad, this);
 
 	m_QuadWorldTransform->Identity();
 
@@ -1184,6 +1190,8 @@ void CTank::Tick_For_Posin_Image(float fTimeDelta)
 	angleDiffY /= 30.f;
 
 	m_QuadWorldTransform->Set_State(CTransform::STATE_POSITION, XMVectorSet(angleDiffX, angleDiffY, 0, 1));
+
+	m_QuadWorldTransform->Set_State(CTransform::STATE_LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
 
 	m_CBBindingQuad->Set_World_TexCoord_And_Update(m_QuadWorldTransform, m_QuadTexTransform);
 }
