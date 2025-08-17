@@ -56,7 +56,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_fXRot_TPS = 0.f;
 
-	m_Distance_FPS = 10.f;
+	m_Distance_FPS = 50.f;
 
 	m_fXRot_FPS = 0.f;
 
@@ -106,7 +106,7 @@ void CCamera_Free::Tick(float fTimeDelta)
 		switch (m_PS)
 		{
 		case Client::CCamera_Free::FPS:
-			if(Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN)
+			if (Network_Manager::GetInstance()->MyControlTarget == CONTROL_POSIN)
 				Tick_For_FPS(fTimeDelta);
 			break;
 		case Client::CCamera_Free::TPS:
@@ -127,6 +127,7 @@ void CCamera_Free::LateTick(float fTimeDelta)
 {
 	m_RendererCom->AddtoRenderObjects(m_RG, this);
 
+
 	XMMATRIX world = XMMatrixScaling(5000.f, 5000.f, 5000.f);
 	_matrix textransform = m_TexCoordTransformCom->Get_WorldMatrix();
 
@@ -146,7 +147,9 @@ void CCamera_Free::LateTick(float fTimeDelta)
 	m_CBBindingCom->Set_TexCoordMatrix(textransform);
 	m_CBBindingCom->Update_CBView();
 
-	__super::LateTick(fTimeDelta);
+	PassCBSetting();
+
+	//__super::LateTick(fTimeDelta);
 }
 
 void CCamera_Free::Render()
@@ -160,11 +163,85 @@ void CCamera_Free::Render()
 	m_VIBuffer->Render();
 }
 
+void CCamera_Free::PassCBSetting()
+{
+
+	XMMATRIX proj;
+	if (m_PS == TPS)
+	{
+		 proj = XMMatrixPerspectiveFovLH(
+			XMConvertToRadians(60.0f), // Field of View (radian 단위)
+			1.7777,               // Aspect ratio = width / height
+			1.f,                     // Near clipping plane
+			10000.f                       // Far clipping plane
+		);
+	}
+	else if (m_PS == FPS)
+	{
+		proj = XMMatrixPerspectiveFovLH(
+			XMConvertToRadians(m_Distance_FPS), // Field of View (radian 단위)
+			1.7777,               // Aspect ratio = width / height
+			0.01f,                     // Near clipping plane
+			10000.f                       // Far clipping plane
+		);
+	}
+
+	PassConstants pc{};
+
+	XMMATRIX view = m_TransformCom->Get_WorldMatrix_Inverse();//XMLoadFloat4x4(&mView);
+	//XMMATRIX view = m_TransformCom->Get_WorldMatrix();
+
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	XMMATRIX invView = XMMatrixInverse(nullptr, view);
+	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
+	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
+
+	XMStoreFloat4x4(&pc.View, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&pc.InvView, XMMatrixTranspose(invView));
+	XMStoreFloat4x4(&pc.Proj, XMMatrixTranspose(proj));
+	XMStoreFloat4x4(&pc.InvProj, XMMatrixTranspose(invProj));
+	XMStoreFloat4x4(&pc.ViewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&pc.InvViewProj, XMMatrixTranspose(invViewProj));
+	//XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
+	XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
+	XMStoreFloat3(&pc.EyePosW, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	pc.RenderTargetSize = XMFLOAT2((float)1920, (float)1080);
+	pc.InvRenderTargetSize = XMFLOAT2(1.0f / 1920, 1.0f / 1080);
+	pc.NearZ = 1.0f;
+	pc.FarZ = 10000.0f;
+	pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
+	pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
+	pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	pc.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
+	pc.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
+	pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
+	pc.Lights[2].Strength = { 0.1f, 0.1f, 0.1f };
+
+	//XMStoreFloat4x4(&pc.View, XMMatrixTranspose(view));
+	//XMStoreFloat4x4(&pc.InvView, XMMatrixTranspose(invView));
+	//XMStoreFloat4x4(&pc.Proj, XMMatrixTranspose(proj));
+	//XMStoreFloat4x4(&pc.ViewProj, XMMatrixTranspose(viewProj));
+	//XMVECTOR vec = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	//XMStoreFloat3(&pc.EyePosW, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+	//XMStoreFloat4x4(&pc.ShadowTransform, XMMatrixTranspose(m_GameInstance->m_ShadowMap->S));
+	////XMStoreFloat4x4(&pc.ShadowTransform, m_GameInstance->m_ShadowMap->S);
+	//pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
+	//pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
+	//pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	//pc.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
+	//pc.Lights[1].Strength = { 0.3f, 0.3f, 0.3f };
+	//pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
+	//pc.Lights[2].Strength = { 0.15f, 0.15f, 0.15f };
+
+	auto currPassCB = m_GameInstance->Get_Current_FrameResource()->m_PassCB;
+	currPassCB->CopyData(0, pc);
+}
+
 void CCamera_Free::Tick_For_TPS(float fTimeDelta)
 {
 	m_fYRot_TPS += m_GameInstance->Get_Mouse_XDelta() * 0.005f;
 	m_fXRot_TPS += m_GameInstance->Get_Mouse_YDelta() * 0.005f;
-	m_Distance_TPS -= (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
+	//m_Distance_TPS -= (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
 
 	m_fXRot_TPS = max(-85.f, min(85.f, m_fXRot_TPS));
 
@@ -184,44 +261,60 @@ void CCamera_Free::Tick_For_TPS(float fTimeDelta)
 
 void CCamera_Free::Tick_For_FPS(float fTimeDelta)
 {
-	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta()* 0.1f;
+	m_fYRot_FPS += m_GameInstance->Get_Mouse_XDelta() * 0.1f;
 	m_fXRot_FPS += m_GameInstance->Get_Mouse_YDelta() * 0.1f;
-	m_Distance_FPS += (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
+	m_Distance_FPS -= (float)m_GameInstance->Get_Mouse_Scroll() * 0.005f;
 
 	m_fXRot_FPS = max(-85.f, min(85.f, m_fXRot_FPS));
 
-	_float4x4 mat;
-	XMStoreFloat4x4(&mat, XMMatrixIdentity());
+	m_TransformCom->Identity();
 
-	m_TransformCom->Set_WorldMatrix(mat);
-
+	_vector TankLook = XMVector4Normalize(m_TankTransform->Get_State(CTransform::STATE_LOOK));
+	_vector TankRight = m_TankTransform->Get_State(CTransform::STATE_RIGHT);
+	_vector TankUp = m_TankTransform->Get_State(CTransform::STATE_UP);
 	_vector TankPos = m_TankTransform->Get_State(CTransform::STATE_POSITION);
-	_vector myPos = XMVectorSet(0.f, 0.f, -m_Distance_FPS, 1.f);
-	myPos += TankPos;
 
-	m_TransformCom->Set_State(CTransform::STATE_POSITION, myPos);
+	_vector BasePos = TankUp * 2.4f;// +TankLook * 1.4f;
+	// 방향 벡터의 각 성분 가져오기
+	float x = XMVectorGetX(TankLook);
+	float y = XMVectorGetY(TankLook);
+	float z = XMVectorGetZ(TankLook);
 
-	m_TransformCom->Orbit_For_FPS(TankPos,XMConvertToRadians( m_fYRot_FPS), XMConvertToRadians(m_fXRot_FPS));
+	// X축 회전값 (Pitch) 계산
+	// pitch = asin(-y) 또는 asin(y) (좌표계에 따라 부호가 다를 수 있음)
+	float pitch = asinf(y);
 
-	myPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
-	float y = XMVectorGetY(myPos) + 5.f;
-	myPos = XMVectorSetY(myPos, y);
-	m_TransformCom->Set_State(CTransform::STATE_POSITION, myPos);
+	// Y축 회전값 (Yaw) 계산
+	float yaw = atan2f(x, z);
+	_vector BaseLook = TankLook;//XMVector4Transform( XMVectorSet(0.f, 0.f, 1.f, 0.f),XMMatrixRotationX(pitch));
 
-	//_matrix matforBox = XMMatrixIdentity();
+	_matrix matYaw = XMMatrixRotationAxis(TankUp,
+		XMConvertToRadians(m_fYRot_FPS) + (3.141592 * 2 - yaw));
 
-	/*XMStoreFloat3(&vRight, XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f,1.f,0.f,0.f), worldforward)));
+	_matrix matPitch = XMMatrixRotationAxis(TankRight,
+		XMConvertToRadians(m_fXRot_FPS));
 
-	XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(worldforward, XMLoadFloat3(&vRight))));
-	matforBox.r[1] = vUp;*/
-	//matforBox.r[2] = m_TransformCom->Get_State(CTransform::STATE_LOOK);
-	//matforBox.r[3] = m_TransformCom->Get_State(CTransform::STATE_POSITION);
+	// 4. 최종 회전 행렬 계산 (중요: Pitch를 먼저 곱하고 Yaw를 곱합니다)
+	// 로컬 축 기준의 Pitch 변환이 먼저 적용되고, 그 결과가 Yaw 변환됩니다.
+	_matrix matTotalRotation = matPitch * matYaw;
 
+	BaseLook = XMVector3TransformCoord(BaseLook, matYaw);
 
+	BasePos = BasePos + 1.55f * BaseLook;
+	BasePos = TankPos + BasePos;
+	XMVectorSetW(BasePos, 1.f);
 
+	m_TransformCom->Set_State(CTransform::STATE_POSITION, BasePos);
 
-	//if (m_GameInstance->Mouse_Down(0))
-	//	m_GameInstance->AddObject("DefaultObject", "BoxObj", &matforBox);
+	_vector vDir = XMVector3TransformNormal(TankLook, matTotalRotation);
+	/*_vector vDir = XMVector3TransformNormal(XMVectorSet(0.f,0.f,1.f,0.f),
+		XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_fXRot_FPS) * 1.f, XMConvertToRadians(m_fYRot_FPS),0.f));*/
+		/*BaseLook = XMVector4Transform(BaseLook, RotationMatrix);*/
+
+		//m_TransformCom->Look_At(BasePos + BaseLook);
+	m_TransformCom->Adjust_Axis(XMVector4Normalize(vDir));
+
+	m_TransformCom->Go_Left(0.1f);
 
 	_vector camPos = m_TransformCom->Get_State(CTransform::STATE_POSITION);
 	_vector camLook = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));

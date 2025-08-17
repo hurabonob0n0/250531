@@ -246,6 +246,7 @@ void CTank::Render()
 			if (Network_Manager::GetInstance()->MyControlTarget==CONTROL_POSIN) {
 
 				//Render_For_Posin_Image();
+				m_VIBuffer->Render(50);
 			}
 			else
 			{
@@ -1052,18 +1053,6 @@ void CTank::SendShootDataToServer()
 	_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
 	float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	//_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP)* 2.f;
-	//_vector vDir = XMVector3Transform(XMVector3Transform(XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK)),
-	//	XMMatrixRotationAxis(m_TransformCom->Get_State(CTransform::STATE_UP),  XMConvertToRadians(m_fPotapRotation - XMConvertToDegrees(yaw)))),
-	//	XMMatrixRotationX(/*m_TransformCom->Get_State(CTransform::STATE_RIGHT), */XMConvertToRadians(m_fPosinRotation)));
-
-	//_float3 fPos, fDir;
-	//XMStoreFloat3(&fPos, vPos);
-	//XMStoreFloat3(&fDir, vDir);
-
-	// 발사 시작 위치 계산 (기존과 동일)
-
-
 	// 1. 기준이 될 탱크의 순수 전방 벡터를 가져옵니다.
 	_vector vBaseLook = XMVector3Normalize(m_TransformCom->Get_State(CTransform::STATE_LOOK));
 
@@ -1083,7 +1072,8 @@ void CTank::SendShootDataToServer()
 	// 방향 벡터에는 이동(Translation) 정보가 포함되면 안 되므로 XMVector3TransformNormal을 사용하는 것이 더 안전합니다.
 	_vector vDir = XMVector3TransformNormal(vBaseLook, matTotalRotation);
 
-	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP) * 1.25f + vDir * 5.f;
+	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP) * 1.95f
+		+ XMVector3TransformNormal(vBaseLook, matYaw) * 1.15f + vDir * 3.8f;
 
 	// 최종 결과를 _float3로 저장 (기존과 동일)
 	_float3 fPos, fDir;

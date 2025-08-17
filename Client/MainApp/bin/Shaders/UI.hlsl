@@ -40,6 +40,9 @@ float4 PS(VertexOut pin) : SV_Target
     
     color.rgb = pow(color.rgb, 1.0 / 2.2);
     
+    //if (color.rgb == float3(0.f, 0.f, 0.f))
+    //    discard;
+    
     
    if (gObjPad0 == 2) // Á¡·ÉÁö
     {

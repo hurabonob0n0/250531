@@ -286,16 +286,6 @@ void CTransform::Look_At(_fvector vTargetPoint)
 
 	XMStoreFloat3(&vUp, XMVector3Normalize(XMVector3Cross(vLook, XMLoadFloat3(&vRight))));
 
-	/*vRight.x *= length;
-	vRight.y *= length;
-	vRight.z *= length;
-	vUp.x *= length;
-	vUp.y *= length;
-	vUp.z *= length;
-	vLook *= length;*/
-
-
-
 	Set_State(STATE_RIGHT, XMLoadFloat3(&vRight));
 	Set_State(STATE_UP, XMLoadFloat3(&vUp));
 	Set_State(STATE_LOOK, vLook);
