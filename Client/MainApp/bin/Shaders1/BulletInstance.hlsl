@@ -68,7 +68,7 @@ float4 PS(VertexOut pin) : SV_Target
     //float cylinderAlpha = 1.0 - distFromCenter / 0.5f;
 
     //// 3. 시간에 따른 페이드아웃 알파 계산
-    float maxAge = 2.f; // 궤적이 사라지기 시작하는 최대 시간 (2초)
+    float maxAge = 1.f; // 궤적이 사라지기 시작하는 최대 시간 (2초)
     float timeAlpha = 1.0 - saturate(pin.age / maxAge);
 
     // 4. 최종 알파 값 계산 (두 알파 값을 곱함)
