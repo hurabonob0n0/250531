@@ -1,6 +1,8 @@
 #include "..\Public\Animation.h"
 #include "Channel.h"
 
+#if USE_ASSIMP_BAKE
+
 CAnimation::CAnimation()
 {
 }
@@ -97,3 +99,5 @@ void CAnimation::Free()
 
 	m_Channels.clear();
 }
+
+#endif

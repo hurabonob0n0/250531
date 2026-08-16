@@ -1,11 +1,8 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "Client_Globals.h"
 #include "Tank.h"
 #include "Drone.h"
 #include "ClientPacketHandler.h"
-#include "BufferReader.h"
-#include "BufferWriter.h"
-#include "ServiceManager.h"
 #include "GameInstance.h"
 #include "Room_Manager.h"
 #include "Level_Manager.h"
@@ -24,7 +21,7 @@
 
 void ClientPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
+	FPacketReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
@@ -140,7 +137,7 @@ struct S_Pos {
 
 void ClientPacketHandler::Handle_S_TEST(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
+	FPacketReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
@@ -160,13 +157,13 @@ void ClientPacketHandler::Handle_S_SUCCESS_LOGIN(BYTE* buffer, int32 len)
 
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
 		br >> header;
 		uint16 ID;
 		br >> ID;
 
-		ServiceManager::GetInstace().SetMyID(ID);
+		Network_Manager::GetInstance()->SetMyID(ID);
 		Network_Manager::GetInstance()->SetMyClientID(ID);
 		});
 }
@@ -176,7 +173,7 @@ void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
 		br >> header;
 		uint16 ID;
@@ -192,7 +189,7 @@ void ClientPacketHandler::Handle_S_GAME_START(BYTE* buffer, int32 len)
 
 void ClientPacketHandler::Handle_S_SUCCESS_ENTER_ROOM(BYTE* buffer, int32 len)
 {
-	BufferReader br(buffer, len);
+	FPacketReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
@@ -211,7 +208,7 @@ void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
 
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -238,7 +235,7 @@ void ClientPacketHandler::Handle_S_GET_ROOMDATA(BYTE* buffer, int32 len)
 void ClientPacketHandler::Handle_S_ROOM_ENTER(BYTE* buffer, int32 len)
 {
 
-	BufferReader br(buffer, len);
+	FPacketReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
@@ -254,7 +251,7 @@ void ClientPacketHandler::Handle_S_ROOM_PLAYER_STATES(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::LOBBY, [data]() {
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -310,7 +307,7 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -348,7 +345,7 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
 		br >> header;
 
@@ -403,7 +400,7 @@ void ClientPacketHandler::Handle_S_HIT_TANK(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		((CUIKill*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_DAMAGE)))->set_Hit();
 		});
 }
@@ -413,7 +410,7 @@ void ClientPacketHandler::Handle_S_DAMAGED_TANK(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		Network_Manager::GetInstance()->Im_damaged();
 		dynamic_cast<CCamera_Free*>(CGameInstance::Get_Instance()->GetGameObject("Camera", 0))->StartShake(1.3f, 0.9f, 50.f);
 	});
@@ -424,7 +421,7 @@ void ClientPacketHandler::Handle_S_DEAD_TANK(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
 		br >> header;
 		uint8 index;
@@ -450,7 +447,7 @@ void ClientPacketHandler::Handle_S_KILL_TANK(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		((CUIDamaged*)(CGameInstance::Get_Instance()->GetGameObject("UI", UI_KILL)))->set_Hit();
 		Network_Manager::GetInstance()->add_MyKillCount();
 
@@ -467,7 +464,7 @@ void ClientPacketHandler::Handle_S_GAME_WIN(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		dynamic_cast<CUI_VICTORY*>((CGameInstance::Get_Instance()->GetGameObject("UI", UI_VICTORY)))->set_render();
 		});
 }
@@ -477,23 +474,10 @@ void ClientPacketHandler::Handle_S_GAME_LOSE(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		dynamic_cast<CUI_DEFEAT*>((CGameInstance::Get_Instance()->GetGameObject("UI", UI_DEFEAT)))->set_render();
 	});
 }
-
-
-
-//void ClientPacketHandler::Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len)
-//{
-//	std::vector<uint8_t> data(buffer, buffer + len);
-//	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
-//
-//		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
-//
-//		//졌을 때 처리
-//		});
-//}
 
 void ClientPacketHandler::Handle_S_CAPTURE(BYTE* buffer, int32 len)
 {
@@ -501,7 +485,7 @@ void ClientPacketHandler::Handle_S_CAPTURE(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -519,7 +503,7 @@ void ClientPacketHandler::Handle_S_AIRDROP(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		uint8 AreaIndex;
@@ -541,7 +525,7 @@ void ClientPacketHandler::Handle_S_RESPAWN(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		uint8 TankIndex;
@@ -561,7 +545,7 @@ void ClientPacketHandler::Handle_S_SOUND(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		uint8 TankIndex;
@@ -581,7 +565,7 @@ void ClientPacketHandler::Handle_S_ADD_PING(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 		PacketHeader header;
 		uint8 tankindex; 
 		float X, Y, Z;
@@ -605,7 +589,7 @@ void ClientPacketHandler::Handle_S_ROOM_ALL_PLAYER_FINISH_LOADING(BYTE* buffer, 
 {
 
 
-	BufferReader br(buffer, len);
+	FPacketReader br(buffer, len);
 
 	PacketHeader header;
 	br >> header;
@@ -621,7 +605,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -634,17 +618,32 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 			uint8 TankIndex;
 			br >> TankIndex;
 
-			_float4x4 mat = {};
 
-			for (int row = 0; row < 4; ++row)
-				for (int col = 0; col < 4; ++col)
-					br >> mat.m[row][col];
+			//위치 3 -> 쿼터니언 4 -> 포탑 -> 포신 -> HP -> 바퀴 14
+
+			_float3 vPos = {};
+			_float4 qRot = {};
+			br >> vPos.x >> vPos.y >> vPos.z;
+			br >> qRot.x >> qRot.y >> qRot.z >> qRot.w;
 
 			float potapAngle = 0.f;
 			float posinAngle = 0.f;
 			uint8 tankHP = 0;
 
 			br >> potapAngle >> posinAngle >> tankHP;
+
+			int8 wheelSag[TANK_WHEEL_COUNT] = {};
+			for (int w = 0; w < TANK_WHEEL_COUNT; ++w)
+				br >> wheelSag[w];
+
+			// 모자란 패킷이면 여기서 멈춘다 
+			if (br.IsUnderflow())
+				break;
+
+			_float4x4 mat = {};
+			XMStoreFloat4x4(&mat,
+				XMMatrixRotationQuaternion(XMLoadFloat4(&qRot)) *
+				XMMatrixTranslation(vPos.x, vPos.y, vPos.z));
 
 			uint8 myTankID = Network_Manager::GetInstance()->GetMyTankIndex();
 
@@ -654,6 +653,9 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 				if (tank)
 				{
 					tank->Set_OtherPlayerState(mat, potapAngle, posinAngle);
+
+					//남의 탱크 바퀴
+					tank->Set_WheelSagFromServer(wheelSag);
 				}
 			}
 			else
@@ -661,6 +663,7 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 				if (Network_Manager::GetInstance()->MyPosMode == POS_POSU)
 				{
 					tank->SetMyMatrix(mat);
+					tank->Set_WheelSagFromServer(wheelSag);
 				}
 				else if(Network_Manager::GetInstance()->MyPosMode == POS_DRIVER)
 				{
@@ -680,7 +683,7 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 	std::vector<uint8_t> data(buffer, buffer + len);
 	Network_Manager::GetInstance()->PushPacket(PacketQueueType::INGAME, [data]() {
 		
-		BufferReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
+		FPacketReader br(reinterpret_cast<BYTE*>(const_cast<uint8_t*>(data.data())), static_cast<int32>(data.size()));
 
 		PacketHeader header;
 		br >> header;
@@ -722,8 +725,8 @@ void ClientPacketHandler::Handle_S_ALL_DRONE_STATE(BYTE* buffer, int32 len)
 
 SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 	bw << id;
@@ -739,8 +742,8 @@ SendBufferRef ClientPacketHandler::Make_C_LOGIN(uint64 id)
 
 SendBufferRef ClientPacketHandler::Make_C_SHOWROOM(uint8 Dummy)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << Dummy;
@@ -756,8 +759,8 @@ SendBufferRef ClientPacketHandler::Make_C_SHOWROOM(uint8 Dummy)
 
 SendBufferRef ClientPacketHandler::Make_C_JOINROOM(uint32 RoomNum)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << RoomNum;
@@ -771,8 +774,8 @@ SendBufferRef ClientPacketHandler::Make_C_JOINROOM(uint32 RoomNum)
 
 SendBufferRef ClientPacketHandler::Make_C_CREATEROOM(uint8 Dummy)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << Dummy;
@@ -786,8 +789,8 @@ SendBufferRef ClientPacketHandler::Make_C_CREATEROOM(uint8 Dummy)
 
 SendBufferRef ClientPacketHandler::Make_C_EXITROOM(uint8 Dummy)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << Dummy;
@@ -801,8 +804,8 @@ SendBufferRef ClientPacketHandler::Make_C_EXITROOM(uint8 Dummy)
 
 SendBufferRef ClientPacketHandler::Make_C_CHANGE_INFO(Room_Ready_Data data)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << data.PlayerID << data.Position << data.Team << data.IsReady;
@@ -819,8 +822,8 @@ SendBufferRef ClientPacketHandler::Make_C_READY(uint8 dummy)
 {
 
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	header->size = bw.WriteSize();
@@ -833,8 +836,8 @@ SendBufferRef ClientPacketHandler::Make_C_READY(uint8 dummy)
 
 SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
@@ -850,8 +853,8 @@ SendBufferRef ClientPacketHandler::Make_C_START(uint8 dummy)
 SendBufferRef ClientPacketHandler::Make_C_LOADING_FINISH(uint8 dummy)
 {
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
@@ -862,10 +865,37 @@ SendBufferRef ClientPacketHandler::Make_C_LOADING_FINISH(uint8 dummy)
 	return sendBuffer;
 }
 
+/*===========================================================================
+	탱크 자세를 와이어에 싣는다
+===========================================================================*/
+static void WriteTankTransform(FPacketWriter& bw, const _float4x4& worldMatrix)
+{
+	_vector vScale, qRot, vPos;
+
+	if (!XMMatrixDecompose(&vScale, &qRot, &vPos, XMLoadFloat4x4(&worldMatrix)))
+	{
+		//분해가 안 되는 행렬이면 회전을 포기하고 위치만 살린다
+		qRot = XMQuaternionIdentity();
+		vPos = XMLoadFloat4x4(&worldMatrix).r[3];
+	}
+
+	_float3 vP; XMStoreFloat3(&vP, vPos);
+	_float4 vQ; XMStoreFloat4(&vQ, qRot);
+
+	bw << vP.x << vP.y << vP.z;
+	bw << vQ.x << vQ.y << vQ.z << vQ.w;
+}
+
+static void WriteWheelSag(FPacketWriter& bw, const int8* pWheelSag)
+{
+	for (int i = 0; i < TANK_WHEEL_COUNT; ++i)
+		bw << (pWheelSag ? pWheelSag[i] : (int8)0);
+}
+
 SendBufferRef ClientPacketHandler::Make_C_TANK_RESPAWN(_float4x4& worldMatrix, float potapRotation, float posinRotation)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
@@ -890,8 +920,8 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_RESPAWN(_float4x4& worldMatrix, f
 
 SendBufferRef ClientPacketHandler::Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
@@ -906,20 +936,15 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_POSINMOVE(float potapRotation, fl
 	return sendBuffer;
 }
 
-SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
+SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix, const int8* pWheelSag)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
-	for (int i = 0; i < 4; ++i)
-	{
-		bw << worldMatrix.m[i][0];  // row i, col 0
-		bw << worldMatrix.m[i][1];  // row i, col 1
-		bw << worldMatrix.m[i][2];  // row i, col 2
-		bw << worldMatrix.m[i][3];  // row i, col 3
-	}
+	WriteTankTransform(bw, worldMatrix);
+	WriteWheelSag(bw, pWheelSag);
 
 	header->size = bw.WriteSize();
 	header->id = C_MYPOS;
@@ -931,8 +956,8 @@ SendBufferRef ClientPacketHandler::Make_C_TANK_POSMOVE(_float4x4& worldMatrix)
 
 SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
@@ -947,8 +972,8 @@ SendBufferRef ClientPacketHandler::Make_C_AIRDROP(uint8 AreaNum)
 
 SendBufferRef ClientPacketHandler::Make_C_SOUND(float EngineVol, float EnginePitch, float TrackVol, float TrackPitch)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
@@ -963,8 +988,8 @@ SendBufferRef ClientPacketHandler::Make_C_SOUND(float EngineVol, float EnginePit
 
 SendBufferRef ClientPacketHandler::Make_C_PING(float X, float Y, float Z)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << (uint8)Network_Manager::GetInstance()->GetMyTankIndex();
@@ -982,25 +1007,20 @@ SendBufferRef ClientPacketHandler::Make_C_PING(float X, float Y, float Z)
 
 #pragma region ForIngame
 
-SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation)
+SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation, const int8* pWheelSag)
 {
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
 	uint8 Tankindex = Network_Manager::GetInstance()->GetMyTankIndex();
 	bw << Tankindex;
-	for (int i = 0; i < 4; ++i)
-	{
-		bw << worldMatrix.m[i][0];  // row i, col 0
-		bw << worldMatrix.m[i][1];  // row i, col 1
-		bw << worldMatrix.m[i][2];  // row i, col 2
-		bw << worldMatrix.m[i][3];  // row i, col 3
-	}
+	WriteTankTransform(bw, worldMatrix);
 	bw << potapRotation;
 	bw << posinRotation;
+	WriteWheelSag(bw, pWheelSag);
 
 	header->size = bw.WriteSize();
 	header->id = C_MOVEMENT;
@@ -1014,8 +1034,8 @@ SendBufferRef ClientPacketHandler::Make_C_MOVE(_float4x4& worldMatrix, float pot
 SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
 {
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 	bw << key;
@@ -1031,8 +1051,8 @@ SendBufferRef ClientPacketHandler::Make_C_KEYINPUT(uint8 key)
 
 SendBufferRef ClientPacketHandler::Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ)
 {
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	uint8 TankIndex = Network_Manager::GetInstance()->GetMyTankIndex();
@@ -1050,8 +1070,8 @@ SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(float PosX, float PosY, flo
 {
 
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 
@@ -1072,8 +1092,8 @@ SendBufferRef ClientPacketHandler::Make_C_DRONE_MOVE(float PosX, float PosY, flo
 SendBufferRef ClientPacketHandler::Make_C_MOVE(float x, float y, float z)
 {
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	BufferWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
+	SendBufferRef sendBuffer = MakeSendBuffer(4096);
+	FPacketWriter bw(sendBuffer->Buffer(), sendBuffer->AllocSize());
 	PacketHeader* header = bw.Reserve<PacketHeader>();
 
 	bw << x << y << z;

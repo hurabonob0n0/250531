@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "Level_Room.h"
 #include "Bmp_Manager.h"
 #include "Object_Manager.h"
@@ -8,12 +8,11 @@
 #include "Key_Manager.h"
 #include "ClientPacketHandler.h"
 #include "Network_Manager.h"
-#include "ServiceManager.h"
 
 
 
 Level_Room::Level_Room()
-    : lastClickTime(GetTickCount()) // ÃÊ±âÈ­
+    : lastClickTime(GetTickCount()) // ì´ˆê¸°í™”
 {
 }
 
@@ -38,13 +37,13 @@ void Level_Room::Initialize()
     for (int i = 0; i < 8; ++i)
     {
         int row = i / 2; // 0~3
-        int col = i % 2; // 0 ¶Ç´Â 1
+        int col = i % 2; // 0 ë˜ëŠ” 1
 
-        // °¢ ½½·ÔÀÇ °£°İ
+        // ê° ìŠ¬ë¡¯ì˜ ê°„ê²©
         int slotGapX = 10;
         int slotGapY = 26;
 
-        // °¢ ½½·ÔÀÇ ½ÃÀÛ À§Ä¡
+        // ê° ìŠ¬ë¡¯ì˜ ì‹œì‘ ìœ„ì¹˜
         int blueStartX = 80;
         int redStartX = 555;
         int startY = 130;
@@ -95,11 +94,11 @@ int Level_Room::Update()
 
         const auto& players = Room_Manager::Get_Instance()->GetRoomPlayerStates();
 
-        // ½½·Ô Á¡À¯ »óÅÂ ÃÊ±âÈ­
+        // ìŠ¬ë¡¯ ì ìœ  ìƒíƒœ ì´ˆê¸°í™”
         for (auto& slot : Slots)
             slot.occupied = false;
 
-        // ÇöÀç Á¡À¯µÈ ½½·Ô Ç¥½Ã
+        // í˜„ì¬ ì ìœ ëœ ìŠ¬ë¡¯ í‘œì‹œ
         for (const auto& player : players)
         {
             for (auto& slot : Slots)
@@ -112,7 +111,7 @@ int Level_Room::Update()
             }
         }
 
-        // Å¬¸¯ÇÑ ºó ½½·Ô Ã³¸®
+        // í´ë¦­í•œ ë¹ˆ ìŠ¬ë¡¯ ì²˜ë¦¬
         for (auto& slot : Slots)
         {
             if (::PtInRect(&slot.rect, pt) && !slot.occupied)
@@ -146,11 +145,11 @@ void Level_Room::Render(HDC hDC)
 
     const auto& players = Room_Manager::Get_Instance()->GetRoomPlayerStates();
 
-    // 1. ½½·Ô Á¡À¯ »óÅÂ ÃÊ±âÈ­
+    // 1. ìŠ¬ë¡¯ ì ìœ  ìƒíƒœ ì´ˆê¸°í™”
     for (auto& slot : Slots)
         slot.occupied = false;
 
-    // 2. ÇÃ·¹ÀÌ¾î°¡ ÀÖ´Â ½½·Ô Á¡À¯ Ç¥½Ã
+    // 2. í”Œë ˆì´ì–´ê°€ ìˆëŠ” ìŠ¬ë¡¯ ì ìœ  í‘œì‹œ
     for (const auto& player : players)
     {
         for (auto& slot : Slots)
@@ -163,10 +162,10 @@ void Level_Room::Render(HDC hDC)
         }
     }
 
-    // 3. ½½·Ô Å×µÎ¸®¿Í ÅØ½ºÆ® Ãâ·Â
+    // 3. ìŠ¬ë¡¯ í…Œë‘ë¦¬ì™€ í…ìŠ¤íŠ¸ ì¶œë ¥
     for (const auto& slot : Slots)
     {
-        // µğ¹ö±ë¿ëÀÓ
+        // ë””ë²„ê¹…ìš©ì„
         //Rectangle(hDC, slot.rect.left, slot.rect.top, slot.rect.right, slot.rect.bottom);
 
         for (const auto& player : players)
@@ -178,21 +177,21 @@ void Level_Room::Render(HDC hDC)
                     text += L" (Ready)";
 
                 // --------------------
-                // ÆùÆ® ¼³Á¤ (¸¼Àº °íµñ, Å©±â 20, Bold)
+                // í°íŠ¸ ì„¤ì • (ë§‘ì€ ê³ ë”•, í¬ê¸° 20, Bold)
                 HFONT hFont = CreateFont(30, 0, 0, 0, FW_HEAVY, FALSE, FALSE, FALSE,
                     ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                     DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Impact");
 
                 HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-                // ¹è°æ Åõ¸í, ±ÛÀÚ °ËÁ¤»ö
+                // ë°°ê²½ íˆ¬ëª…, ê¸€ì ê²€ì •ìƒ‰
                 SetBkMode(hDC, TRANSPARENT);
                 SetTextColor(hDC, RGB(200, 200, 200));
 
-                // ÅØ½ºÆ® Ãâ·Â
+                // í…ìŠ¤íŠ¸ ì¶œë ¥
                 DrawText(hDC, text.c_str(), -1, const_cast<RECT*>(&slot.rect), DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
-                // ÆùÆ® º¹±¸ ¹× Á¦°Å
+                // í°íŠ¸ ë³µêµ¬ ë° ì œê±°
                 SelectObject(hDC, hOldFont);
                 DeleteObject(hFont);
                 // --------------------
@@ -204,13 +203,13 @@ void Level_Room::Render(HDC hDC)
 }
 void Level_Room::Release()
 {
-    // ½½·Ô Á¤º¸ ÇØÁ¦
+    // ìŠ¬ë¡¯ ì •ë³´ í•´ì œ
     Slots.clear();
 
-    // ÆÀ ½½·Ô RECT Á¤¸® (ÇÊ¿ä ¾øÀ¸¸é ÀÌ°Å »ı·« °¡´É)
+    // íŒ€ ìŠ¬ë¡¯ RECT ì •ë¦¬ (í•„ìš” ì—†ìœ¼ë©´ ì´ê±° ìƒëµ ê°€ëŠ¥)
     BlueTeamRects.clear();
     RedTeamRects.clear();
 
-    // ¿ÀºêÁ§Æ®µµ ÀüºÎ Á¦°Å (ÇÊ¿ä ½Ã)
+    // ì˜¤ë¸Œì íŠ¸ë„ ì „ë¶€ ì œê±° (í•„ìš” ì‹œ)
     Object_Manager::Get_Instance()->DeleteID(OBJ_BUTTON);
 }

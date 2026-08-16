@@ -4,6 +4,7 @@ CBone::CBone()
 {
 }
 
+#if USE_ASSIMP_BAKE
 HRESULT CBone::Initialize(const aiNode * pAINode, _int iParentBoneIndex)
 {
 	strcpy_s(m_szName, pAINode->mName.data);
@@ -66,6 +67,7 @@ HRESULT CBone::Initialize(const aiNode * pAINode, _int iParentBoneIndex)
 
 	//return S_OK;
 }
+#endif
 
 HRESULT CBone::Initialize(const char* szName, const _float4x4& transformMat, _int iParentIndex)
 {
@@ -91,6 +93,7 @@ void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones)
 	}
 }
 
+#if USE_ASSIMP_BAKE
 CBone * CBone::Create(const aiNode * pAINode, _int iParentBoneIndex)
 {
 	CBone* pInstance = new CBone();
@@ -103,6 +106,7 @@ CBone * CBone::Create(const aiNode * pAINode, _int iParentBoneIndex)
 
 	return pInstance;
 }
+#endif
 
 CBone* CBone::Create(const char* szName, const _float4x4& transformMat, _int iParentIndex)
 {

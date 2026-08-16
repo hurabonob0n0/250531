@@ -44,14 +44,27 @@ public:
 	void Set_MaterialIndex(_uint Matindex);
 
 public:
+	/* Track bending. Set to a zero SagB.w to turn it off (that is the default). */
+	void Set_TrackSag(const _float4& SagA, const _float4& SagB, const _float4& Param) {
+		m_TrackSagA = SagA; m_TrackSagB = SagB; m_TrackParam = Param;
+	}
+
+public:
 	char				m_szName[MAX_PATH] = "";
 	_uint				m_iMaterialIndex = { 0 };
 	CBone*				m_Bone = nullptr;
 	class CBBinding*	m_CBBinding = nullptr;
 
 private:
+	_float4				m_TrackSagA = {};
+	_float4				m_TrackSagB = {};
+	_float4				m_TrackParam = {};
+
+private:
+#if USE_ASSIMP_BAKE
 	HRESULT Ready_NonAnim_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix);
 	HRESULT Ready_Anim_Mesh(const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PivotMatrix);
+#endif
 
 public:
 	static CMesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext);

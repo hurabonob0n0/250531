@@ -1,6 +1,8 @@
 #include "..\Public\Channel.h"
 #include "Bone.h"
 
+#if USE_ASSIMP_BAKE
+
 CChannel::CChannel()
 {
 
@@ -129,3 +131,5 @@ void CChannel::Free()
 {
 	m_KeyFrames.clear();
 }
+
+#endif

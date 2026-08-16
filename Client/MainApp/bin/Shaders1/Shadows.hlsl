@@ -23,8 +23,12 @@ VertexOut VS(VertexIn vin)
 
 	MaterialData matData = gMaterialData[gMaterialIndex];
 	
+    // Same bend as Default.hlsl, otherwise the track shadow would not match the track.
+    float3 posL = vin.PosL;
+    posL.z += TrackSag(posL);
+
     // Transform to world space.
-    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    float4 posW = mul(float4(posL, 1.0f), gWorld);
 
     // Transform to homogeneous clip space.
     vout.PosH = mul(posW, gViewProj);

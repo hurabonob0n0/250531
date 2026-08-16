@@ -1,4 +1,5 @@
 #include "ShadowMap.h"
+#include "Engine_Config.h"
 #include "GameInstance.h"
 
 IMPLEMENT_SINGLETON(CShadowMap)
@@ -20,8 +21,8 @@ void CShadowMap::Initialize()
 	ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Alignment = 0;
-	texDesc.Width = 4096*2;
-	texDesc.Height = 4096 * 2;
+	texDesc.Width = SHADOWMAP_SIZE;
+	texDesc.Height = SHADOWMAP_SIZE;
 	texDesc.DepthOrArraySize = 1;
 	texDesc.MipLevels = 1;
 	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -52,8 +53,8 @@ void CShadowMap::Initialize()
 	dsvDesc.Texture2D.MipSlice = 0;
 	m_Device->CreateDepthStencilView(m_Resource, &dsvDesc, mhCpuDsv);
 
-	mViewport = { 0.0f, 0.0f, (float)4096 * 2, (float)4096 * 2, 0.0f, 1.0f };
-	mScissorRect = { 0, 0, (int)4096 * 2, (int)4096 * 2 };
+	mViewport = { 0.0f, 0.0f, (float)SHADOWMAP_SIZE, (float)SHADOWMAP_SIZE, 0.0f, 1.0f };
+	mScissorRect = { 0, 0, (int)SHADOWMAP_SIZE, (int)SHADOWMAP_SIZE };
 
 
 }
@@ -102,12 +103,15 @@ void CShadowMap::Late_Update()
 	XMMATRIX proj = XMLoadFloat4x4(&mLightProj);*/
 
 	XMMATRIX viewProj = XMMatrixMultiply(lightView, lightProj);
+
+	/* The terrain culls against the light frustum during the shadow pass. */
+	pGameInstance->Set_ShadowViewProj(viewProj);
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(lightView), lightView);
 	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(lightProj), lightProj);
 	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
-	UINT w = 4096 * 2;
-	UINT h = 4096 * 2;
+	UINT w = SHADOWMAP_SIZE;
+	UINT h = SHADOWMAP_SIZE;
 
 	PassConstants pc;
 

@@ -69,7 +69,55 @@ cbuffer cbPerObject : register(b0)
     uint gObjPad0;
     uint gObjPad1;
     float gObjPad2;
+
+    // Tank track bending. Filled in only for the two track meshes.
+    float4 gTrackSagA;      // road wheel 1..4 vertical travel, in model units
+    float4 gTrackSagB;      // road wheel 5..7, w = on/off
+    float4 gTrackParam;     // x = front wheel local x, y = rear wheel local x,
+                            // z = wheel axle line local z, w = top run local z
 };
+
+//---------------------------------------------------------------------------------------
+// Bends the tank track so its bottom run follows the road wheels.
+//
+// The track mesh sits in its own space: local +x runs towards the back of the tank and
+// local +z points DOWN, so the bottom run is at gTrackParam.w and the top run at .z.
+// The seven road wheels sit between gTrackParam.x (front) and .y (rear); their suspension
+// travel arrives in gTrackSagA/B as a model-space Y offset, so moving a vertex down means
+// adding to local z. Returns the offset to add to PosL.z.
+//---------------------------------------------------------------------------------------
+float TrackSag(float3 posL)
+{
+    if (gTrackSagB.w < 0.5f)
+        return 0.0f;
+
+    float sags[7] =
+    {
+        gTrackSagA.x, gTrackSagA.y, gTrackSagA.z, gTrackSagA.w,
+        gTrackSagB.x, gTrackSagB.y, gTrackSagB.z
+    };
+
+    float spacing = (gTrackParam.y - gTrackParam.x) / 6.0f;
+
+    // Position along the wheel line, in wheel units (0 = front wheel, 6 = rear wheel).
+    float t = (posL.x - gTrackParam.x) / spacing;
+
+    int   i = (int) floor(clamp(t, 0.0f, 5.0f));
+    float f = saturate(t - (float) i);
+    float sag = lerp(sags[i], sags[i + 1], f);
+
+    // Past the end wheels the track wraps around the sprocket and the idler, and both of
+    // those are bolted to the hull - so fade the movement out over one wheel spacing.
+    float endFade = saturate(t + 1.0f) * saturate(7.0f - t);
+
+    // Everything from the wheel axle line downwards has to move with the wheel by the full
+    // amount, otherwise the wheels poke out through the side of the track. Only above that
+    // line does it fade out, up to the top run which rests on the return rollers and must
+    // not move at all.
+    float height = saturate((posL.z - gTrackParam.w) / (gTrackParam.z - gTrackParam.w));
+
+    return -sag * endFade * height;
+}
 
 cbuffer cbPass : register(b1)
 {

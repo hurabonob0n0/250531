@@ -111,6 +111,9 @@ void CCamera::LateTick(float fTimeDelta)
 	//pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
 	//pc.Lights[2].Strength = { 0.15f, 0.15f, 0.15f };
 
+	/* The terrain culls chunks and picks its LOD from this. */
+	m_GameInstance->Set_CameraViewProj(viewProj, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+
 	auto currPassCB = m_GameInstance->Get_Current_FrameResource()->m_PassCB;
 	currPassCB->CopyData(0, pc);
 }

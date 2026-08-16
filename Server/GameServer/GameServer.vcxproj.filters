@@ -22,37 +22,61 @@
     <Filter Include="Object_Manager\GameObjects">
       <UniqueIdentifier>{2fd43faf-b1f9-448e-991c-3782b2110a37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object_Manager\GameObjects\Tank">
-      <UniqueIdentifier>{ee61a507-c2ff-4ce2-8437-03c65edb8624}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Room_Manager\Player">
       <UniqueIdentifier>{0e7a3f43-80d0-4e28-84e9-ae350855d39f}</UniqueIdentifier>
     </Filter>
     <Filter Include="99.Docs">
       <UniqueIdentifier>{e93215de-dc6b-4813-9f48-013699792490}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object_Manager\Map_Manager">
+      <UniqueIdentifier>{b86d145f-1084-488a-990b-00e499733b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\Map_Manager\Terrain_Manager">
+      <UniqueIdentifier>{5ab047ae-a17c-4b36-9441-e4132e497e3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\TransformObject">
+      <UniqueIdentifier>{95a6d7ba-0805-4388-a4e0-5bde8ee66b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec3Object">
+      <UniqueIdentifier>{d4f574e3-90ed-4e84-b4b7-1544d3c61b88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\TransformObject\Tank">
+      <UniqueIdentifier>{ee61a507-c2ff-4ce2-8437-03c65edb8624}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec3Object\Weapon">
+      <UniqueIdentifier>{ba75d8b2-4942-4e86-9ba3-ef25331e03f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec3Object\Weapon\Normal_Potan">
+      <UniqueIdentifier>{96f70672-ce31-4bbc-907e-0393b8e36897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Room_Manager\Rooms">
+      <UniqueIdentifier>{cfa2060e-cce3-46e6-800a-a28907f6b8f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec2Object">
+      <UniqueIdentifier>{a9a3aac3-be15-4273-b729-c35f0695f00a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision_Manager">
+      <UniqueIdentifier>{9b40a524-4b25-4790-b7b7-9b690f118e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec2Object\Tree">
+      <UniqueIdentifier>{125d7a00-d63e-457b-bd7f-3f6cd5b7cc23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\TransformObject\Drone">
+      <UniqueIdentifier>{807f11ff-3609-473f-b0e4-d3e5d31735d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object_Manager\GameObjects\Vec3Object\Weapon\AirDrop_Bomb">
+      <UniqueIdentifier>{59e7d1dc-9715-4a78-9491-829d653f4e85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network_Level">
+      <UniqueIdentifier>{727ebcf7-a021-43f2-be59-054ef7651b84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameServer.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ClientSession.cpp">
-      <Filter>Session_Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientSessionManager.cpp">
-      <Filter>Session_Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="ServerPacketHandler.cpp">
-      <Filter>Utils\Packet_Handler</Filter>
-    </ClCompile>
-    <ClCompile Include="Room.cpp">
-      <Filter>Room_Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Tank.cpp">
-      <Filter>Object_Manager\GameObjects\Tank</Filter>
+      <Filter>Object_Manager\GameObjects\TransformObject\Tank</Filter>
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Object_Manager</Filter>
@@ -63,26 +87,61 @@
     <ClCompile Include="Player.cpp">
       <Filter>Room_Manager\Player</Filter>
     </ClCompile>
-    <ClCompile Include="SGlobal.cpp" />
+    <ClCompile Include="Weapon.cpp">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Normal_Potan.cpp">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon\Normal_Potan</Filter>
+    </ClCompile>
+    <ClCompile Include="Room_Manager.cpp">
+      <Filter>Room_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain_Manager.cpp">
+      <Filter>Object_Manager\Map_Manager\Terrain_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformObject.cpp">
+      <Filter>Object_Manager\GameObjects\TransformObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Room_Manager\Rooms</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision_Manager.cpp">
+      <Filter>Collision_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree.cpp">
+      <Filter>Object_Manager\GameObjects\Vec2Object\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Drone.cpp">
+      <Filter>Object_Manager\GameObjects\TransformObject\Drone</Filter>
+    </ClCompile>
+    <ClCompile Include="AirDrop_Bomb.cpp">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon\AirDrop_Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="MainServer.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Network_Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Session_Manager.cpp">
+      <Filter>Network_Level</Filter>
+    </ClCompile>
+    <ClCompile Include="SGlobal.cpp">
+      <Filter>Network_Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet_Handler.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP_Server.cpp">
+      <Filter>Network_Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ClientSession.h">
-      <Filter>Session_Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="ClientSessionManager.h">
-      <Filter>Session_Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerPacketHandler.h">
-      <Filter>Utils\Packet_Handler</Filter>
-    </ClInclude>
-    <ClInclude Include="Room.h">
-      <Filter>Room_Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Tank.h">
-      <Filter>Object_Manager\GameObjects\Tank</Filter>
+      <Filter>Object_Manager\GameObjects\TransformObject\Tank</Filter>
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
       <Filter>Object_Manager</Filter>
@@ -99,14 +158,62 @@
     <ClInclude Include="AbstractFactory.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="SGlobal.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\TextDocs\ToDoList_Server.txt">
-      <Filter>99.Docs</Filter>
-    </Text>
-    <Text Include="..\..\TextDocs\Client_Server_Flow.txt">
-      <Filter>99.Docs</Filter>
-    </Text>
+    <ClInclude Include="Weapon.h">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Room_Manager.h">
+      <Filter>Room_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain_Manager.h">
+      <Filter>Object_Manager\Map_Manager\Terrain_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformObject.h">
+      <Filter>Object_Manager\GameObjects\TransformObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Room_Manager\Rooms</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision_Manager.h">
+      <Filter>Collision_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Normal_Potan.h">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon\Normal_Potan</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.h">
+      <Filter>Object_Manager\GameObjects\Vec2Object\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Drone.h">
+      <Filter>Object_Manager\GameObjects\TransformObject\Drone</Filter>
+    </ClInclude>
+    <ClInclude Include="AirDrop_Bomb.h">
+      <Filter>Object_Manager\GameObjects\Vec3Object\Weapon\AirDrop_Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBuffer.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
+    <ClInclude Include="RWLock.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Session_Manager.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
+    <ClInclude Include="SGlobal.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet_Handler.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerConfig.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP_Server.h">
+      <Filter>Network_Level</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

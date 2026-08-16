@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Client_Defines.h"
 #include "Camera.h"
 #include "Tank.h"
@@ -62,12 +62,12 @@ public:
 
 private:
 
-	bool   m_IsShaking = false;     // ¼ÎÀÌÅ© Áß ¿©ºÎ(Áßº¹ È£Ãâ ¹æÁö)
-	float  m_ShakeTime = 0.f;       // ÁøÇà ½Ã°£
-	float  m_ShakeDur = 0.f;       // ÃÑ Áö¼Ó
-	float  m_ShakeAmp = 0.f;       // ÁøÆø(Ä«¸Ş¶ó-°ø°£ ¿ÀÇÁ¼Â, ´ÜÀ§: world units)
-	float  m_ShakeFreq = 0.f;       // ÁÖÆÄ¼ö(Áøµ¿ ¼Óµµ)
-	float  m_ShakeSeed = 0.f;       // À§»ó ½Ãµå(°³º° È£Ãâ¸¶´Ù ´Ş¸®)
+	bool   m_IsShaking = false;     // ì…°ì´í¬ ì¤‘ ì—¬ë¶€(ì¤‘ë³µ í˜¸ì¶œ ë°©ì§€)
+	float  m_ShakeTime = 0.f;       // ì§„í–‰ ì‹œê°„
+	float  m_ShakeDur = 0.f;       // ì´ ì§€ì†
+	float  m_ShakeAmp = 0.f;       // ì§„í­(ì¹´ë©”ë¼-ê³µê°„ ì˜¤í”„ì…‹, ë‹¨ìœ„: world units)
+	float  m_ShakeFreq = 0.f;       // ì£¼íŒŒìˆ˜(ì§„ë™ ì†ë„)
+	float  m_ShakeSeed = 0.f;       // ìœ„ìƒ ì‹œë“œ(ê°œë³„ í˜¸ì¶œë§ˆë‹¤ ë‹¬ë¦¬)
 
 	DirectX::XMFLOAT3 m_ShakeOfs = { 0,0,0 };
 

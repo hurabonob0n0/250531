@@ -1,5 +1,6 @@
-#include "..\Public\MeshModel.h"
+ï»¿#include "..\Public\MeshModel.h"
 #include "VIBuffer_Mesh.h"
+#include "ModelBaker.h"
 
 CMeshModel::CMeshModel(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList)
 	: CComponent(pDevice, pCommandList)
@@ -17,19 +18,77 @@ CMeshModel::CMeshModel(const CMeshModel& rhs)
 	}
 }
 
+string CMeshModel::Make_BinPath(const string& strModelFilePath)
+{
+	const size_t iDot = strModelFilePath.find_last_of('.');
+	const size_t iSlash = strModelFilePath.find_last_of("/\\");
+
+	if (string::npos == iDot || (string::npos != iSlash && iDot < iSlash))
+		return strModelFilePath + ".bin";
+
+	return strModelFilePath.substr(0, iDot) + ".bin";
+}
+
 HRESULT CMeshModel::Initialize_Prototype(const string& strModelFilePath, _fmatrix PivotMatrix, _uint type)
 {
-	//_uint		iFlag = aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast | aiProcess_PreTransformVertices;
-	//_uint		iFlag = aiProcessPreset_TargetRealtime_Fast | aiProcess_PreTransformVertices;
-	_uint		iFlag = aiProcess_PreTransformVertices;
+	const string strBinPath = Make_BinPath(strModelFilePath);
 
-	/* m_pAIScene¾È¿¡ .fbxÆÄÀÏ¿¡ ´ã°ÜÀÖ´ø Á¤º¸µéÀÌ ´ã±ä´Ù.  */
-	m_pAIScene = m_Importer.ReadFile(strModelFilePath, iFlag);
-	if (nullptr == m_pAIScene)
-		return E_FAIL;
+	/* .bin ì´ ì—†ìœ¼ë©´(= ëª¨ë¸ì„ ìƒˆë¡œ ë„£ì—ˆê±°ë‚˜ ì²˜ìŒ ëŒë¦¬ëŠ” ê²ƒì´ë©´) FBX ì—ì„œ í•œ ë²ˆ êµ¬ì›Œë‘”ë‹¤.
+	   ê·¸ ë‹¤ìŒë¶€í„°ëŠ” ì´ ë¶„ê¸°ë¡œ ë“¤ì–´ì˜¤ì§€ ì•ŠëŠ”ë‹¤. */
+	if (!CModelBaker::Is_File_Exist(strBinPath))
+	{
+		if (!CModelBaker::Bake_MeshModel(strModelFilePath, strBinPath, PivotMatrix, type))
+			return E_FAIL;
+	}
 
-	if (FAILED(Ready_Meshes(PivotMatrix,type)))
+	return Load_Binary(strBinPath);
+}
+
+HRESULT CMeshModel::Load_Binary(const string& strBinPath)
+{
+	std::ifstream fin(strBinPath, std::ios::binary);
+	if (!fin.is_open())
+	{
+		MessageBoxA(nullptr, ("Failed to open model binary:\n" + strBinPath).c_str(), "Error", MB_OK);
 		return E_FAIL;
+	}
+
+	MESHBINARY_HEADER Header{};
+	fin.read(reinterpret_cast<char*>(&Header), sizeof(MESHBINARY_HEADER));
+
+	if (0 != memcmp(Header.szMagic, MESHBINARY_MAGIC, sizeof(Header.szMagic)) ||
+		MESHBINARY_VERSION != Header.iVersion)
+	{
+		MessageBoxA(nullptr, ("Model binary is not ours or is an old version:\n" + strBinPath +
+			"\nDelete it and run once with USE_ASSIMP_BAKE = 1.").c_str(), "Error", MB_OK);
+		return E_FAIL;
+	}
+
+	m_iNumMeshes = Header.iNumMeshes;
+	m_Meshes.reserve(m_iNumMeshes);
+
+	std::vector<VTXMESH> Vertices;
+	std::vector<_ulong>  Indices;
+
+	for (_uint i = 0; i < m_iNumMeshes; ++i)
+	{
+		_uint iVertexNum = 0, iIndexNum = 0;
+		fin.read(reinterpret_cast<char*>(&iVertexNum), sizeof(_uint));
+		fin.read(reinterpret_cast<char*>(&iIndexNum), sizeof(_uint));
+
+		Vertices.resize(iVertexNum);
+		Indices.resize(iIndexNum);
+
+		fin.read(reinterpret_cast<char*>(Vertices.data()), std::streamsize(sizeof(VTXMESH) * iVertexNum));
+		fin.read(reinterpret_cast<char*>(Indices.data()), std::streamsize(sizeof(_ulong) * iIndexNum));
+
+		CVIBuffer_Mesh* pMesh = CVIBuffer_Mesh::Create(m_Device, m_CommandList,
+			Vertices.data(), iVertexNum, Indices.data(), iIndexNum);
+		if (nullptr == pMesh)
+			return E_FAIL;
+
+		m_Meshes.push_back(pMesh);
+	}
 
 	return S_OK;
 }
@@ -41,28 +100,8 @@ HRESULT CMeshModel::Initialize(void* pArg)
 
 HRESULT CMeshModel::Render(_uint iMeshIndex)
 {
-	/* iMeshIndex¿¡ ÇØ´çÇÏ´Â ¸Þ½Ã¿¡ ¿µÇâÀ» ÁÖ´Â »ÀµéÀ» ¸ð¾Æ¼­ ¼ÎÀÌ´õ·Î Àü´ÞÇÑ´Ù. */
+	/* iMeshIndexì— í•´ë‹¹í•˜ëŠ” ë©”ì‹œë§Œ ê·¸ë¦°ë‹¤. */
 	m_Meshes[iMeshIndex]->Render();
-
-	return S_OK;
-}
-
-HRESULT CMeshModel::Ready_Meshes(_fmatrix PivotMatrix, _uint type)
-{
-	/* ÇöÀç ¸ðµ¨À» ±¸¼ºÇÏ´Â ¸Þ½ÃÀÇ °¹¼ö. */
-	m_iNumMeshes = m_pAIScene->mNumMeshes;
-
-	m_Meshes.reserve(m_iNumMeshes);
-
-	for (size_t i = 0; i < m_iNumMeshes; i++)
-	{
-		/* VB, IB¸¦ ¸¸µç´Ù. */
-		CVIBuffer_Mesh* pMesh = CVIBuffer_Mesh::Create(m_Device, m_CommandList, m_pAIScene->mMeshes[i], PivotMatrix,type);
-		if (nullptr == pMesh)
-			return E_FAIL;
-
-		m_Meshes.push_back(pMesh);
-	}
 
 	return S_OK;
 }
@@ -71,7 +110,7 @@ CMeshModel* CMeshModel::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList*
 {
 	CMeshModel* pInstance = new CMeshModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(strModelFilePath, PivotMatrix,type)))
+	if (FAILED(pInstance->Initialize_Prototype(strModelFilePath, PivotMatrix, type)))
 	{
 		MSG_BOX("Failed to Created : CMeshModel");
 		Safe_Release(pInstance);
@@ -100,6 +139,5 @@ void CMeshModel::Free()
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 
-	m_Importer.FreeScene();
-
+	m_Meshes.clear();
 }

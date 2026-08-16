@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "MyBmp.h"
 
 MyBmp::MyBmp()
@@ -17,14 +17,14 @@ void MyBmp::Load_Bmp(const TCHAR* pFilePath, HWND Handle)
 
 	ReleaseDC(Handle, hDC);
 
-	m_hBitmap = (HBITMAP)LoadImage(NULL,		// ÇÁ·Î±×·¥ ÀÎ½ºÅÏ½ºÀÇ ÇÚµé, ÀÌ¹ÌÁö´Â ÇÁ·Î±×·¥¿¡¼­ ¾ò¾î¿À´Â °ÍÀÌ ¾Æ´Ï¶ó ÆÄÀÏ·ÎºÎÅÍ ÀÐ¾î¿Ã °ÍÀÌ±â NULL°ª ¼¼ÆÃ
-		pFilePath,  // ÆÄÀÏÀÇ °æ·Î
-		IMAGE_BITMAP, // ¾î¶² Å¸ÀÔÀ» ÀÐ¾î¿ÃÁö Àü´Þ 
-		0,	// ÀÌ¹ÌÁöÀÇ °¡·Î Å©±â
-		0,	// ÀÌ¹ÌÁöÀÇ ¼¼·Î Å©±â
-		LR_LOADFROMFILE | LR_CREATEDIBSECTION);  // LR_LOADFROMFILE : ÆÄÀÏ¿¡¼­ ÀÌ¹ÌÁö¸¦ ºÒ·¯¿À°Ú´Ù´Â ÀÇ¹Ì, LR_CREATEDIBSECTION : ÀÐ¾î¿Â ÆÄÀÏÀ» DIB ÇüÅÂ·Î º¯È¯
+	m_hBitmap = (HBITMAP)LoadImage(NULL,		// í”„ë¡œê·¸ëž¨ ì¸ìŠ¤í„´ìŠ¤ì˜ í•¸ë“¤, ì´ë¯¸ì§€ëŠ” í”„ë¡œê·¸ëž¨ì—ì„œ ì–»ì–´ì˜¤ëŠ” ê²ƒì´ ì•„ë‹ˆë¼ íŒŒì¼ë¡œë¶€í„° ì½ì–´ì˜¬ ê²ƒì´ê¸° NULLê°’ ì„¸íŒ…
+		pFilePath,  // íŒŒì¼ì˜ ê²½ë¡œ
+		IMAGE_BITMAP, // ì–´ë–¤ íƒ€ìž…ì„ ì½ì–´ì˜¬ì§€ ì „ë‹¬ 
+		0,	// ì´ë¯¸ì§€ì˜ ê°€ë¡œ í¬ê¸°
+		0,	// ì´ë¯¸ì§€ì˜ ì„¸ë¡œ í¬ê¸°
+		LR_LOADFROMFILE | LR_CREATEDIBSECTION);  // LR_LOADFROMFILE : íŒŒì¼ì—ì„œ ì´ë¯¸ì§€ë¥¼ ë¶ˆëŸ¬ì˜¤ê² ë‹¤ëŠ” ì˜ë¯¸, LR_CREATEDIBSECTION : ì½ì–´ì˜¨ íŒŒì¼ì„ DIB í˜•íƒœë¡œ ë³€í™˜
 
-	// SelectObject : GDI ¿ÀºêÁ§Æ®¸¦ ¼±ÅÃÇÏ±â Àü¿¡ ±âÁ¸¿¡ °¡Áö°í ÀÖ´ø ¿ÀºêÁ§Æ®¸¦ ¹ÝÈ¯
+	// SelectObject : GDI ì˜¤ë¸Œì íŠ¸ë¥¼ ì„ íƒí•˜ê¸° ì „ì— ê¸°ì¡´ì— ê°€ì§€ê³  ìžˆë˜ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
 	m_hOldBmp = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
 }
 

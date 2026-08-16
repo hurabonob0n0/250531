@@ -120,6 +120,32 @@ public: //For RandomMgr
 		return m_RandomMgr->Get_RandomF(Start, End);
 	}
 
+public: //For Terrain culling / LOD
+	/* Cameras hand over the view-projection they just wrote into the pass CB,
+	   so the terrain can cull chunks and pick a LOD without knowing the camera. */
+	void Set_CameraViewProj(_fmatrix ViewProj, _fvector EyePos) {
+		XMStoreFloat4x4(&m_CameraViewProj, ViewProj);
+		XMStoreFloat3(&m_CameraEye, EyePos);
+		m_isCameraValid = true;
+	}
+	void Set_ShadowViewProj(_fmatrix ViewProj) { XMStoreFloat4x4(&m_ShadowViewProj, ViewProj); }
+
+	_matrix		Get_CameraViewProj() const { return XMLoadFloat4x4(&m_CameraViewProj); }
+	_matrix		Get_ShadowViewProj() const { return XMLoadFloat4x4(&m_ShadowViewProj); }
+	_float3		Get_CameraEye() const { return m_CameraEye; }
+	bool		Is_CameraValid() const { return m_isCameraValid; }
+
+	/* CRenderer turns this on while it records the shadow pass. */
+	void		Set_ShadowPass(bool isShadowPass) { m_isShadowPass = isShadowPass; }
+	bool		Is_ShadowPass() const { return m_isShadowPass; }
+
+private:
+	_float4x4	m_CameraViewProj = {};
+	_float4x4	m_ShadowViewProj = {};
+	_float3		m_CameraEye = {};
+	bool		m_isCameraValid = false;
+	bool		m_isShadowPass = false;
+
 public:
 	void Free();
 

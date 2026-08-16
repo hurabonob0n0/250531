@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "BulletPath.h"
 #include "GameInstance.h"
 #include "Terrain.h"
@@ -22,7 +22,7 @@ HRESULT CBulletPath::Initialize_Prototype()
 
 HRESULT CBulletPath::Initialize(void* pArg)
 {
-	m_RG = CRenderer::RG_BULLETPATH; // ¹Ù²ã¾ßÇÔ.
+	m_RG = CRenderer::RG_BULLETPATH; // ë°”ê¿”ì•¼í•¨.
 
 	BulletPathstr* Info = (BulletPathstr*)pArg;
 	OwnerTankIndex = Info->OwnerTankIndex;
@@ -108,28 +108,28 @@ void CBulletPath::Render()
 		m_GameInstance->Get_Current_FrameResource()->m_InstanceCB->CopyData(i, BulletDatas[i]);
 	}
 	GETCOMMANDLIST->SetGraphicsRootShaderResourceView(6, m_GameInstance->Get_Current_FrameResource()->m_InstanceCB->Resource()->GetGPUVirtualAddress());
-	(CVIBuffer_Geos*)m_VIBuffer->Render((int)BulletDatas.size()); // ÀÎ½ºÅÏ½Ì¿ëÀ¸·Î ¹Ù²ã¾ßÇÔ.
+	(CVIBuffer_Geos*)m_VIBuffer->Render((int)BulletDatas.size()); // ì¸ìŠ¤í„´ì‹±ìš©ìœ¼ë¡œ ë°”ê¿”ì•¼í•¨.
 }
 
 InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, const XMVECTOR& newPos)
 {
 	InstanceData data;
 
-	// 1. Look º¤ÅÍ °è»ê (ÇöÀç À§Ä¡ - ÀÌÀü À§Ä¡)
+	// 1. Look ë²¡í„° ê³„ì‚° (í˜„ì¬ ìœ„ì¹˜ - ì´ì „ ìœ„ì¹˜)
 	XMVECTOR look = XMVectorSubtract(newPos, oldPos);
 
-	// 2. ±ËÀû Á¶°¢ÀÇ ±æÀÌ(Scale) °è»ê
+	// 2. ê¶¤ì  ì¡°ê°ì˜ ê¸¸ì´(Scale) ê³„ì‚°
 	float distance = XMVectorGetX(XMVector3Length(look));
-	look = XMVector3Normalize(look); // Look º¤ÅÍ Á¤±ÔÈ­
+	look = XMVector3Normalize(look); // Look ë²¡í„° ì •ê·œí™”
 
-	// 3. Right, Up º¤ÅÍ °è»ê
+	// 3. Right, Up ë²¡í„° ê³„ì‚°
 	XMVECTOR up, right;
 	XMVECTOR worldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	// Look º¤ÅÍ°¡ World Up º¤ÅÍ¿Í °ÅÀÇ ÆòÇàÇÑ °æ¿ì (¼öÁ÷À¸·Î ½î´Â °æ¿ì)
+	// Look ë²¡í„°ê°€ World Up ë²¡í„°ì™€ ê±°ì˜ í‰í–‰í•œ ê²½ìš° (ìˆ˜ì§ìœ¼ë¡œ ì˜ëŠ” ê²½ìš°)
 	if (XMVectorGetX(XMVector3Dot(look, worldUp)) > 0.999f || XMVectorGetX(XMVector3Dot(look, worldUp)) < -0.999f)
 	{
-		// ´Ù¸¥ ±âÁØ º¤ÅÍ(¿¹: World Forward)¸¦ »ç¿ë
+		// ë‹¤ë¥¸ ê¸°ì¤€ ë²¡í„°(ì˜ˆ: World Forward)ë¥¼ ì‚¬ìš©
 		XMVECTOR worldForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		right = XMVector3Normalize(XMVector3Cross(look, worldForward));
 		up = XMVector3Normalize(XMVector3Cross(right, look));
@@ -140,30 +140,30 @@ InstanceData CBulletPath::CreateBulletTrailInstance(const XMVECTOR& oldPos, cons
 		up = XMVector3Normalize(XMVector3Cross(look, right));
 	}
 
-	// 4. World Çà·Ä »ı¼º
+	// 4. World í–‰ë ¬ ìƒì„±
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 
-	// °¢ Ãà º¤ÅÍ¸¦ Çà·Ä¿¡ ¼³Á¤ (È¸Àü)
+	// ê° ì¶• ë²¡í„°ë¥¼ í–‰ë ¬ì— ì„¤ì • (íšŒì „)
 	worldMatrix.r[0] = right;
 	worldMatrix.r[1] = up;
 	worldMatrix.r[2] = look;
 	worldMatrix.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// ½ºÄÉÀÏ Çà·Ä »ı¼º (±ËÀû µÎ²² 0.1, ±æÀÌ´Â distance)
-	// ZÃàÀ¸·Î ±æ¾îÁöµµ·Ï ¼³Á¤ÇÕ´Ï´Ù. VIBufferÀÇ Á¤À°¸éÃ¼ ¸ğµ¨ÀÌ ZÃàÀ» ¹Ù¶óº¸µµ·Ï Á¦ÀÛµÇ¾î¾ß ÇÕ´Ï´Ù.
+	// ìŠ¤ì¼€ì¼ í–‰ë ¬ ìƒì„± (ê¶¤ì  ë‘ê»˜ 0.1, ê¸¸ì´ëŠ” distance)
+	// Zì¶•ìœ¼ë¡œ ê¸¸ì–´ì§€ë„ë¡ ì„¤ì •í•©ë‹ˆë‹¤. VIBufferì˜ ì •ìœ¡ë©´ì²´ ëª¨ë¸ì´ Zì¶•ì„ ë°”ë¼ë³´ë„ë¡ ì œì‘ë˜ì–´ì•¼ í•©ë‹ˆë‹¤.
 	XMMATRIX scaleMatrix = XMMatrixScaling(0.1f, 0.1f, distance);
 
-	// À§Ä¡ Çà·Ä »ı¼º (µÎ À§Ä¡ÀÇ Áß°£ ÁöÁ¡)
+	// ìœ„ì¹˜ í–‰ë ¬ ìƒì„± (ë‘ ìœ„ì¹˜ì˜ ì¤‘ê°„ ì§€ì )
 	XMVECTOR midPoint = XMVectorScale(XMVectorAdd(oldPos, newPos), 0.5f);
 	XMMATRIX translationMatrix = XMMatrixTranslationFromVector(midPoint);
 
 
-	// ÃÖÁ¾ World Çà·Ä: Scale -> Rotate -> Translate ¼ø¼­·Î °ö¼À
+	// ìµœì¢… World í–‰ë ¬: Scale -> Rotate -> Translate ìˆœì„œë¡œ ê³±ì…ˆ
 	worldMatrix = XMMatrixMultiply(scaleMatrix, worldMatrix);
 	worldMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(90.f)), worldMatrix);
 	worldMatrix = XMMatrixMultiply(worldMatrix, translationMatrix);
 
-	// HLSLÀº ±âº»ÀûÀ¸·Î column-major ÀÌ¹Ç·Î, Çà·ÄÀ» ÀüÄ¡(Transpose)ÇØ¼­ ÀúÀåÇÕ´Ï´Ù.
+	// HLSLì€ ê¸°ë³¸ì ìœ¼ë¡œ column-major ì´ë¯€ë¡œ, í–‰ë ¬ì„ ì „ì¹˜(Transpose)í•´ì„œ ì €ì¥í•©ë‹ˆë‹¤.
 	XMStoreFloat4x4(&data.World, XMMatrixTranspose(worldMatrix));
 
 	return data;
@@ -189,7 +189,7 @@ bool CBulletPath::CheckCollisionWithTank()
 
 	int targetTankIndex = (OwnerTankIndex == 0) ? 1 : 0;
 
-	// »ó´ë ÅÊÅ© °¡Á®¿À±â
+	// ìƒëŒ€ íƒ±í¬ ê°€ì ¸ì˜¤ê¸°
 	CTank* pTank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", targetTankIndex));
 	if (!pTank) return false;
 
@@ -199,33 +199,33 @@ bool CBulletPath::CheckCollisionWithTank()
 	constexpr float R = 5.0f;
 	constexpr float R2 = R * R;
 
-	// ÅÊÅ© ¿ùµå Çà·Ä¿¡¼­ À§Ä¡ ÃßÃâ
+	// íƒ±í¬ ì›”ë“œ í–‰ë ¬ì—ì„œ ìœ„ì¹˜ ì¶”ì¶œ
 	for (int i = 0; i < tankCount; ++i)
 	{
-		if (i == OwnerTankIndex && OwnerTankIndex >= 0)  // ³»(¹ß»çÀÚ) ÅÊÅ© Á¦¿Ü
+		if (i == OwnerTankIndex && OwnerTankIndex >= 0)  // ë‚´(ë°œì‚¬ì) íƒ±í¬ ì œì™¸
 			continue;
 
 		CTank* pTank = dynamic_cast<CTank*>(m_GameInstance->GetGameObject("Tank", i));
 		if (!pTank) continue;
 
 
-		// ÅÊÅ© Áß½É À§Ä¡
+		// íƒ±í¬ ì¤‘ì‹¬ ìœ„ì¹˜
 		XMMATRIX tankWorld;
 		tankWorld = pTank->Get_WorldMatrix();
 		XMFLOAT4X4 m; XMStoreFloat4x4(&m, tankWorld);
 		XMVECTOR tankPos = XMVectorSet(m._41, m._42, m._43, 1.0f);
 
-		// ÃÑ¾Ë ÇöÀç À§Ä¡¿ÍÀÇ °Å¸® Á¦°ö
+		// ì´ì•Œ í˜„ì¬ ìœ„ì¹˜ì™€ì˜ ê±°ë¦¬ ì œê³±
 		XMVECTOR d = XMVectorSubtract(m_Pos2, tankPos);
 		float distSq = XMVectorGetX(XMVector3LengthSq(d));
 
 		if (distSq <= R2)
 		{
-			return true; // Ãæµ¹!
+			return true; // ì¶©ëŒ!
 		}
 	}
 
-	return false; // Ãæµ¹ ¾øÀ½
+	return false; // ì¶©ëŒ ì—†ìŒ
 
 }
 

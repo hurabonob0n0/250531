@@ -1,5 +1,6 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "MainApp.h"
+#include "ModelBaker.h"
 #include "DefaultObj.h"
 #include "Camera_Free.h"
 #include "BoxObj.h"
@@ -33,12 +34,8 @@
 	For Server
 -----------------*/
 #include "Client_Globals.h"
-#include "ThreadManager.h"
-#include "Session.h"
-#include "BufferReader.h"
 #include "ClientPacketHandler.h"
 #include "Network_Manager.h"
-#include "ServiceManager.h"
 
 /*----------------
 	For Lobby
@@ -62,9 +59,47 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return CMainApp::Get_Instance()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
+/*---------------------------------------------------------------------------
+	FBX → .bin 굽기 (개발용, D3D 없이 돈다)
+
+		00.MainApp.exe -bake
+
+	로 실행하면 로비도 창도 안 띄우고 모델만 구운 뒤 바로 끝난다.
+	모델(FBX)을 새로 넣거나 바꿨을 때 한 번만 돌리면 된다.
+	여기 목록은 아래 Initialize 의 AddPrototype 과 반드시 같아야 한다
+	(피벗행렬/type 이 다르면 모양이 틀어진다).
+---------------------------------------------------------------------------*/
+static void Bake_All_Models()
+{
+	CModelBaker::Bake_Tank_Meshes("../bin/Models/Tank/M1A2.fbx", "../bin/Models/Tank/",
+		XMMatrixScaling(0.01f, 0.01f, 0.01f));
+
+	const _matrix TreePivot = XMMatrixRotationX(XMConvertToRadians(-90.f));
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Trunk_1.FBX", "../bin/Models/Tree/Dead_Trunk_1.bin", TreePivot, 0);
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Trunk_2.FBX", "../bin/Models/Tree/Dead_Trunk_2.bin", TreePivot, 0);
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Tree_3.FBX", "../bin/Models/Tree/Dead_Tree_3.bin", TreePivot, 0);
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Tree_4.FBX", "../bin/Models/Tree/Dead_Tree_4.bin", TreePivot, 0);
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Tree_5.FBX", "../bin/Models/Tree/Dead_Tree_5.bin", TreePivot, 0);
+	CModelBaker::Bake_MeshModel("../bin/Models/Tree/Dead_Tree_6.FBX", "../bin/Models/Tree/Dead_Tree_6.bin", TreePivot, 0);
+
+	CModelBaker::Bake_MeshModel("../bin/Models/Drone/Drone.fbx", "../bin/Models/Drone/Drone.bin",
+		XMMatrixScaling(0.01f, 0.01f, 0.01f), 1);
+
+	CModelBaker::Bake_MeshModel("../bin/Models/Zet/Zet1.fbx", "../bin/Models/Zet/Zet1.bin",
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(3.141592f * 0.5f), 1);
+
+	MessageBoxA(nullptr, "Model bake finished.", "ModelBaker", MB_OK);
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd){
 	//_CrtSetBreakAlloc(8420);
+
+	if (nullptr != cmdLine && nullptr != strstr(cmdLine, "-bake"))
+	{
+		Bake_All_Models();
+		return 0;
+	}
 
 	if (!RunLobbyWindowLoop(hInstance, showCmd))
 	return 0;
@@ -117,7 +152,13 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE, GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/TerrainVertices"));
+	/* 예전엔 1.14GB짜리 TerrainVertices(정점 1670만개)를 통째로 읽어 한 번에 그렸다.
+	   이제는 높이값(4096x4096 float)만 읽어서 청크 + LOD 로 만든다.
+	   원본이던 Terrain4096Map.bin(201MB, 정점당 x/y/z)은 높이만 뽑아낸 Terrain4096.hgt(67MB)와
+	   내용이 같아서 _AssetSources 로 빼뒀다. 여기서는 .hgt 를 바로 읽는다.
+	   (.hgt 가 없으면 같은 폴더의 Terrain4096Map.bin 을 찾아 다시 만든다 - CVIBuffer_Terrain::Load_HeightMap)
+	   해상도 조절은 Engine_Config.h 의 TERRAIN_VERTEX_STEP. */
+	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain4096.hgt"));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f, 0.01f, 0.01f)));
 	m_GameInstance->AddPrototype("VIBuffer_QuadCom", CVIBuffer_Quad::Create(GETDEVICE, GETCOMMANDLIST));
@@ -223,6 +264,7 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 		for (size_t i = 0; i < roomPlayers.size(); ++i)
 		{
 			const Room_Ready_Data& player = roomPlayers[i];
+
 
 			int pos = player.Position;
 			int keyPos = (pos % 2 == 0) ? pos - 1 : pos; // 짝수는 조종수 포지션으로 매핑

@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "FMOD_Manager.h"
 
 FMOD_Manager* FMOD_Manager::m_pInstance = nullptr;
@@ -126,7 +126,7 @@ bool FMOD_Manager::SetSound3DRolloff(const std::string& id, AudioRolloff rolloff
     FMOD_MODE cur = FMOD_DEFAULT;
     it->second->getMode(&cur);
 
-    // ±âÁ¸ ·Ñ¿ÀÇÁ ÇÃ·¡±× Á¦°Å
+    // ê¸°ì¡´ ë¡¤ì˜¤í”„ í”Œëž˜ê·¸ ì œê±°
     cur &= ~(FMOD_3D_INVERSEROLLOFF | FMOD_3D_LINEARROLLOFF | FMOD_3D_LINEARSQUAREROLLOFF |
         FMOD_3D_INVERSETAPEREDROLLOFF | FMOD_3D_CUSTOMROLLOFF);
 
@@ -177,7 +177,7 @@ bool FMOD_Manager::Play3D_ReturnChannel(const std::string& id, const AudioVec3& 
     if (!mSystem) return false;
     auto it = mSounds.find(id); if (it == mSounds.end()) return false;
 
-    // 3D ¼Ó¼º ¼¼ÆÃ À§ÇØ ÀÏ´Ü pause·Î ¹Þ±â
+    // 3D ì†ì„± ì„¸íŒ… ìœ„í•´ ì¼ë‹¨ pauseë¡œ ë°›ê¸°
     FMOD_RESULT r = mSystem->playSound(it->second, mMaster, true, outCh);
     FMOD_LOG(("playSound3D " + id).c_str(), r);
     if (!FMOD_OK_CHECK(r) || !(*outCh)) return false;

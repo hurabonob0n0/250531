@@ -1,8 +1,7 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "Drone.h"
 #include "GameInstance.h"
 #include "ClientPacketHandler.h"
-#include "ServiceManager.h"
 #include "Network_Manager.h"
 #include "FMOD_Manager.h"
 #include "Tank.h"
@@ -125,7 +124,7 @@ void CDrone::Tick(float fTimeDelta)
             XMVectorGetY(m_vPos),
             XMVectorGetZ(m_vPos)
         };
-        AudioVec3 vel{ 0,0,0 }; // ÇÊ¿ä½Ã ¼Óµµ °è»êÇØ¼­ Àü´Þ
+        AudioVec3 vel{ 0,0,0 }; // í•„ìš”ì‹œ ì†ë„ ê³„ì‚°í•´ì„œ ì „ë‹¬
         m_pFlyChannel->set3DAttributes((FMOD_VECTOR*)&pos, (FMOD_VECTOR*)&vel);
     }
 
@@ -174,14 +173,14 @@ void CDrone::Update_Speed_and_Rot(float fTimeDelta)
     }
 
     if (m_GameInstance->Key_Pressing(VK_CONTROL)) {
-        // µå·Ð ³ôÀÌ°¡ ÃÖ¼Ò 40.f ÀÌ»óÀÏ ¶§¸¸ ÇÏ°­ Çã¿ë
+        // ë“œë¡  ë†’ì´ê°€ ìµœì†Œ 40.f ì´ìƒì¼ ë•Œë§Œ í•˜ê°• í—ˆìš©
         if (XMVectorGetY(m_vPos) > 50.f) {
             m_fUpAxisSpeed -= fTimeDelta * 30.f;
             if (m_fUpAxisSpeed <= -m_fMaxSpeed)
                 m_fUpAxisSpeed = -m_fMaxSpeed;
         }
         else {
-            // ÃÖ¼Ò ³ôÀÌ¿¡ °É¸®¸é ÇÏ°­ ¼Óµµ 0À¸·Î °íÁ¤
+            // ìµœì†Œ ë†’ì´ì— ê±¸ë¦¬ë©´ í•˜ê°• ì†ë„ 0ìœ¼ë¡œ ê³ ì •
             m_fUpAxisSpeed = 0.f;
         }
     }
@@ -272,7 +271,7 @@ CRenderObject* CDrone::Clone(void* pArg)
 void CDrone::Set_My_DronePos_OnTank(XMFLOAT4X4& world)
 {
     float posX = world._41;
-    float posY = world._42 + 50.f; // Y°ª¸¸ +50
+    float posY = world._42 + 50.f; // Yê°’ë§Œ +50
     float posZ = world._43;
 
     m_vPos = { posX, posY, posZ, 1.f };
@@ -298,13 +297,13 @@ void CDrone::SendMyPosToServer()
     float y = XMVectorGetY(m_vPos);
     float z = XMVectorGetZ(m_vPos);
     auto sendBuffer = ClientPacketHandler::Make_C_DRONE_MOVE(x,y,z, m_fYawRot, m_fRollRot, m_fPitchRot);
-    ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+    Network_Manager::GetInstance()->Send(sendBuffer);
 
 }
 
 void CDrone::Update_Follow_Tank(float dt)
 {
-    // ³» ÅÊÅ© °¡Á®¿À±â
+    // ë‚´ íƒ±í¬ ê°€ì ¸ì˜¤ê¸°
     CTank* myTank = nullptr;
     if (Network_Manager::GetInstance()->isConnected())
         myTank = static_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", Network_Manager::GetInstance()->GetMyTankIndex()));
@@ -312,34 +311,34 @@ void CDrone::Update_Follow_Tank(float dt)
         myTank = static_cast<CTank*>(CGameInstance::Get_Instance()->GetGameObject("Tank", 0));
     if (!myTank) return;
 
-    // 2) ÅÊÅ© À§Ä¡
+    // 2) íƒ±í¬ ìœ„ì¹˜
     const DirectX::XMMATRIX tankWorld = myTank->Get_WorldMatrix();
     DirectX::XMFLOAT4X4 m; DirectX::XMStoreFloat4x4(&m, tankWorld);
     DirectX::XMVECTOR tankPos = DirectX::XMVectorSet(m._41, m._42, m._43, 1.f);
 
-    // 3) ¸ñÇ¥ À§Ä¡(À§·Î m_followHeight)
+    // 3) ëª©í‘œ ìœ„ì¹˜(ìœ„ë¡œ m_followHeight)
     const DirectX::XMVECTOR targetPos = DirectX::XMVectorAdd(tankPos, DirectX::XMVectorSet(0.f, m_followHeight, 0.f, 0.f));
 
     {
-        // ¸ñÇ¥±îÁöÀÇ º¤ÅÍ/°Å¸®
+        // ëª©í‘œê¹Œì§€ì˜ ë²¡í„°/ê±°ë¦¬
         DirectX::XMVECTOR delta = DirectX::XMVectorSubtract(targetPos, m_vPos);
         float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(delta));
 
         if (dist > 1e-4f) {
             DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(delta);
 
-            const float maxSpeed = 15.f;     // ¡Ú ÃÊ´ç ÀÌµ¿ ¼Óµµ(¿øÇÏ´Â °ªÀ¸·Î Á¶Àý)
-            float step = maxSpeed * dt;      // ÀÌ¹ø ÇÁ·¹ÀÓ ÀÌµ¿·®
+            const float maxSpeed = 15.f;     // â˜… ì´ˆë‹¹ ì´ë™ ì†ë„(ì›í•˜ëŠ” ê°’ìœ¼ë¡œ ì¡°ì ˆ)
+            float step = maxSpeed * dt;      // ì´ë²ˆ í”„ë ˆìž„ ì´ë™ëŸ‰
 
-            if (step > dist) step = dist;    // ¸ñÇ¥ ±ÙÃ³¿¡¼­ overshoot ¹æÁö
+            if (step > dist) step = dist;    // ëª©í‘œ ê·¼ì²˜ì—ì„œ overshoot ë°©ì§€
 
             m_vPos = DirectX::XMVectorAdd(m_vPos, DirectX::XMVectorScale(dir, step));
         }
     }
 
-    // 5) (¿É¼Ç) È¸Àü À¯Áö/°»½ÅÀÌ ÇÊ¿äÇÏ¸é ¿©±â¼­ Ã³¸®
+    // 5) (ì˜µì…˜) íšŒì „ ìœ ì§€/ê°±ì‹ ì´ í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ ì²˜ë¦¬
 
-    // 6) Æ®·£½ºÆû ¹Ý¿µ
+    // 6) íŠ¸ëžœìŠ¤í¼ ë°˜ì˜
     const DirectX::XMMATRIX rot =
         DirectX::XMMatrixRotationRollPitchYaw(m_fPitchRot, m_fYawRot, m_fRollRot);
     m_TransformCom->Set_WorldMatrix(rot);

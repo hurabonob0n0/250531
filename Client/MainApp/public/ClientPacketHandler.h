@@ -1,58 +1,15 @@
-#pragma once
-#include "Session.h"
+﻿#pragma once
+#include "Protocol.h"
+#include "SendBuffer.h"
 #include "RenderObject.h"
+
+// 패킷 ID enum 은 Protocol.h 로 옮겼다.
+// 서버와 한 글자도 어긋나면 안 되는 값이라, 클라/서버가 같은 파일을 복제해서 쓴다.
 
 BEGIN(Engine)
 class CGameInstance;
 END
 
-enum
-{
-	S_TEST = 1,//for Dummy
-	S_SUCCESS_LOGIN = 2,
-	S_SUCCESS_ENTER_ROOM = 3,
-	S_GAME_START = 4,
-	S_ALL_TANK_STATE = 5,
-	S_WEAPON_HIT = 6,
-	S_ROOM_DATA = 7,
-	S_ROOM_ENTER = 8,
-	S_ROOM_PLAYER_STATES = 9,
-	S_ROOM_ALL_PLAYER_FINISH_LOADING = 10,
-	S_TANK_HIT = 11,
-	S_TANK_DAMAGED = 12,
-	S_TANK_DEAD = 13,
-	S_TANK_KILL = 14,
-	S_GAME_WIN = 15,
-	S_GAME_LOSE = 16,
-	S_CAPTURE = 17,
-	S_ALL_DRONE_STATE = 18,
-	S_BULLET_ADD = 19,
-	S_AIRDROP_INDEX = 20,
-	S_TANK_RESPAWN = 21,
-	S_TANK_SOUND = 22,
-	S_ADD_PING = 23,
-
-	C_LOGIN = 1001,
-	C_FINISH_LOADING = 1002,
-	C_KEYINPUT = 1003,
-	C_MOVEMENT = 1004,
-	C_SHOT = 1005,
-	C_SHOW_ROOM = 1006,
-	C_CREATE_ROOM = 1007,
-	C_JOIN_ROOM = 1008,
-	C_EXIT_ROOM = 1009,
-	C_CHANGE_INFO = 1010,
-	C_READY = 1011,
-	C_START = 1012,
-	C_RESPAWN_TANK = 1013,
-	C_MYPOS = 1014,
-	C_MYPOSIN = 1015,
-	C_MYDRONEMOVE = 1016,
-	C_AIRDROP = 1017,
-	C_TANK_SOUND = 1018,
-	C_ADD_PING = 1019
-
-};
 
 
 
@@ -101,7 +58,7 @@ public:
 
 
 
-	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation);
+	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation, const int8* pWheelSag);
 	static SendBufferRef Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ);
 
 	static SendBufferRef Make_C_DRONE_MOVE(float PosX, float PosY, float PosZ, float Yaw, float Roll, float Pitch);
@@ -121,7 +78,7 @@ public:
 	static SendBufferRef Make_C_TANK_RESPAWN(_float4x4& worldMatrix, float potapRotation, float posinRotation);
 
 	static SendBufferRef Make_C_TANK_POSINMOVE(float potapRotation, float posinRotation);
-	static SendBufferRef Make_C_TANK_POSMOVE(_float4x4& worldMatrix);
+	static SendBufferRef Make_C_TANK_POSMOVE(_float4x4& worldMatrix, const int8* pWheelSag);
 
 	static SendBufferRef Make_C_AIRDROP(uint8 AreaNum);
 	static SendBufferRef Make_C_SOUND(float EngineVol,float EnginePitch, float TrackVol, float TrackPitch);
@@ -130,8 +87,6 @@ public:
 	//For GamePlay
 
 
-	USE_LOCK;
-	
 	//static SendBufferRef Make_C_SHOT(uint, uint16 attack);
 
 

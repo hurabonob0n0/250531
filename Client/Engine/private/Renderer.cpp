@@ -95,7 +95,9 @@ void CRenderer::Render()
     m_CommandList->ClearDepthStencilView(m_GameInstance->m_ShadowMap->mhCpuDsv,
         D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     m_CommandList->OMSetRenderTargets(0, nullptr, false, &m_GameInstance->m_ShadowMap->mhCpuDsv);
+    m_GameInstance->Set_ShadowPass(true);
     Render_NonBlend();
+    m_GameInstance->Set_ShadowPass(false);
     m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GameInstance->m_ShadowMap->m_Resource,
         D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
 #pragma endregion ShadowPass

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Base.h"
+#include "Engine_Config.h"
+
+#if USE_ASSIMP_BAKE
 
 /* 특정 애니메이션을 구동하기위한 정보를 가진다. */
 /* 전체시간(Duration), 속도(TickPerSecond), 제어하는 뼈의 정보들. */
@@ -40,3 +43,5 @@ public:
 };
 
 END
+
+#endif

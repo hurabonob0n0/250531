@@ -72,26 +72,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binary\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binary\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binary\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binary\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -102,6 +94,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +112,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +130,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +148,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,40 +159,60 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameServer.cpp" />
-    <ClCompile Include="ClientSession.cpp" />
-    <ClCompile Include="ClientSessionManager.cpp" />
+    <ClCompile Include="AirDrop_Bomb.cpp" />
+    <ClCompile Include="Collision_Manager.cpp" />
+    <ClCompile Include="Drone.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="IOCP_Server.cpp" />
+    <ClCompile Include="MainServer.cpp" />
+    <ClCompile Include="Normal_Potan.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="Packet_Handler.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Room_Manager.cpp" />
+    <ClCompile Include="SGlobal.cpp" />
+    <ClCompile Include="Session.cpp" />
+    <ClCompile Include="Session_Manager.cpp" />
+    <ClCompile Include="Tank.cpp" />
+    <ClCompile Include="Terrain_Manager.cpp" />
+    <ClCompile Include="TransformObject.cpp" />
+    <ClCompile Include="Tree.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="SGlobal.cpp" />
-    <ClCompile Include="Tank.cpp" />
-    <ClCompile Include="Room.cpp" />
-    <ClCompile Include="ServerPacketHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractFactory.h" />
+    <ClInclude Include="AirDrop_Bomb.h" />
+    <ClInclude Include="Collision_Manager.h" />
     <ClInclude Include="Define.h" />
-    <ClInclude Include="ClientSession.h" />
-    <ClInclude Include="ClientSessionManager.h" />
+    <ClInclude Include="Drone.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="IOCP_Server.h" />
+    <ClInclude Include="Normal_Potan.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="Packet_Handler.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="SGlobal.h" />
-    <ClInclude Include="Tank.h" />
+    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="RWLock.h" />
     <ClInclude Include="Room.h" />
-    <ClInclude Include="ServerPacketHandler.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\TextDocs\Client_Server_Flow.txt" />
-    <Text Include="..\..\TextDocs\ToDoList_Server.txt" />
+    <ClInclude Include="Room_Manager.h" />
+    <ClInclude Include="SGlobal.h" />
+    <ClInclude Include="SendBuffer.h" />
+    <ClInclude Include="ServerConfig.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="Session_Manager.h" />
+    <ClInclude Include="Tank.h" />
+    <ClInclude Include="Terrain_Manager.h" />
+    <ClInclude Include="TransformObject.h" />
+    <ClInclude Include="Tree.h" />
+    <ClInclude Include="Weapon.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "Animation.h"
+#include "ModelBaker.h"
 
 
 
@@ -42,12 +43,16 @@ HRESULT CModel::Initialize_Prototype(TYPE eModelType, const string& strModelFile
 	/* 추후에 뼈를 움직이게되면 정점에 들어가있는 뼈 상태를 빼서 넣는다라는 복잡한과정. */
 	/* 그래서 해당 옵션을 주고 로드하게되면 어심프자체에서 애니메이션에 관련된 정보를 삭제해버린다. */
 	/* 이 옵션을 통해 로드하는 경우는 반드시 애니메이션이 없는 경우에만 처리를 해야되겠다. */
-	_uint		iFlag = aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
-
-	if (TYPE_NONANIM == eModelType)
-		iFlag |= aiProcess_PreTransformVertices;
-
 	XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix);
+
+	/* The tank is loaded from TankMeshInfo_*.bin, not from the FBX.
+	   If those files are missing (fresh machine, or the model changed),
+	   bake them once from the FBX. See Engine_Config.h / USE_ASSIMP_BAKE. */
+	if (!CModelBaker::Is_File_Exist("../bin/Models/Tank/TankMeshInfo_0.bin"))
+	{
+		if (!CModelBaker::Bake_Tank_Meshes(strModelFilePath, "../bin/Models/Tank/", PivotMatrix))
+			return E_FAIL;
+	}
 
 	/* m_pAIScene안에 들어가있는 정보들을 우리가 사용하기 좋은 형태로 생성, 저장해주는 작업을 수행하면 되겠다. */
 	/* mRootNode : 모든 뼈의 가장 시작이되는 뼈다. */	
@@ -86,6 +91,11 @@ void CModel::Set_MatOffsets(_uint MatOffset)
 void CModel::Set_MatIndex(_uint MeshIndex, _uint MatIndex)
 {
 	m_Meshes[MeshIndex]->Set_MaterialIndex(MatIndex);
+}
+
+void CModel::Set_TrackSag(_uint MeshIndex, const _float4& SagA, const _float4& SagB, const _float4& Param)
+{
+	m_Meshes[MeshIndex]->Set_TrackSag(SagA, SagB, Param);
 }
 
 void CModel::Set_Team(int redorblue)
@@ -205,38 +215,46 @@ void CModel::Save_For_Tank_Bones()
 			fout.write(reinterpret_cast<const char*>(&bones[i].m_iParentBoneIndex), sizeof(int));
 		}
 
-		for (int i = 0; i < 55; ++i) {
-			if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14 || i == 15 || i == 16 || i == 17 || i == 18 ||
-				i == 19 || i == 20 || i == 21 || i == 22 || i == 23 || i == 38 || i == 39)
-			{
-				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 0;
-				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
-			}
-			else if (i == 5 || i == 25 || i == 27  || i == 31 || i == 40 || i == 41 || i == 43 || i == 45 || i == 47 || i == 49 || i == 52 || i == 53 || i == 54)
-			{
-				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 1;
-				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
-			}
-			else if (i == 29 || i == 51 || i == 50 )
-			{
-				m_Meshes[i]->m_Bone->m_iParentBoneIndex = 2;
-				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
-			}
-			else if (i == 24 || i == 26 || i == 28 || i == 30 || i == 32 || i == 34 || i == 36 || i == 46 || i == 37 || i == 35 || i == 33 || i == 44 || i == 48 || i == 42)
-			{
-				m_Meshes[i]->m_Bone->m_iParentBoneIndex = -1;
-				fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
-				fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
-			}
+		/* mesh index -> parent bone.
+		    0 = RootNode(hull), 1 = PotabNode(turret), 2 = PosinNode(gun),
+		   -1 = no parent ON PURPOSE.
 
-				
+		   The -1 entries are the 14 road wheels. Do NOT "fix" them to 0: CTank::LateTick
+		   writes their final matrix itself
+		     Set_Combined_Matrix(26, Get_TransformMatrix(26) * WorldMatrix)   // Tank.cpp
+		   so that each wheel can spin with the suspension. Parenting them to the hull as well
+		   multiplies the tank world matrix in twice and the wheels shoot off the map.
+		   (Tried that on 2026-08-15. All the wheels vanished.)
+
+		   The FBX is flat - all 55 meshes hang off the root - so this table is the only place
+		   that says which part belongs to what. Keep it in sync with
+		   ../bin/Models/Tank/TankBones, which is the file the game actually reads.
+
+		   2026-08-15: 22 Fences_02 and 23 Fences_003 (the basket on the back of the turret)
+		   moved from the hull to the turret - they sit right against Panel_01, which is part of
+		   the same structure and was already on the turret, so they used to stay put while the
+		   turret turned under them. */
+		static const int s_ParentOfMesh[55] =
+		{
+			 0,  0,  0,  0,  0,   /*  0~ 4 : M1A2_Glacis_Pl, M1A2_Light_Gla, M1A2_Fences, M1A2_Wheel_028, M1A2_Wheel_029 */
+			 1,  0,  0,  0,  0,   /*  5~ 9 : M1A2_Turret, W_Base_008, W_Base_010, W_Base_011, W_Base_012 */
+			 0,  0,  0,  0,  0,   /* 10~14 : W_Base_013, W_Base_009, W_Base_007, M1A2_Sprocket_, M1A2_Sprocket_ */
+			 0,  0,  0,  0,  0,   /* 15~19 : W_Base_006, W_Base_005, W_Base_004, W_Base_003, W_Base_002 */
+			 0,  0,  1,  1, -1,   /* 20~24 : W_Base_001, W_Base_000, M1A2_Fences_02, M1A2_Fences_00, M1A2_Wheel_020 */
+			 1, -1,  1, -1,  2,   /* 25~29 : M1A2_Optical_P, M1A2_Wheel_019, Cylinder047, M1A2_Wheel_018, M1A2_Gun_Mantl */
+			-1,  1, -1, -1, -1,   /* 30~34 : M1A2_Wheel_017, M2-50_Base, M1A2_Wheel_005, M1A2_Wheel_024, M1A2_Wheel_006 */
+			-1, -1, -1,  0,  0,   /* 35~39 : M1A2_Wheel_025, M1A2_Wheel_007, M1A2_Wheel_026, M1A2_Chain_01, M1A2_Chain_02 */
+			 1,  1, -1,  1, -1,   /* 40~44 : M1A2_Shield_02, M1A2_Shield_01, M1A2_Wheel_023, M1A2_Commander, M1A2_Wheel_021 */
+			 1, -1,  1, -1,  1,   /* 45~49 : M1A2_Cupola, M1A2_Wheel_027, M1A2_Panel_01, M1A2_Wheel_022, M1A2_Shield_03 */
+			 2,  2,  1,  1,  1,   /* 50~54 : M1A2_Main_Gun, M1A2_Co-Axial_, M2-50, M1A2_Optical_P, M240P */
+		};
+
+		for (int i = 0; i < 55; ++i)
+		{
+			m_Meshes[i]->m_Bone->m_iParentBoneIndex = s_ParentOfMesh[i];
+			fout.write(reinterpret_cast<const char*>(m_Meshes[i]->m_Bone->m_szName), MAX_PATH);
+			fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_CombindTransformationMatrix), sizeof(_float4x4));
+			fout.write(reinterpret_cast<const char*>(&m_Meshes[i]->m_Bone->m_iParentBoneIndex), sizeof(int));
 		}
 
 		fout.close();
@@ -305,6 +323,7 @@ HRESULT CModel::Ready_Meshes()
 	return S_OK;
 }
 
+#if USE_ASSIMP_BAKE
 HRESULT CModel::Ready_Bones(aiNode* pAINode, _int iParentBoneIndex)
 {
 	CBone*		pBone = CBone::Create(pAINode, iParentBoneIndex);
@@ -321,6 +340,7 @@ HRESULT CModel::Ready_Bones(aiNode* pAINode, _int iParentBoneIndex)
 	}
 	return S_OK;
 }
+#endif
 
 void CModel::Set_Matrix_to_Bone(_uint iBoneIndex, _matrix Mat)
 {
@@ -365,6 +385,5 @@ void CModel::Free()
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 
-	m_Importer.FreeScene();
-
+	m_Meshes.clear();
 }

@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 
 #define PURE	= 0
@@ -27,10 +27,10 @@ void Safe_Delete(T& Temp)
 
 typedef struct tagInfo
 {
-	float	fX;		// ¡ﬂ¡° X
-	float	fY;		// ¡ﬂ¡° Y
-	float	fCX;	// ∞°∑Œ ªÁ¿Ã¡Ó
-	float	fCY;	// ºº∑Œ ªÁ¿Ã¡Ó
+	float	fX;		// Ï§ëÏ†ê X
+	float	fY;		// Ï§ëÏ†ê Y
+	float	fCX;	// Í∞ÄÎ°ú ÏÇ¨Ïù¥Ï¶à
+	float	fCY;	// ÏÑ∏Î°ú ÏÇ¨Ïù¥Ï¶à
 
 }INFO;
 

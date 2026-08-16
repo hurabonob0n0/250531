@@ -1,4 +1,23 @@
-#pragma once
+﻿#pragma once
+#include "Protocol.h"
+#include "SendBuffer.h"
+
+// ================================================================
+//  Network_Manager
+//
+//  ★ ServerCore(ClientService + IocpCore + PacketSession + ServerSession)
+//    를 걷어내고, 소켓 하나를 이 클래스가 직접 들도록 바꿨다.
+//
+//    클라는 서버 딱 하나에 붙는다. 연결이 하나뿐이면 IOCP 는 얻는 게 없고
+//    (완료 통지를 분배할 상대가 없다) 대신 Service/Session/IocpEvent/
+//    RecvBuffer/RefCounting 이 전부 따라온다. 그래서
+//        블로킹 소켓 + 전용 수신 스레드 1개 + 락 걸린 send
+//    로 줄였다. 서버(IOCP)와 달리 클라는 이게 정답이다.
+//
+//  ★ 수신 스레드는 UI/렌더를 절대 직접 건드리지 않는다.
+//    받은 패킷을 람다로 감싸 _packetQueue 에 넣기만 하고,
+//    메인 스레드가 Dispatch() 로 꺼내 실행한다(D3D12 는 이 규칙이 필수).
+// ================================================================
 
 enum class PacketQueueType
 {
@@ -52,7 +71,8 @@ public:
 
 public:
 	bool Initialize(const std::wstring& ip, uint16 port);
-	void Update(); // ¸í·É Å¥ Ã³¸®¿ë
+	void Disconnect();
+	void Update(); // 명령 큐 처리용
 
 	void PushPacket(PacketQueueType type, std::function<void()> handler);
 	void Dispatch(PacketQueueType type);
@@ -64,6 +84,16 @@ public:
 	void ClearAllPackets();
 
 	bool isConnected() { return _connected; };
+
+	// 로그인 응답으로 받은 내 전역 ID.
+	// 예전엔 ServiceManager 가 따로 들고 있었는데, 같은 값을 두 군데
+	// 저장할 이유가 없어 여기로 합쳤다(SetMyClientID 와 동일한 값이었다).
+	void   SetMyID(uint16 id) { _myGlobalID = id; }
+	uint16 GetMyID() const    { return _myGlobalID; }
+
+private:
+	void RecvThread();                      // 전용 수신 스레드
+	void ProcessRecvData(int32 newBytes);   // 헤더 기준 패킷 조립
 
 public:
 	int GetMyClientID() {
@@ -98,12 +128,14 @@ public:
 	}
 
 
-	void SetGamstart() { WRITE_LOCK; GameStart = true; };
+	void SetGamstart() {
+		std::lock_guard<std::mutex> lock(_stateLock);
+		GameStart = true;
+	};
 
 	bool GetGameStart() {
-		READ_LOCK;
+		std::lock_guard<std::mutex> lock(_stateLock);
 		return GameStart;
-
 	}
 	void SetMyTankIndex(int TankIndex) { MyTankIndex = TankIndex; };
 	int  GetMyTankIndex() { return MyTankIndex; };
@@ -136,9 +168,20 @@ public:
 	bool PingAdded = false;
 private:
 
-	ClientServiceRef _service;
-	bool _connected = false;
+	// ---- 소켓 (예전 ClientService + ServerSession) ----
+	static constexpr int32 RECV_BUF_SIZE = 8192;
+
+	SOCKET				_socket = INVALID_SOCKET;
+	std::atomic<bool>	_connected = false;
+	std::thread			_recvThread;
+	std::mutex			_sendLock;      // send 는 스레드 하나만 들어가야 한다
+
+	// 수신 버퍼. 링버퍼가 아니라, 남은 조각을 배열 앞으로 당겨 이어 붙인다.
+	std::vector<BYTE>	_recvBuf;
+	int32				_prevRemain = 0;
+
 	int MyClientID;
+	uint16 _myGlobalID = 0;
 
 	bool GameStart = false;
 
@@ -153,7 +196,7 @@ private:
 
 
 	int MyKillCount = 0;
-	USE_LOCK;
+	std::mutex _stateLock;      // GameStart 등 상태값 보호 (예전 USE_LOCK)
 
 public:
 	static	Network_Manager* m_pInstance;

@@ -43,8 +43,12 @@ VertexOut VS(VertexIn vin)
 	// Fetch the material data.
 	MaterialData matData = gMaterialData[gMaterialIndex];
 	
+    // Bend the tank track onto the road wheels (no-op for every other mesh).
+    float3 posL = vin.PosL;
+    posL.z += TrackSag(posL);
+
     // Transform to world space.
-    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    float4 posW = mul(float4(posL, 1.0f), gWorld);
     vout.PosW = posW.xyz;
 
     // Assumes nonuniform scaling; otherwise, need to use inverse-transpose of world matrix.

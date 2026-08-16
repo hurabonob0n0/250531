@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+Ôªø#include "Client_pch.h"
 #include "RoomListBar.h"
 #include "Bmp_Manager.h"
 
@@ -46,7 +46,7 @@ void RoomListBar::Render(HDC hDC)
         (int)m_tInfo.fCY,
         RGB(255, 255, 255));
 
-    // ≈ÿΩ∫∆Æ øµø™ ∫–«“: √— 3µÓ∫–
+    // ÌÖçÏä§Ìä∏ ÏòÅÏó≠ Î∂ÑÌï†: Ï¥ù 3Îì±Î∂Ñ
     const int totalWidth = (int)m_tInfo.fCX;
     const int sectionWidth = totalWidth / 3;
 
@@ -54,16 +54,16 @@ void RoomListBar::Render(HDC hDC)
     int top = (int)(m_tInfo.fY - m_tInfo.fCY / 2.f);
     int height = (int)m_tInfo.fCY;
 
-    // ∆˘∆Æ º≥¡§ (º±≈√ªÁ«◊)
+    // Ìè∞Ìä∏ ÏÑ§Ï†ï (ÏÑ†ÌÉùÏÇ¨Ìï≠)
     HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-        DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, TEXT("∏º¿∫ ∞ÌµÒ"));
+        DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, TEXT("ÎßëÏùÄ Í≥†Îîï"));
     HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
 
     SetBkMode(hDC, TRANSPARENT);
     SetTextColor(hDC, RGB(255, 255, 255));
 
-    // RoomID √‚∑¬
+    // RoomID Ï∂úÎ†•
     {
         RECT rc = { left +20, top, left + sectionWidth, top + height };
         wchar_t szRoomID[32] = {};
@@ -71,14 +71,14 @@ void RoomListBar::Render(HDC hDC)
         DrawText(hDC, szRoomID, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     }
 
-    // Active/UnActive √‚∑¬
+    // Active/UnActive Ï∂úÎ†•
     {
         RECT rc = { left + sectionWidth + 20, top, left + sectionWidth * 2, top + height };
         const wchar_t* status = Room_data.isActive ? L"Active" : L"UnActive";
         DrawText(hDC, status, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     }
 
-    // (Cur/Max) √‚∑¬
+    // (Cur/Max) Ï∂úÎ†•
     {
         RECT rc = { left + sectionWidth * 2 + 40, top, left + sectionWidth * 3, top + height };
         wchar_t szPlayer[32] = {};
@@ -86,7 +86,7 @@ void RoomListBar::Render(HDC hDC)
         DrawText(hDC, szPlayer, -1, &rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     }
 
-    // ∆˘∆Æ ø¯ªÛ∫π±Õ
+    // Ìè∞Ìä∏ ÏõêÏÉÅÎ≥µÍ∑Ä
     SelectObject(hDC, hOldFont);
     DeleteObject(hFont);
 }
