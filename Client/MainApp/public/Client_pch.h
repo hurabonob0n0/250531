@@ -1,26 +1,37 @@
-#pragma once
+﻿#pragma once
 
-#define WIN32_LEAN_AND_MEAN // ���� ������ �ʴ� ������ Windows ������� �����մϴ�.
+#define WIN32_LEAN_AND_MEAN // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
 
-#ifdef _DEBUG
-#pragma comment(lib, "Debug\\ServerCore.lib")
-//#pragma comment(lib, "Debug\\fmodL_vc.lib")
-#else
-#pragma comment(lib, "Release\\ServerCore.lib")
-#endif
+/*--------------------------
+	For Server Connection
 
-#include "CorePch.h"
+	★ ServerCore(루키스 프레임워크) 의존을 걷어냈다.
+	  예전에는 여기서 CorePch.h 를 끌어오고 ServerCore.lib 를 링크했는데,
+	  클라가 실제로 쓰던 건 "소켓 하나로 붙어서 패킷을 주고받는다" 뿐이라
+	  IocpCore/Service/Listener/MemoryPool/RefCounting 전체가 과했다.
+	  지금은 Network_Manager 하나가 연결/수신스레드/송신을 다 들고 있다.
+--------------------------*/
 
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <windows.h>
+#pragma comment(lib, "ws2_32.lib")
 
 /*-------------------
 	For Container
 -------------------*/
 
+#include <iostream>     // 예전엔 CorePch.h 가 끌고 왔다 (cout 을 쓰는 곳이 있다)
 #include <list>
 #include <vector>
 #include <set>
 #include <map>
-#include <windows.h>
+#include <queue>
+#include <string>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <algorithm>
@@ -28,15 +39,29 @@
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
-/*--------------------------
-	For Server Connection
---------------------------*/
+// 예전에는 CorePch.h -> Container.h 가 이걸 끌고 왔다.
+// 클라 코드가 vector/map/shared_ptr 을 std:: 없이 쓰고 있어 그대로 유지한다.
+using namespace std;
 
+/*-------------------
+	기본 타입
 
+	ServerCore/Types.h 에 있던 별칭 중 클라가 실제로 쓰는 것만 남겼다.
+-------------------*/
+using BYTE   = unsigned char;
+using int8   = __int8;
+using int16  = __int16;
+using int32  = __int32;
+using int64  = __int64;
+using uint8  = unsigned __int8;
+using uint16 = unsigned __int16;
+using uint32 = unsigned __int32;
+using uint64 = unsigned __int64;
 
+#include "Protocol.h"
+#include "SendBuffer.h"
 
-using ClientSessionRef = shared_ptr<class ClientSession>;
-using PlayerRef = shared_ptr<class Player>;
+using PlayerRef = std::shared_ptr<class Player>;
 
 #define LOBBY_WINCX  1024
 #define LOBBY_WINCY  880
@@ -88,11 +113,11 @@ struct Room_Data {
 
 
 /*------------------
-	�� false = Red
-	�� True  = Blue
+	팀 false = Red
+	팀 True  = Blue
 
-	������ False = ������
-	������ True = ����
+	포지션 False = 조종수
+	포지션 True = 포수
 
 
 

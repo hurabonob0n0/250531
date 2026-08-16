@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "Camera_Drone.h"
 #include "GameInstance.h"
 #include "Client_Globals.h"
@@ -8,7 +8,6 @@
 #include "AirDrop.h"
 #include "Ping.h"
 #include "ClientPacketHandler.h"
-#include "ServiceManager.h"
 
 CCamera_Drone::CCamera_Drone() : CCamera()
 {
@@ -84,7 +83,7 @@ void CCamera_Drone::Tick(float fTimeDelta)
 
 			if (Network_Manager::GetInstance()->isConnected()) {
 				auto sendBuffer = ClientPacketHandler::Make_C_PING(x, y, z);
-				ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+				Network_Manager::GetInstance()->Send(sendBuffer);
 			}
 		}
 

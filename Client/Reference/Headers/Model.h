@@ -3,6 +3,7 @@
 /* 어떤 모델이든 다수의 메시로 구성되어 있다. */
 /* 모델 = 메시 + 메시 + 메시... */
 #include "Component.h"
+#include "Engine_Config.h"
 
 BEGIN(Engine)
 
@@ -29,6 +30,7 @@ public:
 
 public:
 	void Set_MatIndex(_uint MeshIndex, _uint MatIndex);
+	void Set_TrackSag(_uint MeshIndex, const _float4& SagA, const _float4& SagB, const _float4& Param);
 	void Set_Team(int redorblue);
 
 public:
@@ -49,10 +51,12 @@ public:
 
 private:
 	/* .fbx파일로부터 읽어온 정보를 1차적으로 저장한다.*/
+#if USE_ASSIMP_BAKE
 	Assimp::Importer			m_Importer;
 
 	// m_pAIScene = m_Importer.ReadFile( 경로, 플래그 );
 	const aiScene*				m_pAIScene = { nullptr };
+#endif
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
@@ -67,7 +71,9 @@ private:
 	/* 1차적으로 저장된 데이터로부터 내가 사용할 정보를 꺼내와서 추후 사용하기 편하도록 내 스타일대로 정리한다. */
 private:	
 	HRESULT Ready_Meshes();
+#if USE_ASSIMP_BAKE
 	HRESULT Ready_Bones(aiNode* pNode, _int iParentBoneIndex);
+#endif
 
 public:
 	void Set_Matrix_to_Bone(_uint iBoneIndex,_matrix mat);

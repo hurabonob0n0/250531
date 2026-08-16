@@ -102,6 +102,7 @@ void CMesh::Update()
 	_float4x4 mat = m_Bone->Get_CombinedMatrix();
 	m_CBBinding->Set_WorldMatrix(mat);
 	m_CBBinding->Set_TexCoordMatrix(XMMatrixIdentity());
+	m_CBBinding->Set_TrackSag(m_TrackSagA, m_TrackSagB, m_TrackParam);
 
 	m_CBBinding->Update_CBView();
 }
@@ -131,6 +132,7 @@ void CMesh::Set_MaterialIndex(_uint Matindex)
 	m_CBBinding->Set_MaterialIndex(Matindex);
 }
 
+#if USE_ASSIMP_BAKE
 HRESULT CMesh::Ready_NonAnim_Mesh(const aiMesh * pAIMesh, _fmatrix PivotMatrix)
 {
 	m_VertexByteStride = sizeof(VTXMESH);
@@ -187,6 +189,7 @@ HRESULT CMesh::Ready_Anim_Mesh(const aiMesh * pAIMesh, const vector<class CBone*
 
 	return S_OK;
 }
+#endif
 
 CMesh* CMesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext)
 {

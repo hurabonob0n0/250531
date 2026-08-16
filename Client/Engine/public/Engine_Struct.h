@@ -2,7 +2,10 @@
 #include "Engine_Macro.h"
 #include <d3d12.h>
 #include <DirectXMath.h>
+#include "Engine_Config.h"
+#if USE_ASSIMP_BAKE
 #include <assimp/material.h>
+#endif
 
 #define MaxLights 16
 
@@ -21,6 +24,14 @@ namespace Engine
 		UINT     ObjPad0 = 0;
 		UINT     ObjPad1 = 0;
 		float     ObjPad2 = 0;
+
+		/* Tank track bending. Only the two track meshes fill these in; every other mesh
+		   leaves TrackSagB.w at 0, which switches the whole thing off in the shader.
+		   See CTank::Update_Track_Sag and TrackSag() in Shaders1/Common.hlsl. */
+		XMFLOAT4 TrackSagA = XMFLOAT4{};   /* road wheel 1..4 vertical travel, model units */
+		XMFLOAT4 TrackSagB = XMFLOAT4{};   /* road wheel 5..7, w = on/off */
+		XMFLOAT4 TrackParam = XMFLOAT4{};  /* x = front wheel local x, y = rear wheel local x,
+		                                      z = top run local z, w = bottom run local z */
 	};
 
 	struct ENGINE_DLL Light
@@ -118,7 +129,9 @@ namespace Engine
 namespace Engine {
 	typedef struct tagModelMaterial
 	{
-		class CTexture* pMaterials[AI_TEXTURE_TYPE_MAX];
+		/* was AI_TEXTURE_TYPE_MAX (= aiTextureType_UNKNOWN = 18).
+		   Spelled out so this struct does not drag assimp in. Nothing uses it yet. */
+		class CTexture* pMaterials[18];
 	}MODEL_MATERIAL;
 
 	typedef struct tagKeyFrame

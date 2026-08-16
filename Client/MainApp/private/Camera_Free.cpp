@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "Camera_Free.h"
 #include "GameInstance.h"
 #include "Client_Globals.h"
@@ -236,6 +236,9 @@ void CCamera_Free::PassCBSetting()
 	//pc.Lights[1].Strength = { 0.3f, 0.3f, 0.3f };
 	//pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
 	//pc.Lights[2].Strength = { 0.15f, 0.15f, 0.15f };
+
+	/* 지형이 이 값으로 청크를 절두체 컬링하고 LOD를 고른다. */
+	m_GameInstance->Set_CameraViewProj(viewProj, m_TransformCom->Get_State(CTransform::STATE_POSITION));
 
 	auto currPassCB = m_GameInstance->Get_Current_FrameResource()->m_PassCB;
 	currPassCB->CopyData(0, pc);

@@ -23,6 +23,13 @@ public:
 	void Set_MaterialIndex(_uint MatIndex);
 	void Set_Pad0(_uint Pad) { m_ObjConstants.ObjPad0 = Pad; }
 	void Set_Pad1(_uint Pad) { m_ObjConstants.ObjPad1 = Pad; }
+
+	/* Track bending. Only CTank fills these in, for the two track meshes. */
+	void Set_TrackSag(const _float4& SagA, const _float4& SagB, const _float4& Param) {
+		m_ObjConstants.TrackSagA = SagA;
+		m_ObjConstants.TrackSagB = SagB;
+		m_ObjConstants.TrackParam = Param;
+	}
 	void Set_Pad2(_uint Pad) { m_ObjConstants.ObjPad2 = Pad; }
 
 public:

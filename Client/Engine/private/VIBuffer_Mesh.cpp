@@ -1,4 +1,4 @@
-#include "VIBuffer_Mesh.h"
+﻿#include "VIBuffer_Mesh.h"
 #include "Bone.h"
 #include "Shader.h"
 #include "GameInstance.h"
@@ -13,41 +13,23 @@ CVIBuffer_Mesh::CVIBuffer_Mesh(CVIBuffer_Mesh& rhs)
 {
 }
 
-HRESULT CVIBuffer_Mesh::Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix,_uint type)
+HRESULT CVIBuffer_Mesh::Initialize_Prototype(const VTXMESH* pVertices, _uint iVertexNum, const _ulong* pIndices, _uint iIndexNum)
 {
-	m_VertexNum = pAIMesh->mNumVertices;
-	m_IndexNum = pAIMesh->mNumFaces * 3;
+	if (nullptr == pVertices || 0 == iVertexNum || nullptr == pIndices || 0 == iIndexNum)
+		return E_FAIL;
+
+	m_VertexByteStride = sizeof(VTXMESH);
+	m_VertexNum = iVertexNum;
+	m_VertexBufferByteSize = m_VertexNum * m_VertexByteStride;
+
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
+	m_IndexNum = iIndexNum;
+	m_IndexBufferByteSize = m_IndexNum * sizeof(_ulong);
+
 	m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	m_IndexBufferByteSize = m_IndexNum * sizeof(std::uint32_t);
 
-#pragma region VERTEX_BUFFER
-
-	Ready_Mesh(pAIMesh, PivotMatrix,type);
-
-#pragma endregion
-
-
-#pragma region INDEX_BUFFER
-	_ulong* pIndices = new _ulong[m_IndexNum];
-	ZeroMemory(pIndices, m_IndexBufferByteSize);
-
-	_uint		iNumIndices = 0;
-
-	for (size_t i = 0; i < pAIMesh->mNumFaces; ++i)
-	{
-		aiFace	AIFace = pAIMesh->mFaces[i];
-
-		pIndices[iNumIndices++] = AIFace.mIndices[0];
-		pIndices[iNumIndices++] = AIFace.mIndices[1];
-		pIndices[iNumIndices++] = AIFace.mIndices[2];
-	}
-
+	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
 	__super::Create_Buffer(&m_IndexBufferGPU, &m_IndexBufferUploader, pIndices, m_IndexBufferByteSize);
-
-	delete[] pIndices;
-	pIndices = nullptr;
-#pragma endregion
 
 	return S_OK;
 }
@@ -67,55 +49,12 @@ HRESULT CVIBuffer_Mesh::Render(int instanceNum)
 	return S_OK;
 }
 
-
-HRESULT CVIBuffer_Mesh::Ready_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix, _uint type)
-{
-	m_VertexByteStride = sizeof(VTXMESH);
-	m_VertexBufferByteSize = m_VertexByteStride * m_VertexNum;
-
-	VTXMESH* pVertices = new VTXMESH[m_VertexNum];
-	ZeroMemory(pVertices, sizeof(VTXMESH) * m_VertexNum);
-
-	if (type == 0)
-	{
-		for (size_t i = 0; i < m_VertexNum; i++)
-		{
-			memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
-			XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
-
-			memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-			XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
-
-			memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-			memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
-		}
-	}
-	else
-	{
-		for (size_t i = 0; i < m_VertexNum; i++)
-		{
-			memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
-			XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
-
-			memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-			XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
-
-			memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-		}
-	}
-	__super::Create_Buffer(&m_VertexBufferGPU, &m_VertexBufferUploader, pVertices, m_VertexBufferByteSize);
-
-	delete[] pVertices;
-	pVertices = nullptr;
-
-	return S_OK;
-}
-
-CVIBuffer_Mesh* CVIBuffer_Mesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext, const aiMesh* pAIMesh, _fmatrix PivotMatrix, _uint type)
+CVIBuffer_Mesh* CVIBuffer_Mesh::Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext,
+	const VTXMESH* pVertices, _uint iVertexNum, const _ulong* pIndices, _uint iIndexNum)
 {
 	CVIBuffer_Mesh* pInstance = new CVIBuffer_Mesh(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pAIMesh, PivotMatrix,type)))
+	if (FAILED(pInstance->Initialize_Prototype(pVertices, iVertexNum, pIndices, iIndexNum)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Mesh");
 		Safe_Release(pInstance);

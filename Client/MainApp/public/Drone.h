@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Client_Defines.h"
 #include "RenderObject.h"
 
@@ -90,8 +90,8 @@ public:
 
 public:
 
-	bool m_followTank = false;   // Z·Î Åä±Û
-	float m_followHeight = 30.f; // ÅÊÅ© À§ °íÁ¤ ³ôÀÌ
+	bool m_followTank = false;   // Zë¡œ í† ê¸€
+	float m_followHeight = 30.f; // íƒ±í¬ ìœ„ ê³ ì • ë†’ì´
 };
 
 END

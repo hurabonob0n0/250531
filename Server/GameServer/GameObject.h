@@ -10,19 +10,30 @@ public:
 	~GameObject();
 
 public:
-	virtual void Initialize()	PURE;
-	virtual int	 Update()		PURE;
-	virtual void Late_Update()	PURE;
-	virtual void Release()		PURE;
-
-public:
-
-	void SetPos(float a, float b, float c) { Pos.PosX = a, Pos.PosY = b, Pos.PosZ = c; };
-	Position GetPos() { return Pos; };
+	virtual void Initialize()					PURE;
+	virtual int	 Update(float deltaTime)		PURE;
+	virtual void Late_Update()					PURE;
+	virtual void Release()						PURE;
 
 protected:
 
-	Position Pos{0,0,0};
+	Vec3	_myPos;
+	Size	_mySize;
+	bool	_isDead = false;
+	uint8	_hp;
+	bool	_isBlue;
+public:
+
+	void SetPos(float a, float b, float c) { _myPos.X = a, _myPos.Y = b, _myPos.Z = c; };
+	const Vec3 GetPos() { return _myPos; };
+
+	void SetBlueTeam(bool isblue) 
+	{
+		if (isblue)
+			_isBlue = true;
+		else _isBlue = false;
+	};
+	bool isBlueTeam() { return _isBlue; };
 
 };
 

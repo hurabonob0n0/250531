@@ -1,9 +1,8 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "Tank.h"
 #include "Client_Defines.h"
 #include "GameInstance.h"
 #include "ClientPacketHandler.h"
-#include "ServiceManager.h"
 #include "Network_Manager.h"
 #include "UIReloading.h"
 #include "UISelectPos.h"
@@ -17,6 +16,13 @@
 
 static inline AudioVec3 ToAudio(const XMFLOAT3& v) { return AudioVec3(v.x, v.y, v.z); }
 static inline AudioVec3 ToAudio(const XMVECTOR& v) { XMFLOAT3 t; XMStoreFloat3(&t, v); return ToAudio(t); }
+
+/*  이 클라가 서버로 상태를 올리는 주기. 렌더 프레임과 무관하다.
+	서버 틱이 60Hz 라 그보다 자주 보내봐야 다음 틱 전에 덮여서 그냥 버려진다.
+	30Hz 로 둔 것은 여유(틱 하나를 놓쳐도 다음 게 곧 온다)와 트래픽 사이의 타협이고,
+	수신측 보간이 들어간 뒤라 화면에서는 165Hz 와 구분되지 않는다.
+	(나머지 네트워크 상수는 Update_NetInterpolation 위의 익명 namespace 에 있다) */
+static const float NET_SEND_INTERVAL = 1.f / 30.f;
 
 
 
@@ -99,6 +105,10 @@ HRESULT CTank::Initialize(void* pArg)
 
 	m_VIBuffer->Set_MatOffsets(matindex);
 
+	/* 바퀴 본 행렬이 매 프레임 PhysX 값으로 덮이기 전인 '지금' 쉴 때 위치를 받아둬야 한다.
+	   LateTick 에서 부르면 이미 덮인 뒤라 값이 전부 0 이 된다. */
+	Ready_Track_Sag();
+
 	m_pPhysicsEngine = MyPhysicsEngine::CMyPhysicsEngine::Get_Instance();
 
 	Set_Team(1);
@@ -176,11 +186,34 @@ void CTank::LateTick(float fTimeDelta)
 {
 
 	__super::LateTick(fTimeDelta);
-	
+
+	/*  ★ 반드시 Set_Tank_Element_from_ServerData() 보다 먼저 부를 것.
+		그 함수가 m_TransformCom / m_fPotapRotation 을 읽어 뼈에 꽂으므로,
+		여기서 이번 프레임 값을 만들어 두지 않으면 보간이 한 프레임 늦게 반영된다.  */
+	Update_NetInterpolation(fTimeDelta);
 
 	if (_myPlayer) {
 
-	
+		/*  송신 주기를 렌더 프레임에서 떼어낸다.
+			예전엔 프레임마다 보냈는데(165fps = 초당 165번) 서버는 60Hz 로 도니
+			보낸 것의 2/3 는 다음 틱 전에 덮여 그냥 버려졌다.
+			수신측 보간이 들어갔으므로 30Hz 로 낮춰도 화면에서 티가 나지 않는다.
+			★ 발사(SendShootDataToServer)는 여기 걸지 말 것 - 그건 주기적 상태가
+			   아니라 사건이라, 늦추면 그대로 조작 지연이 된다.                   */
+		m_fNetSendTimer += fTimeDelta;
+
+		const bool isSendTurn = (m_fNetSendTimer >= NET_SEND_INTERVAL);
+		if (isSendTurn)
+		{
+			m_fNetSendTimer -= NET_SEND_INTERVAL;
+
+			/* 프레임이 크게 밀렸다면 밀린 만큼 몰아 보내지 않는다(따라잡아도 의미 없는 과거 상태다) */
+			if (m_fNetSendTimer > NET_SEND_INTERVAL)
+				m_fNetSendTimer = 0.f;
+		}
+
+		const bool isSendable = Network_Manager::GetInstance()->isConnected() && isSendTurn;
+
 		switch (Network_Manager::GetInstance()->MyPosMode) {
 		case POS_MASTER: {
 			RotPotap_And_Posin(fTimeDelta);
@@ -193,7 +226,7 @@ void CTank::LateTick(float fTimeDelta)
 					m_isFPS = !m_isFPS;
 				}
 			}
-			if (Network_Manager::GetInstance()->isConnected())
+			if (isSendable)
 				SendMyStateToServer();
 
 		}
@@ -201,7 +234,7 @@ void CTank::LateTick(float fTimeDelta)
 		case POS_DRIVER: {
 			Set_Tank_Element_from_Engine();
 			ErrorRespawn();
-			if (Network_Manager::GetInstance()->isConnected())
+			if (isSendable)
 				SendPosData();
 
 		}
@@ -211,7 +244,7 @@ void CTank::LateTick(float fTimeDelta)
 			Set_Tank_Element_from_ServerData();
 			Tick_For_Posin_Image(fTimeDelta);
 			RotPotap_And_Posin(fTimeDelta);
-			if(Network_Manager::GetInstance()->isConnected())
+			if (isSendable)
 				SendPosinData();
 
 		}
@@ -508,7 +541,7 @@ void CTank::UpdateAudio(float dt)
 		if (!Network_Manager::GetInstance()->isConnected()) return;
 
 		auto sendBuffer = ClientPacketHandler::Make_C_SOUND(engVol, engPit, trkVol, trkPit); // 숫자 그대로
-		ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+		Network_Manager::GetInstance()->Send(sendBuffer);
 
 	}
 
@@ -557,7 +590,7 @@ void CTank::Request_Air_Drop()
 		if (m_GameInstance->Key_Down(key))
 		{
 			auto sendBuffer = ClientPacketHandler::Make_C_AIRDROP(slot); // 숫자 그대로
-			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+			Network_Manager::GetInstance()->Send(sendBuffer);
 
 			// 쿨타임 시작
 			_airdropReady = false;
@@ -959,20 +992,16 @@ void CTank::Set_Tank_Element_from_Engine()
 	//m_VIBuffer->Set_Transform_Matrix(2, matPosin);
 
 
-	m_VIBuffer->Set_Transform_Matrix(24 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L1Mat); // Left First Wheel
-	m_VIBuffer->Set_Transform_Matrix(26 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L2Mat); // Left Second Wheel
-	m_VIBuffer->Set_Transform_Matrix(28 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L3Mat); // Left Third Wheel
-	m_VIBuffer->Set_Transform_Matrix(30 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L4Mat); // Left Fourth Wheel
-	m_VIBuffer->Set_Transform_Matrix(32 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L5Mat); // Left Fifth Wheel
-	m_VIBuffer->Set_Transform_Matrix(34 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L6Mat); // Left Sixth Wheel
-	m_VIBuffer->Set_Transform_Matrix(36 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * L7Mat); // Left Seventh Wheel
-	m_VIBuffer->Set_Transform_Matrix(46 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R1Mat); // Right First Wheel
-	m_VIBuffer->Set_Transform_Matrix(37 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R2Mat); // Right Second Wheel
-	m_VIBuffer->Set_Transform_Matrix(35 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R3Mat); // Right Third Wheel
-	m_VIBuffer->Set_Transform_Matrix(33 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R4Mat); // Right Fourth Wheel
-	m_VIBuffer->Set_Transform_Matrix(44 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R5Mat); // Right Fifth Wheel
-	m_VIBuffer->Set_Transform_Matrix(48 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R6Mat); // Right Sixth Wheel
-	m_VIBuffer->Set_Transform_Matrix(42 + 3, XMMatrixRotationZ(XMConvertToRadians(90.f)) * R7Mat); // Right Seventh Wheel
+	/* 바퀴 14개 + 궤도 2개를 여기서 한 번에 놓는다.
+	   예전에는 PhysX 월드행렬을 그대로 썼는데, 그러면 바퀴가 궤도 안쪽으로 밀린다.
+	   자세한 건 Update_Wheels_And_Track 주석 참고. */
+	const _matrix PhysXWheelMatrices[14] =
+	{
+		L1Mat, L2Mat, L3Mat, L4Mat, L5Mat, L6Mat, L7Mat,
+		R1Mat, R2Mat, R3Mat, R4Mat, R5Mat, R6Mat, R7Mat,
+	};
+	Update_Wheels_And_Track(mat, PhysXWheelMatrices);
+
 
 
 	//   m_VIBuffer->Set_Transform_Matrix(0, m_TransformCom->Get_WorldMatrix()); // Chassis
@@ -985,6 +1014,268 @@ void CTank::Set_Tank_Element_from_Engine()
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(29, matPosin);
 
 	m_VIBuffer->Update();
+}
+
+/*===========================================================================
+	궤도 구부리기
+
+	메쉬 번호는 Model.cpp 의 s_ParentOfMesh 표와 같은 순서다.
+	왼쪽 바퀴는 앞에서 뒤로 24, 26, 28, 30, 32, 34, 36 이고
+	오른쪽은 46, 37, 35, 33, 44, 48, 42 다 (Tank.cpp 의 L1~L7 / R1~R7 순서와 동일).
+	궤도는 38(왼쪽 Chain_01), 39(오른쪽 Chain_02).
+===========================================================================*/
+namespace
+{
+	const _uint TRACK_MESH[2] = { 38, 39 };
+	const _uint WHEEL_MESH[2][7] =
+	{
+		{ 24, 26, 28, 30, 32, 34, 36 },		/* 왼쪽  : 앞 -> 뒤 */
+		{ 46, 37, 35, 33, 44, 48, 42 },		/* 오른쪽: 앞 -> 뒤 */
+	};
+
+	/* 궤도 메쉬 로컬공간에서 윗런의 높이(z). +z 가 아래쪽이라 윗런이 제일 작은 값이다.
+	   M1A2 궤도 메쉬를 실측한 값이고, 모델을 바꾸면 다시 재야 한다.
+	   (바닥런은 0.81 인데, 바퀴 축 높이는 바퀴 본에서 직접 구하므로 상수가 필요 없다) */
+	const float TRACK_TOP_RUN_Z = -0.38f;
+}
+
+void CTank::Ready_Track_Sag()
+{
+	/* 바퀴 본 행렬은 매 프레임 PhysX 값으로 덮이므로, 덮이기 전인 지금 쉴 때 위치를 받아둔다. */
+	for (int iSide = 0; iSide < 2; ++iSide)
+	{
+		const _matrix TrackBone = m_VIBuffer->Get_TransformMatrix(TRACK_MESH[iSide]);
+		const _matrix TrackBoneInverse = XMMatrixInverse(nullptr, TrackBone);
+
+		float fFrontX = 0.f, fRearX = 0.f, fWheelLineZ = 0.f;
+
+		for (_uint i = 0; i < TRACK_WHEEL_COUNT; ++i)
+		{
+			const _matrix WheelBone = m_VIBuffer->Get_TransformMatrix(WHEEL_MESH[iSide][i]);
+			const _vector vWheelModelPos = WheelBone.r[3];
+
+			XMStoreFloat4x4(&m_WheelRestMatrix[iSide][i], WheelBone);
+
+			/* 같은 바퀴가 궤도 메쉬 안에서는 어디쯤인지(로컬 x, 로컬 z) */
+			const _vector vWheelTrackPos = XMVector3TransformCoord(vWheelModelPos, TrackBoneInverse);
+
+			if (i == 0)
+				fFrontX = XMVectorGetX(vWheelTrackPos);
+			if (i == TRACK_WHEEL_COUNT - 1)
+				fRearX = XMVectorGetX(vWheelTrackPos);
+
+			fWheelLineZ += XMVectorGetZ(vWheelTrackPos) / TRACK_WHEEL_COUNT;
+		}
+
+		/* 바퀴 축 높이(fWheelLineZ)부터 아래로는 궤도가 바퀴를 100% 따라가야 바퀴를 품는다.
+		   그 위(윗런 쪽)로만 서서히 0 으로 뺀다. */
+		m_TrackParam[iSide] = _float4(fFrontX, fRearX, fWheelLineZ, TRACK_TOP_RUN_Z);
+	}
+
+	m_isTrackSagReady = true;
+}
+
+void CTank::Update_Wheels_And_Track(_fmatrix ChassisWorld, const _matrix* pPhysXWheelMatrices)
+{
+	if (!m_isTrackSagReady)
+		return;
+
+	/* PhysX 가 주는 바퀴 위치는 좌우로 x = ±1.3 인데(chassisDims.x 로 계산한다),
+	   모델의 바퀴는 x = ±1.61 이고 궤도 폭도 거기에 맞춰져 있다.
+	   그 값을 그대로 쓰면 바퀴가 궤도 안쪽으로 0.3칸 밀려 그려져서 궤도 밖으로 삐져나온다.
+
+	   그래서 바퀴는 '모델 제자리'에 두고, PhysX 에서는 상하 이동량(서스펜션)만 가져온다.
+	   궤도도 똑같은 값으로 구부리므로 둘이 절대 어긋나지 않는다. */
+	const _matrix ChassisInverse = XMMatrixInverse(nullptr, ChassisWorld);
+
+	for (int iSide = 0; iSide < 2; ++iSide)
+	{
+		float fSag[TRACK_WHEEL_COUNT] = {};
+
+		for (_uint i = 0; i < TRACK_WHEEL_COUNT; ++i)
+		{
+			const _matrix RestMatrix = XMLoadFloat4x4(&m_WheelRestMatrix[iSide][i]);
+
+			/* PhysX 바퀴를 차체 기준으로 되돌려서, 쉴 때보다 얼마나 오르내렸는지만 뽑는다. */
+			const _vector vPhysXModelPos = XMVector3TransformCoord(
+				pPhysXWheelMatrices[iSide * TRACK_WHEEL_COUNT + i].r[3], ChassisInverse);
+
+			fSag[i] = XMVectorGetY(vPhysXModelPos) - XMVectorGetY(RestMatrix.r[3]);
+
+			/* 송신용으로 같이 담아둔다(int8 한 칸 = 0.0031). */
+			m_WheelSagWire[iSide * TRACK_WHEEL_COUNT + i] = QuantizeWheelSag(fSag[i]);
+
+			/* 바퀴 = 모델 제자리에서 위아래로만 이동 */
+			_matrix WheelMatrix = RestMatrix;
+			WheelMatrix.r[3] = XMVectorSetY(WheelMatrix.r[3],
+				XMVectorGetY(WheelMatrix.r[3]) + fSag[i]);
+
+			m_VIBuffer->Set_Transform_Matrix(WHEEL_MESH[iSide][i] + 3, WheelMatrix * ChassisWorld);
+		}
+
+		m_VIBuffer->Set_TrackSag(TRACK_MESH[iSide],
+			_float4(fSag[0], fSag[1], fSag[2], fSag[3]),
+			_float4(fSag[4], fSag[5], fSag[6], 1.f),		/* w = 1 : 셰이더에서 켜기 */
+			m_TrackParam[iSide]);
+	}
+}
+
+/*===========================================================================
+	네트워크 보간
+
+	서버는 GAME_TICK_FPS(60) 로 S_ALL_TANK_STATE 를 보내고 화면은 165fps 로 돈다.
+	받은 행렬을 그대로 Set_WorldMatrix 하면 같은 값을 2~3 프레임 붙들다가 튀어서
+	원격 탱크가 뚝뚝 끊기고, 포수는 자기 차체를 서버에서 받으므로 화면 전체가 떨린다.
+
+	여기서는 받은 값을 '목표' 로만 두고, 다음 패킷이 올 때까지 직전 값에서 목표까지
+	나눠서 이동한다. 결과적으로 한 패킷 간격(≈16.7ms)만큼 과거를 그리게 되지만,
+	그 대신 매 프레임 값이 갱신되므로 끊김이 사라진다.
+
+	★ 외삽(t>1 로 계속 밀기)은 하지 않는다. 지형 위의 탱크를 미래로 밀면
+	   땅이나 벽을 뚫고 들어갔다가 되돌아오는 게 더 눈에 띈다.
+	   패킷이 끊긴 동안에는 마지막 값에 멈춰 있는 편이 낫다.
+===========================================================================*/
+namespace
+{
+	/* 패킷 간격의 허용 범위. 이 밖으로 나가면 순간적인 지터로 보고 잘라낸다. */
+	const float NET_INTERVAL_MIN = 1.f / 120.f;
+	const float NET_INTERVAL_MAX = 1.f / 15.f;
+
+	/* 한 패킷 사이에 이만큼 튀면 이동이 아니라 순간이동(리스폰 등)으로 본다.
+	   차체 길이가 9.6 이므로 그 5배. 최고속으로 달려도 한 틱에 이만큼은 못 간다. */
+	const float NET_SNAP_DISTANCE = 50.f;
+
+	/* 각도(도) 보간 - 포탑은 360도를 도므로 359 -> 1 을 짧은 쪽으로 돌려야 한다.
+	   안 하면 한 바퀴 거꾸로 휙 도는 게 보인다. */
+	float LerpAngleDegree(float fFrom, float fTo, float fRatio)
+	{
+		float fDiff = fTo - fFrom;
+
+		while (fDiff > 180.f)	fDiff -= 360.f;
+		while (fDiff < -180.f)	fDiff += 360.f;
+
+		return fFrom + fDiff * fRatio;
+	}
+}
+
+void CTank::Push_NetState(const _float4x4& World, float fPotap, float fPosin,
+						  bool isChassis, bool isTurret)
+{
+	m_isNetChassis = isChassis;
+	m_isNetTurret  = isTurret;
+
+	FNetSnapshot New;
+	New.fPotap = fPotap;
+	New.fPosin = fPosin;
+
+	_vector vScale, qRot, vPos;
+	if (!XMMatrixDecompose(&vScale, &qRot, &vPos, XMLoadFloat4x4(&World)))
+	{
+		/* 분해가 안 되는 행렬(스케일 0 등)은 보간할 수 없다. 예전처럼 그대로 넣는다. */
+		if (isChassis)
+			m_TransformCom->Set_WorldMatrix(World);
+		if (isTurret)
+		{
+			m_fPotapRotation = fPotap;
+			m_fPosinRotation = fPosin;
+		}
+		m_isNetReady = false;
+		return;
+	}
+
+	XMStoreFloat3(&New.vPos,   vPos);
+	XMStoreFloat4(&New.qRot,   qRot);
+	XMStoreFloat3(&New.vScale, vScale);
+
+	/* 첫 패킷이거나 순간이동이면 보간하지 않고 그 자리에 놓는다. */
+	bool isSnap = !m_isNetReady;
+
+	if (!isSnap && isChassis)
+	{
+		const float fMoved = XMVectorGetX(XMVector3Length(
+			XMLoadFloat3(&New.vPos) - XMLoadFloat3(&m_NetTarget.vPos)));
+
+		if (fMoved > NET_SNAP_DISTANCE)
+			isSnap = true;
+	}
+
+	if (isSnap)
+	{
+		m_NetPrev	 = New;
+		m_NetTarget	 = New;
+		m_NetDisplay = New;
+		m_isNetReady = true;
+	}
+	else
+	{
+		/*  ★ 출발점은 '직전 목표' 가 아니라 '지금 화면에 그려지고 있는 값' 이다.
+			두 가지가 이것 때문에 해결된다.
+			 - 이전 보간이 덜 끝난 채 새 패킷이 오면, 직전 목표에서 출발할 경우
+			   아직 가지도 않은 지점으로 순간이동했다가 다시 움직인다.
+			 - 한 프레임에 패킷이 2개 도착하면(수신 큐가 밀렸을 때) 첫 번째 값은
+			   화면에 한 번도 안 나오는데, 그걸 출발점으로 삼으면 뒤로 튄다.       */
+		m_NetPrev	= m_NetDisplay;
+		m_NetTarget	= New;
+
+		/*  실제 도착 간격을 재서 평활한다. 서버 틱 지터 + 네트워크 지터가 있어
+			1/60 로 고정하면 매번 조금씩 남거나 모자란다.
+			단 같은 프레임에 두 번 들어온 경우(간격 0)는 표본이 아니므로 버린다.
+			안 버리면 간격이 계속 짧아져서, 목표에 일찍 도착한 뒤 다음 패킷까지
+			멈춰 있는 - 즉 지금 없애려는 그 끊김이 도로 생긴다.                  */
+		if (m_fNetSinceRecv >= NET_INTERVAL_MIN)
+		{
+			const float fMeasured = min(m_fNetSinceRecv, NET_INTERVAL_MAX);
+			m_fNetInterval = m_fNetInterval * 0.8f + fMeasured * 0.2f;
+		}
+	}
+
+	m_fNetElapsed	= 0.f;
+	m_fNetSinceRecv	= 0.f;
+}
+
+void CTank::Update_NetInterpolation(float fTimeDelta)
+{
+	if (!m_isNetReady)
+		return;
+
+	m_fNetSinceRecv	+= fTimeDelta;
+	m_fNetElapsed	+= fTimeDelta;
+
+	float fRatio = (m_fNetInterval > 0.f) ? (m_fNetElapsed / m_fNetInterval) : 1.f;
+	if (fRatio > 1.f)
+		fRatio = 1.f;			/* 외삽하지 않는다 - 위 주석 참고 */
+
+	/* 회전은 성분을 각각 섞으면 안 된다. 직교성이 깨져 모델이 찌그러진다.
+	   쿼터니언 구면보간을 쓴다(짧은 쪽으로 도는 것은 XMQuaternionSlerp 가 처리한다). */
+	const _vector vPos = XMVectorLerp(
+		XMLoadFloat3(&m_NetPrev.vPos), XMLoadFloat3(&m_NetTarget.vPos), fRatio);
+	const _vector qRot = XMQuaternionSlerp(
+		XMLoadFloat4(&m_NetPrev.qRot), XMLoadFloat4(&m_NetTarget.qRot), fRatio);
+	const _vector vScale = XMVectorLerp(
+		XMLoadFloat3(&m_NetPrev.vScale), XMLoadFloat3(&m_NetTarget.vScale), fRatio);
+
+	XMStoreFloat3(&m_NetDisplay.vPos,   vPos);
+	XMStoreFloat4(&m_NetDisplay.qRot,   qRot);
+	XMStoreFloat3(&m_NetDisplay.vScale, vScale);
+
+	m_NetDisplay.fPotap = LerpAngleDegree(m_NetPrev.fPotap, m_NetTarget.fPotap, fRatio);
+	m_NetDisplay.fPosin = LerpAngleDegree(m_NetPrev.fPosin, m_NetTarget.fPosin, fRatio);
+
+	/* 네트워크가 주는 부분만 돌려쓴다. 나머지는 이 클라가 직접 굴리고 있는 값이라
+	   덮으면 자기 조작이 서버 왕복에 밀려 뭉개진다. */
+	if (m_isNetChassis)
+	{
+		m_TransformCom->Set_WorldMatrix(
+			XMMatrixScalingFromVector(vScale) *
+			XMMatrixRotationQuaternion(qRot) *
+			XMMatrixTranslationFromVector(vPos));
+	}
+
+	if (m_isNetTurret)
+	{
+		m_fPotapRotation = m_NetDisplay.fPotap;
+		m_fPosinRotation = m_NetDisplay.fPosin;
+	}
 }
 
 void CTank::Set_Tank_Element_from_ServerData()
@@ -1009,22 +1300,43 @@ void CTank::Set_Tank_Element_from_ServerData()
 	//여기서 받은 데이터로 매트릭스 바꿔줌
 	m_VIBuffer->Invalidate_Bones();
 
-	m_VIBuffer->Set_Combined_Matrix(26, m_VIBuffer->Get_TransformMatrix(26) * m_TransformCom->Get_WorldMatrix()); // Left Second Wheel
-	m_VIBuffer->Set_Combined_Matrix(28, m_VIBuffer->Get_TransformMatrix(28) * m_TransformCom->Get_WorldMatrix()); // Left Third Wheel
-	m_VIBuffer->Set_Combined_Matrix(24, m_VIBuffer->Get_TransformMatrix(24) * m_TransformCom->Get_WorldMatrix()); // Left First Wheel
-	m_VIBuffer->Set_Combined_Matrix(30, m_VIBuffer->Get_TransformMatrix(30) * m_TransformCom->Get_WorldMatrix()); // Left Fourth Wheel
-	m_VIBuffer->Set_Combined_Matrix(32, m_VIBuffer->Get_TransformMatrix(32) * m_TransformCom->Get_WorldMatrix()); // Left Fifth Wheel
-	m_VIBuffer->Set_Combined_Matrix(34, m_VIBuffer->Get_TransformMatrix(34) * m_TransformCom->Get_WorldMatrix()); // Left Sixth Wheel
-	m_VIBuffer->Set_Combined_Matrix(36, m_VIBuffer->Get_TransformMatrix(36) * m_TransformCom->Get_WorldMatrix()); // Left Seventh Wheel
-	m_VIBuffer->Set_Combined_Matrix(46, m_VIBuffer->Get_TransformMatrix(46) * m_TransformCom->Get_WorldMatrix()); // Right First Wheel
-	m_VIBuffer->Set_Combined_Matrix(37, m_VIBuffer->Get_TransformMatrix(37) * m_TransformCom->Get_WorldMatrix()); // Right Second Wheel
-	m_VIBuffer->Set_Combined_Matrix(35, m_VIBuffer->Get_TransformMatrix(35) * m_TransformCom->Get_WorldMatrix()); // Right Third Wheel
-	m_VIBuffer->Set_Combined_Matrix(33, m_VIBuffer->Get_TransformMatrix(33) * m_TransformCom->Get_WorldMatrix()); // Right Fourth Wheel
-	m_VIBuffer->Set_Combined_Matrix(44, m_VIBuffer->Get_TransformMatrix(44) * m_TransformCom->Get_WorldMatrix()); // Right Fifth Wheel
-	m_VIBuffer->Set_Combined_Matrix(48, m_VIBuffer->Get_TransformMatrix(48) * m_TransformCom->Get_WorldMatrix()); // Right Sixth Wheel
-	m_VIBuffer->Set_Combined_Matrix(42, m_VIBuffer->Get_TransformMatrix(42) * m_TransformCom->Get_WorldMatrix()); // Right Seventh Wheel
+	/*  바퀴 14개 + 궤도.
+		예전엔 여기서 바퀴를 '쉴 때 위치 × 월드행렬' 로만 놓아서, 남의 탱크는
+		아무리 험한 지형을 달려도 서스펜션이 굳어 있었다(궤도도 마찬가지).
+		이제 서버가 바퀴 높이를 int8 14개로 실어 보내므로 그걸 얹는다.
 
-	//i == 24 || i == 26 || i == 28 || i == 30 || i == 32 || i == 34 || i == 36 || i == 46 || i == 37 || i == 35 || i == 33 || i == 44 || i == 48 || i == 42
+		★ 여기는 내 탱크의 Update_Wheels_And_Track 과 규약이 다르다.
+		   저쪽은 Invalidate_Bones 앞에서 Set_Transform_Matrix(mesh + 3, ...) 을 쓰고,
+		   여기는 뒤에서 Set_Combined_Matrix(mesh, ...) 를 쓴다.
+		   둘 다 각자의 호출 순서에서 동작하는 것이니 섞지 말 것.               */
+	const _matrix ChassisWorld = m_TransformCom->Get_WorldMatrix();
+
+	for (int iSide = 0; iSide < 2; ++iSide)
+	{
+		float fSag[TRACK_WHEEL_COUNT] = {};
+
+		for (_uint i = 0; i < TRACK_WHEEL_COUNT; ++i)
+		{
+			fSag[i] = DequantizeWheelSag(m_WheelSagWire[iSide * TRACK_WHEEL_COUNT + i]);
+
+			const _uint iMesh = WHEEL_MESH[iSide][i];
+
+			_matrix WheelMatrix = m_VIBuffer->Get_TransformMatrix(iMesh);
+			WheelMatrix.r[3] = XMVectorSetY(WheelMatrix.r[3],
+				XMVectorGetY(WheelMatrix.r[3]) + fSag[i]);
+
+			m_VIBuffer->Set_Combined_Matrix(iMesh, WheelMatrix * ChassisWorld);
+		}
+
+		/* 궤도도 같은 값으로 구부린다(안 하면 바퀴만 움직이고 궤도가 남는다). */
+		if (m_isTrackSagReady)
+		{
+			m_VIBuffer->Set_TrackSag(TRACK_MESH[iSide],
+				_float4(fSag[0], fSag[1], fSag[2], fSag[3]),
+				_float4(fSag[4], fSag[5], fSag[6], 1.f),
+				m_TrackParam[iSide]);
+		}
+	}
 
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(50, matPosin);
 	m_VIBuffer->Multiply_Mesh_Combined_Matrix(51, matPosin);
@@ -1060,8 +1372,8 @@ void CTank::SendMyStateToServer()
 {
 	_float4x4 TempMat;
 	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
-	auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+	auto sendBuffer = ClientPacketHandler::Make_C_MOVE(TempMat, m_fPotapRotation, m_fPosinRotation, m_WheelSagWire);
+	Network_Manager::GetInstance()->Send(sendBuffer);
 }
 
 void CTank::SendPosinData() {
@@ -1069,15 +1381,15 @@ void CTank::SendPosinData() {
 	_float4x4 TempMat;
 	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
 	auto sendBuffer = ClientPacketHandler::Make_C_TANK_POSINMOVE(m_fPotapRotation, m_fPosinRotation);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+	Network_Manager::GetInstance()->Send(sendBuffer);
 }
 
 void CTank::SendPosData() {
 
 	_float4x4 TempMat;
 	XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
-	auto sendBuffer = ClientPacketHandler::Make_C_TANK_POSMOVE(TempMat);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+	auto sendBuffer = ClientPacketHandler::Make_C_TANK_POSMOVE(TempMat, m_WheelSagWire);
+	Network_Manager::GetInstance()->Send(sendBuffer);
 }
 
 void CTank::SendShootDataToServer()
@@ -1120,7 +1432,7 @@ void CTank::SendShootDataToServer()
 
 	auto sendBuffer = ClientPacketHandler::Make_C_SHOT(fPos.x, fPos.y, fPos.z,
 		fDir.x, fDir.y, fDir.z);
-	ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+	Network_Manager::GetInstance()->Send(sendBuffer);
 
 
 }
@@ -1144,11 +1456,8 @@ void CTank::PopAllBulletMatrix(std::function<void(const _matrix&)> processFunc)
 
 void CTank::Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot)
 {
-
-	m_TransformCom->Set_WorldMatrix(mat);
-	Set_Other_PotapRotation(PotapRot);
-	Set_Other_PoSinpRotation(PosinRot);
-
+	/* 남의 탱크 - 차체도 포탑도 전부 서버가 준다. */
+	Push_NetState(mat, PotapRot, PosinRot, true, true);
 }
 
 
@@ -1161,9 +1470,12 @@ void CTank::Set_Posin(float PotapRot, float PosinRot)
 }
 
 void CTank::Set_DriverModeData(float PotapRot, float PosinRot) {
-	Set_Potap_For_Driver(PotapRot);
-	Set_Posin_For_Driver(PosinRot);
+	/* 조종수 - 차체는 자기 PhysX 가 굴리고 포탑만 짝(포수)에게서 온다.
+	   차체 인자는 쓰이지 않지만(isChassis=false) 스냅샷을 채워 두기 위해 현재 값을 넘긴다. */
+	_float4x4 CurWorld;
+	XMStoreFloat4x4(&CurWorld, m_TransformCom->Get_WorldMatrix());
 
+	Push_NetState(CurWorld, PotapRot, PosinRot, false, true);
 }
 
 
@@ -1177,9 +1489,19 @@ void CTank::Set_MyPos(float x, float y, float z)
 
 }
 
+void CTank::Set_WheelSagFromServer(const int8* pWheelSag)
+{
+	if (!pWheelSag)
+		return;
+
+	memcpy(m_WheelSagWire, pWheelSag, sizeof(m_WheelSagWire));
+}
+
 void CTank::SetMyMatrix(_float4x4 mat) {
 
-	m_TransformCom->Set_WorldMatrix(mat);
+	/* 포수 - 포탑은 자기가 돌리고, 자기가 타고 있는 탱크의 '차체' 를 서버에서 받는다.
+	   카메라가 이 차체에 붙어 있어서, 보간이 없으면 화면 전체가 60Hz 로 계단이 진다.  */
+	Push_NetState(mat, 0.f, 0.f, true, false);
 }
 
 
@@ -1286,7 +1608,7 @@ void CTank::setRespawn() {
 		XMStoreFloat4x4(&TempMat, m_TransformCom->Get_WorldMatrix());
 		if (Network_Manager::GetInstance()->isConnected()) {
 			auto sendBuffer = ClientPacketHandler::Make_C_TANK_RESPAWN(TempMat, m_fPotapRotation, m_fPosinRotation);
-			ServiceManager::GetInstace().GetService()->Broadcast(sendBuffer);
+			Network_Manager::GetInstance()->Send(sendBuffer);
 		}
 
 		dynamic_cast<CDrone*>(CGameInstance::Get_Instance()->GetGameObject("Drone", Network_Manager::GetInstance()->GetMyTankIndex()))->Set_My_DronePos_OnTank(TempMat);

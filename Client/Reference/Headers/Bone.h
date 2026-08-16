@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Engine_Config.h"
 
 /* Assimp : aiBone, aiNode, aiNodeAnim*/
 
@@ -55,7 +56,9 @@ public:
 	}
 
 public:
+#if USE_ASSIMP_BAKE
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);
+#endif
 	HRESULT Initialize(const char* szName, const _float4x4& transformMat, _int iParentIndex);
 	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones);
 
@@ -68,7 +71,9 @@ public:
 	_int				m_iParentBoneIndex = { 0 };
 
 public:
+#if USE_ASSIMP_BAKE
 	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
+#endif
 	static CBone* Create(const char* szName, const _float4x4& transformMat, _int iParentIndex);
 	CBone* Clone();
 	virtual void Free() override;

@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <unordered_map>
 #include <mutex>
 #include <cstdint>
 
-// ---- FMOD Àü¹æ ¼±¾ğ (Çì´õ include ¾øÀÌ Æ÷ÀÎÅÍ/ÂüÁ¶¸¸ »ç¿ë) ----
+// ---- FMOD ì „ë°© ì„ ì–¸ (í—¤ë” include ì—†ì´ í¬ì¸í„°/ì°¸ì¡°ë§Œ ì‚¬ìš©) ----
 namespace FMOD {
     class System;
     class ChannelGroup;
@@ -13,13 +13,13 @@ namespace FMOD {
     struct VECTOR;
 }
 
-// ¿ì¸® ÂÊ¿¡¼­ ¾²´Â 3D º¤ÅÍ
+// ìš°ë¦¬ ìª½ì—ì„œ ì“°ëŠ” 3D ë²¡í„°
 struct AudioVec3 {
     float x, y, z;
     AudioVec3(float X = 0, float Y = 0, float Z = 0) : x(X), y(Y), z(Z) {}
 };
 
-// FMOD ·Ñ¿ÀÇÁ ¸ğµå¿¡ ´ëÇÑ Áß¸³ ·¡ÆÛ(enum)
+// FMOD ë¡¤ì˜¤í”„ ëª¨ë“œì— ëŒ€í•œ ì¤‘ë¦½ ë˜í¼(enum)
 enum class AudioRolloff {
     Inverse,        // FMOD_3D_INVERSEROLLOFF
     Linear,         // FMOD_3D_LINEARROLLOFF
@@ -53,7 +53,7 @@ public:
 public:
     // ===== Life-cycle =====
     bool Initialize(int maxChannels = 512, float distanceScale = 1.0f);
-    void Update();      // ¡Ú ¸Å ÇÁ·¹ÀÓ È£Ãâ
+    void Update();      // â˜… ë§¤ í”„ë ˆì„ í˜¸ì¶œ
     void Shutdown();
 
     // ===== Sound Assets =====
@@ -69,21 +69,21 @@ public:
     bool Play2D(const std::string& id, float volume = 1.0f, bool paused = false);
     bool Play3D(const std::string& id, const AudioVec3& pos, const AudioVec3& vel = AudioVec3{}, float volume = 1.0f, bool paused = false);
 
-    // Ã¤³Î ÇÚµéÀÌ ÇÊ¿äÇÏ¸é ¹İÈ¯(Æ÷ÀÎÅÍ ±×´ë·Î ³ëÃâÇÏÁö¸¸ Àü¹æ¼±¾ğ·Î Çì´õ ÀÇÁ¸¼º Á¦°Å)
+    // ì±„ë„ í•¸ë“¤ì´ í•„ìš”í•˜ë©´ ë°˜í™˜(í¬ì¸í„° ê·¸ëŒ€ë¡œ ë…¸ì¶œí•˜ì§€ë§Œ ì „ë°©ì„ ì–¸ë¡œ í—¤ë” ì˜ì¡´ì„± ì œê±°)
     bool Play2D_ReturnChannel(const std::string& id, FMOD::Channel** outCh, float volume = 1.0f, bool paused = false);
     bool Play3D_ReturnChannel(const std::string& id, const AudioVec3& pos, const AudioVec3& vel,
         FMOD::Channel** outCh, float volume = 1.0f, bool paused = false);
 
-    // ¸®½º³Ê(Ä«¸Ş¶ó)
+    // ë¦¬ìŠ¤ë„ˆ(ì¹´ë©”ë¼)
     void SetListener(const AudioVec3& pos, const AudioVec3& vel, const AudioVec3& forward, const AudioVec3& up);
     void SetListener(const FMOD_VECTOR& pos,
         const FMOD_VECTOR& vel,
         const FMOD_VECTOR& forward,
         const FMOD_VECTOR& up);
-    // ¸¶½ºÅÍ º¼·ı
+    // ë§ˆìŠ¤í„° ë³¼ë¥¨
     void SetMasterVolume(float v);
 
-    // ÇÊ¿ä½Ã ½Ã½ºÅÛ Á¢±Ù
+    // í•„ìš”ì‹œ ì‹œìŠ¤í…œ ì ‘ê·¼
     FMOD::System* GetSystem() const { return mSystem; }
 
 private:

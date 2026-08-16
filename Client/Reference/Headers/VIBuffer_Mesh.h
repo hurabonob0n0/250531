@@ -1,10 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
-/* ¸ğµ¨À» ±¸¼ºÇÏ´Â ÇÏ³ªÀÇ ÆÄÃ÷. */
-/* Á¤Á¡°ú ÀÎµ¦½º¸¦ ±¸¼ºÇÏ±âÀ§ÇØ µğÀÚÀÎµÈ Å¬·¡½º´Ù. */
+/* ëª¨ë¸ì„ êµ¬ì„±í•˜ëŠ” í•˜ë‚˜ì˜ ë©ì–´ë¦¬(ë©”ì‹œ). ì •ì /ì¸ë±ìŠ¤ ë²„í¼ë¥¼ ë“¤ê³  ìˆëŠ”ë‹¤. */
 #include "VIBuffer.h"
-#include "Model.h"
-
+#include "MeshBinary.h"
 
 BEGIN(Engine)
 
@@ -16,19 +14,18 @@ private:
 	virtual ~CVIBuffer_Mesh() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
+	/* .bin ì—ì„œ ì½ì–´ì˜¨ ì •ì /ì¸ë±ìŠ¤ë¥¼ ê·¸ëŒ€ë¡œ ì˜¬ë¦°ë‹¤.
+	   í”¼ë²—í–‰ë ¬ê³¼ íƒ„ì  íŠ¸ëŠ” êµ¬ìš¸ ë•Œ ì´ë¯¸ ë°˜ì˜ë¼ ìˆì–´ì„œ ì—¬ê¸°ì„œ í•  ê³„ì‚°ì´ ì—†ë‹¤. */
+	virtual HRESULT Initialize_Prototype(const VTXMESH* pVertices, _uint iVertexNum, const _ulong* pIndices, _uint iIndexNum);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
 	void Update();
 	virtual HRESULT Render(int instanceNum = 1);
 
-private:
-	HRESULT Ready_Mesh(const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
-
-
 public:
-	static CVIBuffer_Mesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext,  const aiMesh* pAIMesh, _fmatrix PivotMatrix = XMMatrixIdentity(), _uint type = 0);
+	static CVIBuffer_Mesh* Create(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pContext,
+		const VTXMESH* pVertices, _uint iVertexNum, const _ulong* pIndices, _uint iIndexNum);
 	virtual CComponent* Clone(void* pArg);
 	virtual void Free() override;
 };

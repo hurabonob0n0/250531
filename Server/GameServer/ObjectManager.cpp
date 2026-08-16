@@ -2,8 +2,6 @@
 #include "ObjectManager.h"
 
 
-ObjectManager* ObjectManager::m_pInstance = nullptr;
-
 ObjectManager::ObjectManager()
 {
 }
@@ -14,14 +12,14 @@ ObjectManager::~ObjectManager()
 }
 
 
-int ObjectManager::Update(void)
+int ObjectManager::Update(float deltaTime)
 {
 	for (size_t i = 0; i < OBJ_END; ++i)
 	{
 		auto& vec = m_ObjectList[i];
 		for (size_t j = 0; j < vec.size(); )
 		{
-			int iResult = vec[j]->Update();
+			int iResult = vec[j]->Update(deltaTime);
 
 			if (1 == iResult)
 			{

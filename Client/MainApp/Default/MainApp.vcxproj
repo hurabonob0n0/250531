@@ -73,20 +73,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../bin/</OutDir>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../bin/</OutDir>
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ServerCore\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -103,7 +99,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,7 +120,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,7 +137,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,6 +151,7 @@
       <AdditionalIncludeDirectories>../public/;../../Reference/Headers/;../../Reference/Headers/PhysX-4.1\physx\include;../../Reference/Headers/PhysX-4.1\physx\snippets;../../Reference/Headers/PhysX-4.1\pxshared\include;../../Reference/Headers/PhysX-4.1\physx\source\foundation\include;../../Reference/Headers/PhysX-4.1\physx\snippets\snippetvehicletank</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Client_pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,7 +159,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;Debug/ServerCore.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;assimp-vc140-mtd.lib;Project1.lib;PhysX_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_static_64.lib;PhysXCooking_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_static_64.lib;PhysXVehicle_static_64.lib;PhysXPvdSDK_static_64.lib;User32.lib;Gdi32.lib;fmodL_vc.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -194,12 +191,12 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\MyBmp.h" />
     <ClInclude Include="..\public\Network_Manager.h" />
+    <ClInclude Include="..\public\Protocol.h" />
+    <ClInclude Include="..\public\SendBuffer.h" />
     <ClInclude Include="..\public\Object_Manager.h" />
     <ClInclude Include="..\public\Ping.h" />
     <ClInclude Include="..\public\RoomListBar.h" />
     <ClInclude Include="..\public\Room_Manager.h" />
-    <ClInclude Include="..\public\ServerSession.h" />
-    <ClInclude Include="..\public\ServiceManager.h" />
     <ClInclude Include="..\public\SmokeEffect.h" />
     <ClInclude Include="..\public\StateMgr.h" />
     <ClInclude Include="..\public\Tank.h">
@@ -278,8 +275,6 @@
     <ClCompile Include="..\private\Ping.cpp" />
     <ClCompile Include="..\private\RoomListBar.cpp" />
     <ClCompile Include="..\private\Room_Manager.cpp" />
-    <ClCompile Include="..\private\ServerSession.cpp" />
-    <ClCompile Include="..\private\ServiceManager.cpp" />
     <ClCompile Include="..\private\SmokeEffect.cpp" />
     <ClCompile Include="..\private\StateMgr.cpp" />
     <ClCompile Include="..\private\Tank.cpp">
@@ -379,13 +374,22 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\CommonTank.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Default.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Effect.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -394,7 +398,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\LightingUtil.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\Shadows.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -409,12 +416,20 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\TankPS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\UI.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

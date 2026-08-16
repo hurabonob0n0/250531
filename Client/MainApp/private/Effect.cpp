@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+ï»¿#include "Client_pch.h"
 #include "Effect.h"
 #include "GameInstance.h"
 #include "Network_Manager.h"
@@ -71,23 +71,23 @@ void CEffect::LateTick(float fTimeDelta)
 
 		m_AccumulatedTime += fTimeDelta*2.f;
 
-		// ÃÑ ÇÁ·¹ÀÓ ¼ö
+		// ì´ í”„ë ˆì„ ìˆ˜
 		const int totalFrames = 64;
 		const int framesPerRow = 8;
 
-		// ¾Ö´Ï¸ŞÀÌ¼Ç ¼Óµµ (ÃÊ´ç ÇÁ·¹ÀÓ ¼ö)
+		// ì• ë‹ˆë©”ì´ì…˜ ì†ë„ (ì´ˆë‹¹ í”„ë ˆì„ ìˆ˜)
 		float frameRate = 24.f;
 		int currentFrame = static_cast<int>(m_AccumulatedTime * frameRate);
-		if (currentFrame >= totalFrames) currentFrame = totalFrames - 1; // ¸¶Áö¸· ÇÁ·¹ÀÓ °íÁ¤
+		if (currentFrame >= totalFrames) currentFrame = totalFrames - 1; // ë§ˆì§€ë§‰ í”„ë ˆì„ ê³ ì •
 
 		int row = currentFrame / framesPerRow;
 		int col = currentFrame % framesPerRow;
 
-		// UV º¯È¯Çà·Ä ±¸¼º
+		// UV ë³€í™˜í–‰ë ¬ êµ¬ì„±
 		XMMATRIX scale = XMMatrixScaling(1.0f / 8.0f, 1.0f / 8.0f, 1.f);
 		XMMATRIX trans = XMMatrixTranslation((float)col / 8.0f, (float)row / 8.0f, 0.f);
 
-		// ÃÖÁ¾ ÅØ½ºÃ³ º¯È¯ Çà·Ä
+		// ìµœì¢… í…ìŠ¤ì²˜ ë³€í™˜ í–‰ë ¬
 		XMMATRIX texTransform = scale * trans;
 
 		m_TexCoordTransformCom->Set_WorldMatrix(texTransform);
@@ -107,23 +107,23 @@ void CEffect::LateTick(float fTimeDelta)
 
 	//m_AccumulatedTime += fTimeDelta*2.f;
 
-	//// ÃÑ ÇÁ·¹ÀÓ ¼ö
+	//// ì´ í”„ë ˆì„ ìˆ˜
 	//const int totalFrames = 64;
 	//const int framesPerRow = 8;
 
-	//// ¾Ö´Ï¸ŞÀÌ¼Ç ¼Óµµ (ÃÊ´ç ÇÁ·¹ÀÓ ¼ö)
+	//// ì• ë‹ˆë©”ì´ì…˜ ì†ë„ (ì´ˆë‹¹ í”„ë ˆì„ ìˆ˜)
 	//float frameRate = 24.f;
 	//int currentFrame = static_cast<int>(m_AccumulatedTime * frameRate);
-	//if (currentFrame >= totalFrames) currentFrame = totalFrames - 1; // ¸¶Áö¸· ÇÁ·¹ÀÓ °íÁ¤
+	//if (currentFrame >= totalFrames) currentFrame = totalFrames - 1; // ë§ˆì§€ë§‰ í”„ë ˆì„ ê³ ì •
 
 	//int row = currentFrame / framesPerRow;
 	//int col = currentFrame % framesPerRow;
 
-	//// UV º¯È¯Çà·Ä ±¸¼º
+	//// UV ë³€í™˜í–‰ë ¬ êµ¬ì„±
 	//XMMATRIX scale = XMMatrixScaling(1.0f / 8.0f, 1.0f / 8.0f, 1.f);
 	//XMMATRIX trans = XMMatrixTranslation((float)col / 8.0f, (float)row / 8.0f, 0.f);
 
-	//// ÃÖÁ¾ ÅØ½ºÃ³ º¯È¯ Çà·Ä
+	//// ìµœì¢… í…ìŠ¤ì²˜ ë³€í™˜ í–‰ë ¬
 	//XMMATRIX texTransform = scale * trans;
 
 	//m_TexCoordTransformCom->Set_WorldMatrix(texTransform);

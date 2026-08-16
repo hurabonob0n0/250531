@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine_Config.h"
 #include "Engine_Function.h"
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"
@@ -33,9 +34,12 @@
 #include "stb_image.h"
 #include "DDSTextureLoader.h"
 #include "d3dUtil.h"
+/* assimp is only needed to bake FBX -> .bin. See Engine_Config.h */
+#if USE_ASSIMP_BAKE
 #include <assimp\Importer.hpp>
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
+#endif
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
