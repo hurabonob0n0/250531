@@ -152,12 +152,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 
 	m_GameInstance->AddPrototype("TransformCom", CTransform::Create(GETDEVICE, GETCOMMANDLIST));
 	m_GameInstance->AddPrototype("VIBuffer_GeosCom", CVIBuffer_Geos::Create(GETDEVICE, GETCOMMANDLIST));
-	/* 예전엔 1.14GB짜리 TerrainVertices(정점 1670만개)를 통째로 읽어 한 번에 그렸다.
-	   이제는 높이값(4096x4096 float)만 읽어서 청크 + LOD 로 만든다.
-	   원본이던 Terrain4096Map.bin(201MB, 정점당 x/y/z)은 높이만 뽑아낸 Terrain4096.hgt(67MB)와
-	   내용이 같아서 _AssetSources 로 빼뒀다. 여기서는 .hgt 를 바로 읽는다.
-	   (.hgt 가 없으면 같은 폴더의 Terrain4096Map.bin 을 찾아 다시 만든다 - CVIBuffer_Terrain::Load_HeightMap)
-	   해상도 조절은 Engine_Config.h 의 TERRAIN_VERTEX_STEP. */
 	m_GameInstance->AddPrototype("TerrainCom", CVIBuffer_Terrain::Create(GETDEVICE, GETCOMMANDLIST, "../bin/Models/Terrain/Terrain4096.hgt"));
 	m_GameInstance->AddPrototype("ModelCom", CModel::Create(m_GameInstance->Get_Device(), m_GameInstance->Get_CommandList(), CModel::TYPE_ANIM, "../bin/Models/Tank/M1A2.fbx",
 		XMMatrixScaling(0.01f, 0.01f, 0.01f)));
