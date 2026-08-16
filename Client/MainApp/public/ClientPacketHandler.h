@@ -3,15 +3,11 @@
 #include "SendBuffer.h"
 #include "RenderObject.h"
 
-// 패킷 ID enum 은 Protocol.h 로 옮겼다.
-// 서버와 한 글자도 어긋나면 안 되는 값이라, 클라/서버가 같은 파일을 복제해서 쓴다.
+
 
 BEGIN(Engine)
 class CGameInstance;
 END
-
-
-
 
 
 
@@ -54,10 +50,6 @@ public:
 	static void Handle_S_ADD_PING(BYTE* buffer, int32 len);
 
 
-	//static void Handle_S_PLAYER_MOVE(BYTE* buffer, int32 len);
-
-
-
 	static SendBufferRef Make_C_MOVE(_float4x4& worldMatrix, float potapRotation, float posinRotation, const int8* pWheelSag);
 	static SendBufferRef Make_C_SHOT(float PosX, float PosY, float PosZ, float nDirX, float nDirY, float nDirZ);
 
@@ -85,11 +77,6 @@ public:
 	static SendBufferRef Make_C_PING(float X, float Y, float Z);
 
 	//For GamePlay
-
-
-	//static SendBufferRef Make_C_SHOT(uint, uint16 attack);
-
-
 
 	class CGameInstance* m_GameInstance = {};
 
