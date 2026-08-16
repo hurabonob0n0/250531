@@ -670,7 +670,15 @@ void ClientPacketHandler::Handle_S_ALL_TANK_STATE(BYTE* buffer, int32 len)
 					tank->Set_DriverModeData(potapAngle, posinAngle);
 				}
 				else {
-				//마스터 포지션
+				/*  마스터 포지션 - 일부러 비어 있다.
+					MASTER 는 탱크에 혼자 탄 경우에만 붙으므로(MainApp.cpp 참고)
+					차체도 포탑도 전부 자기가 주인이다. 서버가 돌려준 값을 여기서
+					다시 넣으면 자기 조작이 서버 왕복에 밀려 뭉개진다.
+
+					⚠️ 여기에 포탑을 넣어 '포수와 같이 탄 마스터' 를 지원하려 하지 말 것.
+					   MASTER 는 RotPotap_And_Posin 으로 자기 카메라를 따라 포탑을 돌리므로
+					   같은 값을 두 곳에서 쓰게 되어 서로 덮어쓴다.
+					   둘이 탈 때는 DRIVER/POSU 로 나누는 게 맞다.                        */
 				}
 			}
 

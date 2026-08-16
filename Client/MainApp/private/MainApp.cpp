@@ -317,7 +317,22 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 							Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
 						}
 
-						if (player.Position == 1) {
+						/*  ★ 예전에는 자리 1번이면 무조건 POS_MASTER 로 덮었다.
+							MASTER 는 혼자서 조종·조준·드론을 전부 하는 모드다(오프라인 테스트용).
+							포수가 같이 탄 상태에서 이걸 쓰면 한 탱크의 포탑 주인이 둘이 된다:
+
+							  - MASTER 는 LateTick 에서 RotPotap_And_Posin 으로 '자기 카메라'를 따라 포탑을 돌리고,
+							  - ClientPacketHandler 의 마스터 분기가 비어 있어(//마스터 포지션)
+							    포수가 보낸 포탑각을 그냥 버리며,
+							  - 게다가 C_MOVEMENT 로 자기 포탑각을 실어 보내 서버에 있는 포수 값을 덮는다.
+
+							그래서 2인 플레이에서 포수가 아무리 화면을 돌려도
+							1번 화면에서는 포탑이 따라 돌지 않았다.
+
+							이제 '이 탱크에 나 혼자일 때' 로 좁힌다. 혼자면 예전처럼 다 조작하고,
+							둘이면 1번은 홀수라 위에서 정해진 POS_DRIVER 로 남는다.
+							그러면 조종수는 차체만, 포수는 포탑만 주인이 되어 서로 덮어쓰지 않는다.   */
+						if (player.Position == 1 && playerList.size() == 1) {
 							Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
 							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
 							Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
