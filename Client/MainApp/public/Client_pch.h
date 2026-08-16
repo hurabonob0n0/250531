@@ -66,6 +66,28 @@ using PlayerRef = std::shared_ptr<class Player>;
 #define LOBBY_WINCX  1024
 #define LOBBY_WINCY  880
 
+/*  로비의 버튼/배경 좌표는 전부 1024x880 기준으로 박혀 있는데,
+	화면이 작은 노트북에서는 창이 그보다 작아진다(세로 768 이면 아래가 잘렸다).
+	그래서 그리는 쪽은 StretchBlt 로 창에 맞춰 늘리고, 마우스는 여기서
+	반대로 되돌려 1024x880 좌표로 만든다. 둘 중 하나만 하면 클릭이 어긋난다.
+
+	★ 로비에서 커서 위치가 필요하면 GetCursorPos + ScreenToClient 를 직접 쓰지 말고
+	   반드시 이 함수를 쓸 것.                                                     */
+inline void Lobby_GetCursorPos(HWND hWnd, POINT* pOut)
+{
+	GetCursorPos(pOut);
+	ScreenToClient(hWnd, pOut);
+
+	RECT rcClient = {};
+	GetClientRect(hWnd, &rcClient);
+
+	if (rcClient.right > 0 && rcClient.bottom > 0)
+	{
+		pOut->x = LONG(pOut->x * (double)LOBBY_WINCX / rcClient.right);
+		pOut->y = LONG(pOut->y * (double)LOBBY_WINCY / rcClient.bottom);
+	}
+}
+
 #define TEAM_BLUE	true
 #define TEAM_RED	false
 

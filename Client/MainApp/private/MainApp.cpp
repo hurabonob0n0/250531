@@ -526,13 +526,29 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// WM_SIZE는 사용자가 윈도우 크기를 변경할 때 보내집니다.
 	case WM_SIZE:
-		// 새로운 윈도우 크기를 저장합니다.
-		m_ClientWidth = LOWORD(lParam);
-		m_ClientHeight = HIWORD(lParam);
-		//m_FullscreenState = !m_FullscreenState;
-		/*if(m_GameInstance)
-			m_GameInstance->OnResize();*/
+		/*  ★ 여기서 m_ClientWidth/Height 를 덮으면 안 된다.
+			그 둘은 창 크기가 아니라 '렌더 해상도(백버퍼)' 이고, 창을 줄였다고
+			백버퍼가 따라 줄어드는 게 아니다. 예전 코드가 덮어쓰고 있었는데
+			초기화가 끝난 뒤라 아무 데도 안 쓰여서 티가 안 났을 뿐이다.
+
+			창 모드에서 사용자가 크기를 바꿨다면 그 크기를 기억해뒀다가
+			전체 화면에서 돌아올 때 복원한다.                                  */
+		if (!m_FullscreenState && wParam != SIZE_MINIMIZED)
+		{
+			m_WindowedWidth  = LOWORD(lParam);
+			m_WindowedHeight = HIWORD(lParam);
+		}
 		return 0;
+
+		// Alt + Enter : 전체 화면 <-> 창 모드
+		// WM_KEYDOWN 이 아니라 WM_SYSKEYDOWN 으로 온다(Alt 가 눌려 있어서).
+	case WM_SYSKEYDOWN:
+		if (wParam == VK_RETURN && (lParam & (1 << 29)))
+		{
+			Toggle_Fullscreen();
+			return 0;
+		}
+		break;
 
 		// 윈도우가 파괴될 때 WM_DESTORY가 보내집니다.
 	case WM_DESTROY:
@@ -580,16 +596,33 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 		return false;
 	}
 
-	// 클라이언트의 크기를 기반으로 윈도우 사각형을 계산합니다.
-	RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
-	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-	int width = R.right - R.left;
-	int height = R.bottom - R.top;
+	/*  예전에는 여기서 창을 1920x1080 WS_POPUP 으로 만들고 CW_USEDEFAULT 에 놓았다.
+		화면이 그보다 작은 노트북에서는 창이 화면 밖으로 나가 잘렸다.
+		(테두리가 없어서 옮기거나 줄일 수도 없었다)
 
-	DWORD style = WS_VISIBLE | WS_POPUP;
+		이제 이 모니터에 들어가는 크기로 만든다. 렌더 해상도는 1920x1080 그대로라
+		화면이 작아도 잘리는 게 아니라 전체가 축소되어 보인다.                      */
+	Calc_WindowedSize(&m_WindowedWidth, &m_WindowedHeight);
+
+	RECT R = { 0, 0, m_WindowedWidth, m_WindowedHeight };
+	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+
+	const int iOuterW = R.right - R.left;
+	const int iOuterH = R.bottom - R.top;
+
+	/* 작업 영역(작업 표시줄 제외) 한가운데에 놓는다. */
+	RECT WorkArea = {};
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &WorkArea, 0);
+
+	m_WindowedPosX = WorkArea.left + ((WorkArea.right - WorkArea.left) - iOuterW) / 2;
+	m_WindowedPosY = WorkArea.top + ((WorkArea.bottom - WorkArea.top) - iOuterH) / 2;
+
+	if (m_WindowedPosX < WorkArea.left)	m_WindowedPosX = WorkArea.left;
+	if (m_WindowedPosY < WorkArea.top)	m_WindowedPosY = WorkArea.top;
 
 	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		style & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_ClientWidth, m_ClientHeight, 0, 0, m_hAppInst, 0);
+		WS_OVERLAPPEDWINDOW, m_WindowedPosX, m_WindowedPosY,
+		iOuterW, iOuterH, 0, 0, m_hAppInst, 0);
 
 	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
@@ -609,6 +642,106 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 	UpdateWindow(m_hMainWnd);
 
 	return S_OK;
+}
+
+/*===========================================================================
+	창 크기 / 전체 화면
+
+	렌더 해상도(백버퍼)는 늘 1920x1080 이다. 여기서 바꾸는 건 창 크기뿐이고,
+	백버퍼를 창에 맞춰 늘리고 줄이는 건 DXGI 가 한다(FLIP_DISCARD + 스트레치).
+
+	이렇게 나눈 이유:
+	  - UI 위치, 뷰포트, 조준선이 전부 1920x1080 기준으로 짜여 있다.
+	    백버퍼를 창 크기에 맞추면 그게 전부 어긋난다.
+	  - 백버퍼를 바꾸려면 ResizeBuffers + RTV/깊이버퍼 재생성이 필요한데,
+	    지금 WM_SIZE 는 값만 저장하고 아무것도 재생성하지 않는다.
+
+	전체 화면은 테두리 없는 창(borderless)이다. SetFullscreenState 를 쓰는
+	독점 전체화면은 해상도를 실제로 바꿔서 알트탭이 느리고, 모드 전환 때마다
+	버퍼를 다시 만들어야 한다. 얻는 게 없다.
+===========================================================================*/
+void CMainApp::Calc_WindowedSize(int* pOutWidth, int* pOutHeight) const
+{
+	/* 작업 표시줄을 뺀 실제로 쓸 수 있는 영역 */
+	RECT WorkArea = {};
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &WorkArea, 0);
+
+	int iAvailW = WorkArea.right - WorkArea.left;
+	int iAvailH = WorkArea.bottom - WorkArea.top;
+
+	/* 창 테두리와 제목 표시줄이 먹는 만큼을 빼둔다(안 빼면 아슬아슬하게 넘친다) */
+	RECT Frame = { 0, 0, 100, 100 };
+	AdjustWindowRect(&Frame, WS_OVERLAPPEDWINDOW, false);
+
+	iAvailW -= (Frame.right - Frame.left) - 100;
+	iAvailH -= (Frame.bottom - Frame.top) - 100;
+
+	/* 렌더 해상도보다 큰 창은 의미가 없다(늘려봐야 흐려지기만 한다) */
+	if (iAvailW > m_ClientWidth)		iAvailW = m_ClientWidth;
+	if (iAvailH > m_ClientHeight)	iAvailH = m_ClientHeight;
+
+	/* 16:9 를 유지한 채 들어가는 최대 크기. 가로/세로 중 더 빡빡한 쪽에 맞춘다. */
+	const double dScale = min(double(iAvailW) / m_ClientWidth,
+							  double(iAvailH) / m_ClientHeight);
+
+	*pOutWidth  = int(m_ClientWidth  * dScale);
+	*pOutHeight = int(m_ClientHeight * dScale);
+
+	/* 너무 작아지면 조작이 불가능하므로 하한을 둔다 */
+	if (*pOutWidth  < 640) *pOutWidth  = 640;
+	if (*pOutHeight < 360) *pOutHeight = 360;
+}
+
+void CMainApp::Apply_Fullscreen(bool isFullscreen)
+{
+	if (!m_hMainWnd || m_FullscreenState == isFullscreen)
+		return;
+
+	if (isFullscreen)
+	{
+		/* 돌아올 자리를 기억해둔다 */
+		RECT WndRect = {};
+		if (GetWindowRect(m_hMainWnd, &WndRect))
+		{
+			m_WindowedPosX = WndRect.left;
+			m_WindowedPosY = WndRect.top;
+		}
+
+		/* 여러 모니터를 쓸 수 있으므로 '지금 창이 올라가 있는' 모니터를 쓴다 */
+		HMONITOR hMonitor = MonitorFromWindow(m_hMainWnd, MONITOR_DEFAULTTONEAREST);
+
+		MONITORINFO MonitorInfo = {};
+		MonitorInfo.cbSize = sizeof(MonitorInfo);
+		if (!GetMonitorInfo(hMonitor, &MonitorInfo))
+			return;
+
+		SetWindowLongPtr(m_hMainWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);
+
+		const RECT& Mon = MonitorInfo.rcMonitor;
+		SetWindowPos(m_hMainWnd, HWND_TOP,
+			Mon.left, Mon.top,
+			Mon.right - Mon.left, Mon.bottom - Mon.top,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowLongPtr(m_hMainWnd, GWL_STYLE, WS_VISIBLE | WS_OVERLAPPEDWINDOW);
+
+		RECT R = { 0, 0, m_WindowedWidth, m_WindowedHeight };
+		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+
+		SetWindowPos(m_hMainWnd, HWND_NOTOPMOST,
+			m_WindowedPosX, m_WindowedPosY,
+			R.right - R.left, R.bottom - R.top,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	}
+
+	m_FullscreenState = isFullscreen;
+}
+
+void CMainApp::Toggle_Fullscreen()
+{
+	Apply_Fullscreen(!m_FullscreenState);
 }
 
 
@@ -682,7 +815,29 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 	wc.lpszClassName = L"LobbyWnd";
 	RegisterClass(&wc);
 
-	RECT rc{ 0,0,LOBBY_WINCX,LOBBY_WINCY };
+	/*  예전엔 1024x880 을 그대로 창 크기로 줬다. 두 가지가 문제였다.
+		 - AdjustWindowRect 를 안 해서 테두리와 제목 표시줄만큼 클라이언트가 작았다.
+		 - 세로 768 노트북에서는 창이 화면을 넘어가 아래쪽 버튼이 안 보였다.
+		이제 화면에 들어가는 크기로 만들고, 모자라면 비율을 유지한 채 줄인다.
+		그리는 쪽(GameLobby::Render)이 StretchBlt 로 맞춰 늘린다.               */
+	RECT WorkArea = {};
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &WorkArea, 0);
+
+	RECT Frame = { 0, 0, 100, 100 };
+	AdjustWindowRect(&Frame, WS_OVERLAPPEDWINDOW, false);
+
+	const int iFrameW = (Frame.right - Frame.left) - 100;
+	const int iFrameH = (Frame.bottom - Frame.top) - 100;
+
+	const int iAvailW = (WorkArea.right - WorkArea.left) - iFrameW;
+	const int iAvailH = (WorkArea.bottom - WorkArea.top) - iFrameH;
+
+	double dScale = min(double(iAvailW) / LOBBY_WINCX, double(iAvailH) / LOBBY_WINCY);
+	if (dScale > 1.0)
+		dScale = 1.0;			/* 원본보다 키우지는 않는다 */
+
+	RECT rc{ 0, 0, int(LOBBY_WINCX * dScale), int(LOBBY_WINCY * dScale) };
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
 
 	hWnd = CreateWindow(L"LobbyWnd", L"게임 로비", WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
