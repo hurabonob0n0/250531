@@ -89,8 +89,7 @@ int Level_Room::Update()
         lastClickTime = now;
 
         POINT pt;
-        GetCursorPos(&pt);
-        ScreenToClient(g_hWnd, &pt);
+        Lobby_GetCursorPos(g_hWnd, &pt);
 
         const auto& players = Room_Manager::Get_Instance()->GetRoomPlayerStates();
 

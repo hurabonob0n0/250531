@@ -1,4 +1,4 @@
-#include "Client_pch.h"
+﻿#include "Client_pch.h"
 #include "Client_Globals.h"
 #include "Button.h"
 #include "Key_Manager.h"
@@ -68,8 +68,7 @@ void Button::Initialize()
 int Button::Update()
 {
 	POINT	pt{};
-	GetCursorPos(&pt);
-	ScreenToClient(g_hWnd, &pt);
+	Lobby_GetCursorPos(g_hWnd, &pt);
 
 	if (PtInRect(&m_tRect, pt))
 	{

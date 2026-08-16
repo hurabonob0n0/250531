@@ -52,8 +52,7 @@ int Level_RoomList::Update()
 
 
 	POINT pt{};
-	GetCursorPos(&pt);
-	ScreenToClient(g_hWnd, &pt);
+	Lobby_GetCursorPos(g_hWnd, &pt);
 
 	for (auto& pair : m_vecRoomRects)
 	{
