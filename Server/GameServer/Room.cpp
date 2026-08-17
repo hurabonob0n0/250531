@@ -12,8 +12,11 @@
 #include "Collision_Manager.h"
 #include "Drone.h"
 #include "AirDrop_Bomb.h"
+#include "RoomJobPool.h"
 
-Room::Room() 
+/* GetNowMs() 는 ServerConfig.h 에 있다(Tank 의 검증 상태와 같은 시계를 써야 한다). */
+
+Room::Room()
 {
 	SetMaxPlayer(8);
 	isActive = false;
@@ -35,9 +38,6 @@ void Room::Initialize()
 
 void Room::Update(float deltaTime)
 {
-	// ★ 여기에 system("cls") 가 있었다.
-	//   방마다, 매 프레임(초당 60번) 프로세스를 새로 띄우고 있었다.
-	//   화면 갱신은 CIOCP_Server::DebugConsoleThread 가 0.5초마다 맡는다.
 
 	switch (CurState) {
 
@@ -52,12 +52,23 @@ void Room::Update(float deltaTime)
 		break;
 	case ROOM_INGAME:
 	{
+		/*  승패가 갈린 뒤 3초 뒤 방을 되돌린다. */
+		if (isGameEnded)
+		{
+			// 끝난 판의 물리와 충돌은 더 돌리지 않는다.
+			_resetTimer += deltaTime;
+			if (_resetTimer >= ROOM_RESET_DELAY)
+				ResetRoom();
+
+			break;
+		}
+
 		Room_ObjectManager.Update(deltaTime);
-		
+
 		UpdateCaptureGauge(deltaTime);
 		Detect_Bullet_Tank_Collisions();
 		Detect_Bullet_Terrain_Collisions();
-		
+
 		Detect_Bomb_Terrain_Collisions();
 		Detect_Bomb_Tank_Collisions();
 
@@ -67,6 +78,23 @@ void Room::Update(float deltaTime)
 		break;
 	}
 
+	// 디버그 콘솔이 볼 값
+	UpdateInfoForDisplay();
+}
+
+// ----------------------------------------------------------------
+//  방 안의 값을 _display 원자값으로 옮긴다.
+// ----------------------------------------------------------------
+void Room::UpdateInfoForDisplay()
+{
+	_displayBlueGauge.store(static_cast<int>(blueGauge));
+	_displayRedGauge.store(static_cast<int>(redGauge));
+
+	int tankCount = 0;
+	if (auto tankList = Room_ObjectManager.Get_List(OBJ_TANK))
+		tankCount = static_cast<int>(tankList->size());
+
+	_displayTankCount.store(tankCount);
 }
 
 void Room::LateUpdate()
@@ -77,10 +105,6 @@ void Room::LateUpdate()
 		Room_ObjectManager.Late_Update();
 		Broadcast_All_TankStates();
 		Broadcast_All_DroneState();
-
-		// ★ 여기서 매 프레임 탱크/드론 좌표를 전부 cout 으로 찍고 있었다.
-		//   콘솔 출력은 락이 걸린 느린 I/O 라 그게 곧 게임 루프의 상한이 됐다.
-		//   상태를 눈으로 보려면 ShowRoomData()/ShowTankState() 를 쓸 것.
 	}
 }
 
@@ -89,12 +113,56 @@ void Room::Release()
 
 }
 
+// ================================================================
+//  틱 잡
+// ================================================================
+
+// 실행권을 잡았지만 여기서 돌지 않는다. 방 잡 풀에 넘긴다.
+void Room::OnReadyToRun()
+{
+	CRoomJobPool::Get_Instance()->AddReadyRoom(this);
+}
+
+void Room::PushTickJob()
+{
+	/*  이전 틱이 아직 큐에 남아 있으면 건너뛴다  */
+	if (_tickPending.exchange(true))
+		return;
+
+	Room* pRoom = this;
+	PushJob([pRoom]() { pRoom->TickJob(); });
+}
+
+void Room::TickJob()
+{
+
+	/*   이 틱을 도는 동안 다음 틱이 예약될 수 있어야 틱 주기가 유지.  */
+	_tickPending.store(false);
+
+	const int64 nowMs  = GetNowMs();
+	int64       lastMs = _lastTickMs.exchange(nowMs);
+
+	if (lastMs == 0)
+		lastMs = nowMs;     // 이 방의 첫 틱
+
+	float deltaTime = static_cast<float>(nowMs - lastMs) / 1000.f;
+
+	/*  방이 오래 놀다 깨어나면 dt 가 몇 초짜리로 들어온다.
+	    그대로 넣으면 총알이 한 프레임에 맵을 관통하고 점령 게이지가 튄다.  */
+	if (deltaTime > 0.25f)
+		deltaTime = 0.25f;
+	if (deltaTime < 0.f)
+		deltaTime = 0.f;
+
+	Update(deltaTime);
+	LateUpdate();
+}
+
 #pragma region ForReady
 
 void Room::Accept_Player(PlayerRef Player)
 {
 	
-	WRITE_LOCK(m_playersLock);
 	_Players[Player->playerID] = Player;
 
 	// 현재 팀별 인원 수 계산
@@ -159,12 +227,11 @@ void Room::Accept_Player(PlayerRef Player)
 	playerData.IsReady = false;
 
 	_Player_States[Player->playerID] = playerData;
-	++RoomCurPlayerCnt;
+
 }
 
 void Room::Leave_Player(PlayerRef Player)
 {
-	WRITE_LOCK(m_playersLock);
 
 	const uint64 playerID = Player->playerID;
 
@@ -178,17 +245,16 @@ void Room::Leave_Player(PlayerRef Player)
 	if (stateIt != _Player_States.end())
 		_Player_States.erase(stateIt);
 
-	// 3. 현재 인원 수 감소
-	if (RoomCurPlayerCnt > 0)
-		--RoomCurPlayerCnt;
+	/*  인원 카운터는 여기서 내리지 않는다.
+	    Room_Manager::Client_LeaveRoom 이 락 안에서 ReturnPlayerSlot() 으로
+	    이미 내렸다. 그래야 "지금 이 방에 자리가 있나" 판단이 즉시 정확해진다
+	    (이 잡이 실행될 때까지 기다리면 나간 사람이 자리를 계속 차지한다). */
 
-	// 4. 플레이어가 모두 나간 경우 → 룸 비활성화
-
+	Player->OwenerSession.reset();
 }
 
 bool Room::Change_Player_Info(uint64 playerID, const Room_Ready_Data& newData)
 {
-	WRITE_LOCK(m_playersLock);
 
 	// 플레이어가 존재하는지 먼저 확인
 	auto it = _Player_States.find(playerID);
@@ -218,7 +284,6 @@ bool Room::Change_Player_Info(uint64 playerID, const Room_Ready_Data& newData)
 
 bool Room::Ready_Player(uint64 playerID)
 {
-	WRITE_LOCK(m_playersLock);
 
 	auto it = _Player_States.find(playerID);
 	if (it == _Player_States.end())
@@ -236,29 +301,27 @@ bool Room::Ready_Player(uint64 playerID)
 
 void Room::Set_Player_Lobby_State(Room_Ready_Data data, uint64 PlayerID)
 {
-	WRITE_LOCK(m_playersLock);
 	_Player_States[PlayerID] = data;
 
 }
 
 bool Room::Check_ClientLoading()
 {
-	READ_LOCK(m_playersLock);
-	if (Wait_LoadingCnt >= RoomCurPlayerCnt) {
-		return true;
-	}
-	return false;
+
+	/* 아무도 없는 방은 절대 시작하지 않는다.  */
+	if (RoomCurPlayerCnt == 0)
+		return false;
+
+	return Wait_LoadingCnt >= RoomCurPlayerCnt;
 }
 
 void Room::Clinet_Loading_Finish()
 {
-	WRITE_LOCK(m_playersLock);
 	Wait_LoadingCnt++;
 }
 
 bool Room::CanStartGame()
 {
-	READ_LOCK(m_playersLock);
 
 	if (_Player_States.empty())
 		return false;
@@ -274,7 +337,6 @@ bool Room::CanStartGame()
 
 bool Room::StartGame()
 {
-	WRITE_LOCK(m_lock);
 
 	if (CurState == ROOM_INGAME)
 		return false;
@@ -282,8 +344,33 @@ bool Room::StartGame()
 	CurState = ROOM_INGAME;
 	isStart = true;
 
+	/*  경과 시간의 기준점  */
+	_displayGameStartMs.store(GetNowMs());
+
 	return true;
 
+}
+
+// ----------------------------------------------------------------
+//  미리 옮겨 둔 _display* 원자값만 읽는다.
+// ----------------------------------------------------------------
+Room::FRoomLiveInfo Room::GetLiveInfo()
+{
+	FRoomLiveInfo info;
+
+	info.State     = CurState.load();
+	info.BlueGauge = _displayBlueGauge.load();
+	info.RedGauge  = _displayRedGauge.load();
+	info.TankCount = _displayTankCount.load();
+
+	if (info.State == ROOM_INGAME)
+	{
+		const int64 startMs = _displayGameStartMs.load();
+		if (startMs > 0)
+			info.ElapsedSec = static_cast<int>((GetNowMs() - startMs) / 1000);
+	}
+
+	return info;
 }
 
 void Room::BroadCast_LobbyInfo()
@@ -291,7 +378,6 @@ void Room::BroadCast_LobbyInfo()
 	std::vector<Room_Ready_Data> playerStates;
 	{
 
-	READ_LOCK(m_playersLock);
 
 		for (const auto& pair : _Player_States)
 		{
@@ -341,7 +427,7 @@ void Room::SpawnTanks()
 {
 	std::map<int, std::vector<Room_Ready_Data>> tankMap;
 
-	// 포지션 기반으로 그룹화 (짝수: 포탑, 홀수: 조종수 → 조종수 기준 그룹핑)
+	// 포지션 기반으로 그룹화
 	for (const auto& pair : _Player_States)
 	{
 		const Room_Ready_Data& player = pair.second;
@@ -393,9 +479,6 @@ void Room::SpawnTanks()
 			Vec3 Temp = { x, y + 50.f, z };
 			drone->SetDroneState(Temp,0,0,0);
 
-			// (선택) 상호 참조 세팅이 있다면 인덱스 교차 기록
-			// drone->SetOwnerTankIndex(tankIndex);
-			// 또는 tank->SetDroneIndex(tankIndex);
 
 			Room_ObjectManager.Add_Object(OBJ_DRONE, drone);
 		}
@@ -406,7 +489,6 @@ void Room::SpawnTanks()
 
 void Room::Change_Tank_INFO(int64 pID, const Matrix4x4& mat, const float& PotapAngle ,const float& PosinAngle)
 {
-	WRITE_LOCK(m_lock);
 	if (Tank* pTank = GetTankAt(pID))
 		pTank->SetTankState(mat, PotapAngle, PosinAngle);
 }
@@ -418,7 +500,6 @@ void Room::Broadcast_All_TankStates()
 
 	// 1. 모든 탱크 상태 수집
 	{
-		READ_LOCK(m_lock);
 		auto tankList = Room_ObjectManager.Get_List(OBJ_TANK);
 		if (tankList)
 		{
@@ -448,7 +529,6 @@ void Room::Broadcast_All_DroneState()
 
 	// 1. 모든 드론 상태 수집
 	{
-		READ_LOCK(m_lock);
 		auto DroneList = Room_ObjectManager.Get_List(OBJ_DRONE);
 		if (DroneList)
 		{
@@ -485,11 +565,6 @@ void Room::Broadcast_Hit_Weapon(Vec3 Pos)
 
 // ----------------------------------------------------------------
 //  방 안 전원에게 같은 버퍼를 보낸다.
-//
-//  ★ 반드시 락을 놓고 나서 Send 한다.
-//    Send 가 실패하면 그 자리에서 Disconnect -> Leave_Player 로 이어져
-//    m_playersLock 을 다시 잡는다. 락을 쥔 채로 보내면 그 순간 데드락이다.
-//    (덤으로, 접속 수만큼의 소켓 호출 동안 다른 스레드를 세워두지 않는다)
 // ----------------------------------------------------------------
 void Room::Broadcast(SendBufferRef sendBuffer)
 {
@@ -501,12 +576,11 @@ void Room::Broadcast(SendBufferRef sendBuffer)
 		session->Send(sendBuffer);
 }
 
-// 보낼 대상 세션만 락 안에서 뽑아 온다.
+// 보낼 대상 세션만 먼저 모은다(방 잡 안에서 호출).
 std::vector<SessionRef> Room::SnapshotSessions()
 {
 	std::vector<SessionRef> targets;
 
-	READ_LOCK(m_playersLock);
 	targets.reserve(_Players.size());
 
 	for (const auto& iter : _Players)
@@ -522,7 +596,6 @@ std::vector<SessionRef> Room::SnapshotSessions()
 // 특정 플레이어의 세션 하나만 꺼낸다. 없으면 nullptr.
 SessionRef Room::FindSession(uint64 playerID)
 {
-	READ_LOCK(m_playersLock);
 
 	auto it = _Players.find(playerID);
 	if (it == _Players.end() || !it->second)
@@ -538,10 +611,13 @@ SessionRef Room::FindSession(uint64 playerID)
 void Room::ShowRoomData()
 {
 	std::cout << "======== ROOM INFO ========" << std::endl;
-	std::cout << "RoomID: " << (int)RoomID << " | Current Players: " << RoomCurPlayerCnt << " / " << RoomMaxPlayerCnt << std::endl;
+	/* uint8 을 그대로 흘리면 숫자가 아니라 문자로 찍힌다. 원래도 그랬다. */
+	std::cout << "RoomID: " << (int)RoomID
+		<< " | Current Players: " << (int)RoomCurPlayerCnt
+		<< " / " << (int)RoomMaxPlayerCnt << std::endl;
 	std::cout << "Active: " << (isActive ? "True" : "False") << " | State: ";
 
-	switch (CurState)
+	switch (CurState.load())
 	{
 	case ROOM_UNACTIVATE:
 		break;
@@ -584,7 +660,6 @@ void Room::ShowRoomData()
 
 void Room::ShowTankState(uint8 Id)
 {
-	// GetTankState 가 이미 m_lock 을 잡는다. 여기서 또 잡으면 자기 자신을 기다린다.
 	Tank_INFO Tank0state = GetTankState(Id);
 	std::cout << "Tank  "<<  Id  <<"  상태" << std::endl;
 	std::cout << "X: " << Tank0state.Pos.X << std::endl;
@@ -600,7 +675,6 @@ void Room::ShowBulletCnt()
 
 	int BulletCnt = 0;
 	if (Room_ObjectManager.Get_List(OBJ_WEAPON)) {
-		READ_LOCK(m_lock);
 		BulletCnt = Room_ObjectManager.Get_List(OBJ_WEAPON)->size();
 	}
 	cout << "생성된 총알 : " << BulletCnt << " 개" << endl;
@@ -608,7 +682,6 @@ void Room::ShowBulletCnt()
 
 bool Room::Wait_Full(uint16 MaxPlayer)
 {
-	READ_LOCK(m_playersLock);
 	int playerCnt = (int)_Players.size();
 
 	std::cout << "플레이어 접속 대기 중" << std::endl;
@@ -626,14 +699,7 @@ bool Room::Wait_Full(uint16 MaxPlayer)
 #pragma endregion ForDebug
 
 // ================================================================
-//  인덱스로 탱크/드론 꺼내기 (m_lock 을 쥔 상태에서 호출)
-//
-//  ★ 예전에는 전부 이렇게 되어 있었다.
-//        dynamic_cast<Tank*>((*Get_List(OBJ_TANK))[index])->SetTankState(...)
-//    Get_List 는 리스트가 비어 있으면 nullptr 을 돌려주는데 그걸 그대로
-//    역참조했고, index 는 클라가 보낸 값인데 범위 검사도 없었다.
-//    그래서 "게임 시작 전(탱크가 아직 없을 때) 이동 패킷 한 방" 또는
-//    "말도 안 되는 tankIndex" 로 서버가 그냥 죽었다. 실제로 재현했다.
+//  인덱스로 탱크/드론 꺼내기 (방 잡 안에서 호출)
 // ================================================================
 Tank* Room::GetTankAt(int64 index)
 {
@@ -653,68 +719,139 @@ Drone* Room::GetDroneAt(int64 index)
 	return dynamic_cast<Drone*>((*droneList)[index]);
 }
 
+// ================================================================
+//  서버 검증
+//
+//  클라가 보낸 값을 그대로 저장하던 자리에 세 겹의 검사를 넣었다.
+//    거부하면 그냥 무시한다
+// ================================================================
+bool Room::IsMoveAllowed(Tank* pTank, const Vec3& pos, int64 nowMs)
+{
+	if (pTank == nullptr)
+		return false;
+
+	/*  1) 월드 경계.  */
+	if (pos.X < -WORLD_LIMIT_XZ || pos.X > WORLD_LIMIT_XZ ||
+		pos.Z < -WORLD_LIMIT_XZ || pos.Z > WORLD_LIMIT_XZ)
+	{
+		_rejectWorld.fetch_add(1);
+		return false;
+	}
+
+	// 2) 지형 높이. 지하 이동과 비행을 막는다.
+	const float terrainH = Terrain_Manager::GetInstance().Get_Height(pos.X, pos.Z);
+	if (pos.Y < terrainH - TERRAIN_ALLOW_BELOW ||
+		pos.Y > terrainH + TERRAIN_ALLOW_ABOVE)
+	{
+		_rejectTerrain.fetch_add(1);
+		return false;
+	}
+
+	// 3) 이동 속도. 텔레포트와 속도핵을 막는다.
+	if (!pTank->CheckMoveSpeed(pos, nowMs))
+	{
+		_rejectSpeed.fetch_add(1);
+		return false;
+	}
+
+	return true;
+}
+
+Room::FRejectCounters Room::GetRejectCount() const
+{
+	FRejectCounters c;
+	c.Shot    = _rejectShot.load();
+	c.Respawn = _rejectRespawn.load();
+	c.World   = _rejectWorld.load();
+	c.Terrain = _rejectTerrain.load();
+	c.Speed   = _rejectSpeed.load();
+	return c;
+}
+
 void Room::SetTankState(int64 index, const Matrix4x4& mat, const float& PotapAngle, const float& PosinAngle)
 {
-	WRITE_LOCK(m_lock);
 	if (Tank* pTank = GetTankAt(index))
 		pTank->SetTankState(mat, PotapAngle, PosinAngle);
 }
 
 void Room::SetTankPosin(int64 index, const float& PotapAngle, const float& PosinAngle) {
-	WRITE_LOCK(m_lock);
 	if (Tank* pTank = GetTankAt(index))
 		pTank->SetTankOnlyPosin(PosinAngle, PotapAngle);
 }
 
 void Room::SetTankPos(int64 index, const Matrix4x4& mat) {
 
-	WRITE_LOCK(m_lock);
 	if (Tank* pTank = GetTankAt(index))
 		pTank->SetTankOnlyPos(mat);
 }
 
-/* --- 위 세 개의 쿼터니언 판. 클라가 실제로 쓰는 경로는 이쪽이다. --- */
+/* --- 위 세 개의 쿼터니언. 클라가 실제로 쓰는 경로. --- */
 
 void Room::SetTankStateQuat(int64 index, const Vec3& pos, const Quat& rot,
 							const float& PotapAngle, const float& PosinAngle,
 							const int8* pWheelSag)
 {
-	WRITE_LOCK(m_lock);
-	if (Tank* pTank = GetTankAt(index))
+	Tank* pTank = GetTankAt(index);
+	if (!pTank)
+		return;
+
+	const int64 nowMs = GetNowMs();
+
+	/*  위치가 거부되면 포탑/포신도 같이 버리지 않는다.
+	    포탑은 포수가 보내는 값이라 이동 치트와 무관하다.  */
+	if (IsMoveAllowed(pTank, pos, nowMs))
 		pTank->SetTankStateQuat(pos, rot, PosinAngle, PotapAngle, pWheelSag);
+	else
+		pTank->SetTankOnlyPosin(PosinAngle, PotapAngle);
 }
 
 void Room::SetTankPosQuat(int64 index, const Vec3& pos, const Quat& rot, const int8* pWheelSag)
 {
-	WRITE_LOCK(m_lock);
-	if (Tank* pTank = GetTankAt(index))
+	Tank* pTank = GetTankAt(index);
+	if (!pTank)
+		return;
+
+	if (IsMoveAllowed(pTank, pos, GetNowMs()))
 		pTank->SetTankOnlyPosQuat(pos, rot, pWheelSag);
 }
 
 void Room::SetDroneState(int64 DroneIndex, const Vec3 Pos, float Yaw, float Roll, float Pitch)
 {
-	WRITE_LOCK(m_lock);
 	if (Drone* pDrone = GetDroneAt(DroneIndex))
 		pDrone->SetDroneState(Pos, Yaw, Roll, Pitch);
 }
 
 void Room::SetDroneRespawn(int64 index, const Matrix4x4& mat)
 {
-	WRITE_LOCK(m_lock);
 	if (Drone* pDrone = GetDroneAt(index))
 		pDrone->SetSpawn(mat);
 }
 
 void Room::SetTankRespawn(int64 index, const Matrix4x4& mat, const float& PotapAngle, const float& PosinAngle)
 {
-	WRITE_LOCK(m_lock);
-	if (Tank* pTank = GetTankAt(index))
-		pTank->SetSpawn(mat, PotapAngle, PosinAngle);
+	Tank* pTank = GetTankAt(index);
+	if (!pTank)
+		return;
+
+	/*  리스폰 대기(5초)  */
+	if (pTank->isSpawned())
+	{
+		_rejectRespawn.fetch_add(1);
+		return;     // 살아 있는데 부활 요청 - 무시
+	}
+
+	const int64 nowMs = GetNowMs();
+	if (nowMs - pTank->GetDeadTimeMs() < RESPAWN_COOLDOWN_MS - COOLDOWN_TOLERANCE_MS)
+	{
+		_rejectRespawn.fetch_add(1);
+		return;
+	}
+
+	pTank->SetSpawn(mat, PotapAngle, PosinAngle);
 }
 
 Tank_INFO Room::GetTankState(int64 index)
 {
-	READ_LOCK(m_lock);
 
 	if (Tank* pTank = GetTankAt(index))
 		return pTank->GetTankState();
@@ -724,7 +861,6 @@ Tank_INFO Room::GetTankState(int64 index)
 
 void Room::CreateBullet(int8 pID, uint8 tankindex,WEAPON_ID ID, Vec3 Dir, Vec3 Pos)
 {
-	WRITE_LOCK(m_lock);
 
 	switch (ID) {
 
@@ -732,7 +868,20 @@ void Room::CreateBullet(int8 pID, uint8 tankindex,WEAPON_ID ID, Vec3 Dir, Vec3 P
 	{
 		Tank* pShooter = GetTankAt(tankindex);
 		if (!pShooter)
-			return;     // 아직 탱크가 없거나 엉뚱한 인덱스 - 총알을 만들지 않는다
+			return;  
+
+		/*  재장전  */
+		const int64 nowMs = GetNowMs();
+		if (nowMs - pShooter->GetLastShotMs() < SHOT_COOLDOWN_MS - COOLDOWN_TOLERANCE_MS)
+		{
+			_rejectShot.fetch_add(1);
+			return;
+		}
+		pShooter->SetLastShotTime(nowMs);
+
+		// 죽은 탱크
+		if (!pShooter->isSpawned())
+			return;
 
 		bool isBlueTeam = pShooter->isBlueTeam();
 		GameObject* TempBullet = CAbstractFactory<Normal_Potan>::Create();
@@ -757,7 +906,6 @@ void Room::CreateBullet(int8 pID, uint8 tankindex,WEAPON_ID ID, Vec3 Dir, Vec3 P
 
 void Room::CreateBomb(uint8 playerID, uint8 TankIndex, uint8 AreaNum)
 {
-	WRITE_LOCK(m_lock);
 
 	if (AreaNum < 1 || AreaNum > 9) return;
 
@@ -784,7 +932,7 @@ void Room::CreateBomb(uint8 playerID, uint8 TankIndex, uint8 AreaNum)
 	}
 
 	// 배치 파라미터
-	constexpr int   bombsPerLine = 6;   // 줄당 6개 → 총 12개
+	constexpr int   bombsPerLine = 6;   // 줄당 6개
 	constexpr float PAD = 10.f;
 	constexpr float Z_OFFSET = 40.f; // 두 줄 간격
 	constexpr float BASE_ALT = 200.f; // 세계 좌측 끝에서의 기본 고도
@@ -845,7 +993,10 @@ void Room::Detect_Bullet_Tank_Collisions()
 		Normal_Potan* bullet = dynamic_cast<Normal_Potan*>(objBullet);
 		if (!bullet || bullet->isHit()) continue;
 
-		Vec3 bulletPos = bullet->GetPos();
+		/*  점이 아니라  선분으로 본다. */
+		const Vec3 bulletPrev = bullet->GetPrevPos();
+		const Vec3 bulletPos  = bullet->GetPos();
+
 		uint8 shooterPlayerID = bullet->GetOwnerID();
 		bool shooterTeam = bullet->isBlueTeam();
 
@@ -860,12 +1011,13 @@ void Room::Detect_Bullet_Tank_Collisions()
 
 			if (!targetTank->isSpawned()) continue;
 
-			// 충돌 판정
-			if (!CollisionManager::GetInstance()->CheckCollision_Point_Sphere(bulletPos, targetTank->GetPos(), 5.0f))
+			Vec3 hitPos;
+			if (!CollisionManager::GetInstance()->CheckCollision_Segment_OBB3D(
+					bulletPrev, bulletPos, targetTank->Get_OBB(), &hitPos))
 				continue;
 
-			// 충돌 시 처리
-			auto effectBuffer = CPacket_Handler::Make_S_WEAPON_HIT(bulletPos.X, bulletPos.Y, bulletPos.Z);
+			// 이펙트는 관통 지점이 아니라 처음 닿은 표면에 그린다.
+			auto effectBuffer = CPacket_Handler::Make_S_WEAPON_HIT(hitPos.X, hitPos.Y, hitPos.Z);
 			Broadcast(effectBuffer);
 
 			bullet->SetDead();
@@ -898,7 +1050,7 @@ void Room::Detect_Bullet_Tank_Collisions()
 			// 사망 판정
 			if (targetTank->IsDead())
 			{
-				targetTank->SetUnSpawn();
+				targetTank->SetUnSpawn(GetNowMs());
 
 				auto bufferDead = CPacket_Handler::Make_S_TANK_DEAD((uint8)i);
 				Broadcast(bufferDead);
@@ -922,7 +1074,6 @@ void Room::Detect_Bullet_Tank_Collisions()
 // 탱크 인덱스는 클라가 보낸 값이라 그대로 배열에 넣으면 안 된다.
 std::vector<Room_Ready_Data> Room::GetPassengersOf(uint8 tankIndex)
 {
-	READ_LOCK(m_lock);
 
 	auto tankList = Room_ObjectManager.Get_List(OBJ_TANK);
 	if (!tankList || tankIndex >= tankList->size())
@@ -981,37 +1132,19 @@ void Room::Detect_Bullet_Terrain_Collisions()
 		Normal_Potan* bullet = dynamic_cast<Normal_Potan*>(objBullet);
 		if (!bullet || bullet->isHit()) continue;
 
-		if (CollisionManager::GetInstance()->Check_Terrain_Collision(bullet))
+		/*  지형도 선분으로 본다. 점 판정이면 능선을 스치는 탄이 그냥 통과한다. */
+		Vec3 hitPos;
+		if (CollisionManager::GetInstance()->CheckCollision_Segment_Terrain(
+				bullet->GetPrevPos(), bullet->GetPos(), &hitPos))
 		{
-
-		
-
-			Vec3 hitPos = bullet->GetPos();
 			bullet->SetDead(); // 총알 제거
 
-			std::cout << "\n=== 지형 충돌 발생 ===" << std::endl;
-			std::cout << "총알 위치: X=" << hitPos.X << " Y=" << hitPos.Y << " Z=" << hitPos.Z << std::endl;
+			/*  ★ 여기서 지형 충돌마다 탱크 전원의 OBB 를 cout 으로 20줄씩 찍고 있었다.
+			    총알이 땅에 맞을 때마다 나오니 사격 중에는 거의 매 프레임이고,
+			    그게 디버그 콘솔의 고정 표를 아래로 밀어내며 화면을 채웠다.
+			    필요한 상태는 대시보드가 방 줄 옆에 그린다(Room::GetLiveInfo).
+			    콘솔 출력은 락이 걸린 느린 I/O 라, 게임 루프에서 부르는 것 자체가 손해다.  */
 
-			auto tankList = Room_ObjectManager.Get_List(OBJ_TANK);
-			if (tankList)
-			{
-				std::cout << "--- 탱크 OBB 정보 ---" << std::endl;
-				for (size_t i = 0; i < tankList->size(); ++i)
-				{
-					Tank* tank = dynamic_cast<Tank*>((*tankList)[i]);
-					if (!tank) continue;
-
-					OBB obb = tank->Get_OBB();
-
-					std::cout << "[탱크 " << i << "]" << std::endl;
-					std::cout << "Center: X=" << obb.center.X << " Y=" << obb.center.Y << " Z=" << obb.center.Z << std::endl;
-					std::cout << "HalfSize: X=" << obb.halfSize.X << " Y=" << obb.halfSize.Y << " Z=" << obb.halfSize.Z << std::endl;
-
-					std::cout << "Axis[0] (Right): X=" << obb.axis[0].X << " Y=" << obb.axis[0].Y << " Z=" << obb.axis[0].Z << std::endl;
-					std::cout << "Axis[1] (Up):    X=" << obb.axis[1].X << " Y=" << obb.axis[1].Y << " Z=" << obb.axis[1].Z << std::endl;
-					std::cout << "Axis[2] (Look):  X=" << obb.axis[2].X << " Y=" << obb.axis[2].Y << " Z=" << obb.axis[2].Z << std::endl;
-				}
-			}
 			auto sendBuffer = CPacket_Handler::Make_S_WEAPON_HIT(hitPos.X, hitPos.Y, hitPos.Z);
 			Broadcast(sendBuffer);
 		}
@@ -1090,56 +1223,61 @@ void Room::UpdateCaptureGauge(float deltaTime)
 		Broadcast(buffer);
 	}
 
-	// 디버깅 출력
-	std::cout << "점령률 → BLUE: " << blueGauge << " / RED: " << redGauge << std::endl;
-
 	if (blueGauge >= 100.f) OnTeamWin(true);
 	else if (redGauge >= 100.f) OnTeamWin(false);
 }
 
 void Room::ResetRoom()
 {
-	// 락 순서는 항상 m_lock -> m_playersLock 이다(반대로 잡는 곳이 없어야 한다).
-	{
-		WRITE_LOCK(m_lock);
+	/*  방 잡 안에서만 부를 것.
+	    Room_ObjectManager.Release() 가 오브젝트를 전부 delete 하므로*/
 
-		CurState = ROOM_WAITTING;
-		blueGauge = 0.f;
-		redGauge = 0.f;
-		isGameEnded = false;
+	CurState = ROOM_WAITTING;
+	blueGauge = 0.f;
+	redGauge = 0.f;
+	isGameEnded = false;
+	_resetTimer = 0.f;
 
-		Room_ObjectManager.Release(); // 모든 오브젝트 제거
-	}
+	/*  게이지 브로드캐스트 기준값도 되돌린다. 안 되돌리면 다음 판에서
+	    점령률이 지난 판 최고치를 넘기 전까지 S_CAPTURE 가 안 나간다. */
+	lastSentBlueGauge = 0;
+	lastSentRedGauge = 0;
 
-	{
-		WRITE_LOCK(m_playersLock);
-		Wait_LoadingCnt = 0;
-		for (auto& tankState : _Player_States)
-			tankState.second.IsReady = false;
-	}
+	Room_ObjectManager.Release(); // 모든 오브젝트 제거
+
+	Wait_LoadingCnt = 0;
+	for (auto& tankState : _Player_States)
+		tankState.second.IsReady = false;
+
+	/*  공개 스냅샷도 같이 되돌린다.   */
+	_displayBlueGauge.store(0);
+	_displayRedGauge.store(0);
+	_displayTankCount.store(0);
+	_displayGameStartMs.store(0);
+
+	_lastTickMs.store(0);
 }
 
 void Room::OnTeamWin(bool isBlueWinner)
 {
+	if (isGameEnded)
+		return;
+
 	isGameEnded = true;
 
-	// 승/패는 팀별로 다른 패킷이라 먼저 팀 정보를 락 안에서 뽑아 두고,
-	// 전송은 락 밖에서 한다(Broadcast 와 같은 이유).
-	std::vector<std::pair<SessionRef, bool>> targets;   // <세션, 승리팀인가>
+	// 승/패는 팀별로 다른 패킷이라 먼저 <세션, 이긴 팀인가> 로 모아 둔다.
+	std::vector<std::pair<SessionRef, bool>> targets;
+	targets.reserve(_Players.size());
+
+	for (const auto& pair : _Players)
 	{
-		READ_LOCK(m_playersLock);
-		targets.reserve(_Players.size());
+		const PlayerRef& player = pair.second;
+		if (!player || !player->OwenerSession) continue;
 
-		for (const auto& pair : _Players)
-		{
-			const PlayerRef& player = pair.second;
-			if (!player || !player->OwenerSession) continue;
+		auto stateIt = _Player_States.find(player->playerID);
+		if (stateIt == _Player_States.end()) continue;
 
-			auto stateIt = _Player_States.find(player->playerID);
-			if (stateIt == _Player_States.end()) continue;
-
-			targets.emplace_back(player->OwenerSession, stateIt->second.Team == isBlueWinner);
-		}
+		targets.emplace_back(player->OwenerSession, stateIt->second.Team == isBlueWinner);
 	}
 
 	SendBufferRef winMsg  = CPacket_Handler::Make_S_GAME_WIN(1);
@@ -1148,16 +1286,11 @@ void Room::OnTeamWin(bool isBlueWinner)
 	for (auto& target : targets)
 		target.first->Send(target.second ? winMsg : loseMsg);
 
-	// ★ 여기에 system("PAUSE") 가 있었다.
-	//   게임 루프 스레드가 콘솔 입력을 기다리며 멈춰 서서,
-	//   승패가 갈리는 순간 서버 전체가 정지했다.
 
-	// 3초 후 초기화 예약
-	std::thread([this]()
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(3));
-			this->ResetRoom();
-		}).detach();
+	/*  초기화는 여기서 하지 않는다. isGameEnded 를 세워 두면
+	    Room::Update 가 ROOM_RESET_DELAY 만큼 세고 ResetRoom 을 부른다.
+	    (그래야 방 잡 안에서, 아무도 이 방을 안 만지는 시점에 실행된다) */
+	_resetTimer = 0.f;
 }
 
 
@@ -1174,7 +1307,8 @@ void Room::Detect_Bomb_Tank_Collisions()
 		AirDrop_Bomb* bomb = dynamic_cast<AirDrop_Bomb*>(objBomb);
 		if (!bomb || bomb->isHit()) continue;
 
-		Vec3 bombPos = bomb->GetPos();
+		const Vec3 bombPrev = bomb->GetPrevPos();
+		const Vec3 bombPos  = bomb->GetPos();
 
 		// Bomb의 오너 정보 사용 (아군/적군 무관 타격)
 		const uint8 ownerPlayerID = bomb->GetOwnerID();
@@ -1191,13 +1325,15 @@ void Room::Detect_Bomb_Tank_Collisions()
 			if (!targetTank) continue;
 			if (!targetTank->isSpawned()) continue;
 
-			// 팀 구분 없음: 포인트-스피어 간단 충돌
-			if (!CollisionManager::GetInstance()->CheckCollision_Point_Sphere(bombPos, targetTank->GetPos(), 5.0f))
+			// 팀 구분 없음. 판정은 총알과 같은 선분 ↔ OBB.
+			Vec3 bombHitPos;
+			if (!CollisionManager::GetInstance()->CheckCollision_Segment_OBB3D(
+					bombPrev, bombPos, targetTank->Get_OBB(), &bombHitPos))
 				continue;
 
 			// 1) 이펙트 브로드캐스트
 			{
-				auto effectBuffer = CPacket_Handler::Make_S_WEAPON_HIT(bombPos.X, bombPos.Y, bombPos.Z);
+				auto effectBuffer = CPacket_Handler::Make_S_WEAPON_HIT(bombHitPos.X, bombHitPos.Y, bombHitPos.Z);
 				Broadcast(effectBuffer);
 			}
 
@@ -1217,7 +1353,7 @@ void Room::Detect_Bomb_Tank_Collisions()
 			// 5) 사망 시: DEAD 브로드캐스트 + (있다면) 오너에게 KILL
 			if (targetTank->IsDead())
 			{
-				targetTank->SetUnSpawn();
+				targetTank->SetUnSpawn(GetNowMs());
 
 				auto bufferDead = CPacket_Handler::Make_S_TANK_DEAD((uint8)i);
 				Broadcast(bufferDead);
@@ -1251,9 +1387,10 @@ void Room::Detect_Bomb_Terrain_Collisions()
 		AirDrop_Bomb* bomb = dynamic_cast<AirDrop_Bomb*>(objBomb);
 		if (!bomb || bomb->isHit()) continue;
 
-		if (CollisionManager::GetInstance()->Check_Terrain_Collision(bomb))
+		Vec3 hitPos;
+		if (CollisionManager::GetInstance()->CheckCollision_Segment_Terrain(
+				bomb->GetPrevPos(), bomb->GetPos(), &hitPos))
 		{
-			Vec3 hitPos = bomb->GetPos();
 			bomb->SetDead();
 
 			auto sendBuffer = CPacket_Handler::Make_S_WEAPON_HIT(hitPos.X, hitPos.Y, hitPos.Z);

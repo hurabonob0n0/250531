@@ -2,6 +2,7 @@
 #include "IOCP_Server.h"
 #include "Session_Manager.h"
 #include "Room_Manager.h"
+#include "RoomJobPool.h"
 #include "Protocol.h"
 
 CIOCP_Server::CIOCP_Server() {}
@@ -43,6 +44,10 @@ bool CIOCP_Server::Start(uint16_t nPort)
 
     StartAccept();
 
+    /*  방 잡 풀을 게임 루프보다 먼저 띄운다.
+        게임 루프가 첫 틱 잡을 밀어 넣는 순간 소화할 스레드가 있어야 한다.  */
+    CRoomJobPool::Get_Instance()->Start();
+
     m_gameThread  = std::thread(&CIOCP_Server::GameLoopThread, this);
     m_debugThread = std::thread(&CIOCP_Server::DebugConsoleThread, this);
     m_gameThread.detach();
@@ -55,7 +60,8 @@ bool CIOCP_Server::Start(uint16_t nPort)
         m_workerThreads.emplace_back(&CIOCP_Server::WorkerThread, this);
 
     std::cout << "[CIOCP_Server] 포트 " << nPort << " 대기 중 (워커 "
-              << nThreadCount << "개)" << std::endl;
+              << nThreadCount << "개, 방 잡 스레드 "
+              << CRoomJobPool::Get_Instance()->GetThreadCount() << "개)" << std::endl;
     return true;
 }
 
@@ -167,8 +173,7 @@ void CIOCP_Server::ReRegisterAccept(SessionRef pSession)
     {
         int nErr = WSAGetLastError();
         if (nErr != WSA_IO_PENDING)
-            std::cout << "[ReRegisterAccept] AcceptEx 실패: " << nErr
-                      << " Socket=" << pSession->GetSocket() << std::endl;
+            SERVER_LOG("AcceptEx 실패 " << nErr);
     }
 }
 
@@ -189,13 +194,13 @@ void CIOCP_Server::WorkerThread()
         CIOEvent* pIOEvent = reinterpret_cast<CIOEvent*>(pOver);
         if (pIOEvent == nullptr) continue;
 
+        /* 세션은 m_owner 로 찾는다 */
         CSession* pRawSession = pIOEvent->m_owner;
         if (pRawSession == nullptr) continue;
 
-        // 슬롯에서 shared_ptr 을 다시 꺼낸다.
-        // 처리 도중 다른 스레드가 세션을 반납해도 여기서 잡은 참조 덕에 살아 있다.
         SessionRef pSession =
             CSession_Manager::Get_Instance()->Get_Session(pRawSession->GetID());
+        if (pSession == nullptr) continue;
 
         if (pIOEvent->m_type == IOType::Accept)
         {
@@ -282,43 +287,37 @@ void CIOCP_Server::ProcessSend(SessionRef pSession)
 }
 
 // ----------------------------------------------------------------
-//  게임 루프 스레드
-//  예전에는 main 이 직접 돌렸다. 스레드로 떼어내야 main 이
-//  서버 수명(워커 join)만 책임지는 구조가 된다.
+//  게임 루프 스레드 - 틱을 밀어 넣음
 // ----------------------------------------------------------------
 void CIOCP_Server::GameLoopThread()
 {
-    using clock = std::chrono::high_resolution_clock;
+    using clock = std::chrono::steady_clock;
+    constexpr auto kFrameTime =
+        std::chrono::nanoseconds(1000000000LL / GAME_TICK_FPS);
 
-    const float fTargetFrameTime = 1.0f / static_cast<float>(GAME_TICK_FPS);
-    auto        previousTime     = clock::now();
+    auto nextTick = clock::now();
 
     while (true)
     {
-        auto  currentTime = clock::now();
-        float fDeltaTime  =
-            std::chrono::duration<float>(currentTime - previousTime).count();
-        previousTime = currentTime;
+        Room_Manager::Get_Instance()->Update(0.f);
 
-        Room_Manager::Get_Instance()->Update(fDeltaTime);
-        Room_Manager::Get_Instance()->Late_Update();
+        nextTick += kFrameTime;
 
-        // 프레임에 남은 시간만큼만 잔다.
-        // (예전 코드는 목표시간에서 "직전 프레임 소요"를 뺐기 때문에
-        //  실제 이번 프레임에 쓴 시간과 무관한 값으로 자고 있었다)
-        float fElapsed = std::chrono::duration<float>(
-            clock::now() - currentTime).count();
-        float fSleep = fTargetFrameTime - fElapsed;
-
-        if (fSleep > 0.f)
-            std::this_thread::sleep_for(std::chrono::duration<float>(fSleep));
+        const auto now = clock::now();
+        if (nextTick > now)
+        {
+            std::this_thread::sleep_until(nextTick);
+        }
+        else
+        {
+            /*  한 프레임보다 오래 걸렸다. 밀린 만큼 따라잡으려고 연속으로 돌면
+                더 밀리기만 하므로, 기준점을 지금으로 다시 잡고 다음 프레임으로 간다. */
+            nextTick = now;
+        }
     }
 }
 
-// ----------------------------------------------------------------
-//  콘솔 전체를 공백으로 덮고 커서를 좌상단으로 되돌린다.
-//  기동 로그를 한 번에 치우는 용도.
-// ----------------------------------------------------------------
+
 static void ClearConsoleAll(HANDLE hConsole)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -335,12 +334,6 @@ static void ClearConsoleAll(HANDLE hConsole)
 
 // ----------------------------------------------------------------
 //  디버그 콘솔 스레드
-//
-//  ★ 예전에는 Room_Manager::Update 가 매 프레임 system("cls") 를 부르고
-//    방 목록을 cout 으로 찍었다. 초당 60번 프로세스를 새로 띄우는 셈이라
-//    게임 루프가 콘솔에 묶여 있었다.
-//    여기서는 프레임 전체를 문자열로 만들어 DEBUG_PRINT_MS 마다 한 번만
-//    출력하고, 줄마다 콘솔 폭까지 공백을 채워 잔상을 지운다.
 // ----------------------------------------------------------------
 void CIOCP_Server::DebugConsoleThread()
 {
@@ -381,9 +374,17 @@ void CIOCP_Server::DebugConsoleThread()
               << "  / 포트 " << SERVER_PORT;
             line(l.str());
         }
+        {
+            /*  방 잡 풀이 살아 있는지 보는 칸 */
+            std::ostringstream l;
+            l << " 방 잡 스레드 " << CRoomJobPool::Get_Instance()->GetThreadCount()
+              << "  / 실행 대기 방 " << CRoomJobPool::Get_Instance()->GetWaitingRoomCount();
+            line(l.str());
+        }
         line("");
-        line(" ROOM   PLAYERS   STATE");
+        line(" ROOM   PLAYERS   STATE     TIME    CAPTURE (BLUE : RED)   TANKS   JOBS   REJECT (shot/resp/world/terr/spd)");
 
+        /*  방 목록*/
         std::vector<Room_Data> rooms = Room_Manager::Get_Instance()->Client_ShowRoom();
         for (const Room_Data& room : rooms)
         {
@@ -391,8 +392,63 @@ void CIOCP_Server::DebugConsoleThread()
             l << "  " << std::setw(3) << static_cast<int>(room.RoomID)
               << "     " << std::setw(2) << static_cast<int>(room.CurPlayer)
               << " / "   << std::setw(2) << static_cast<int>(room.MaxPlayer)
-              << "     " << (room.isActive ? "ACTIVE" : "idle");
+              << "     ";
+
+            Room* pRoom = Room_Manager::Get_Instance()->Get_Room(room.RoomID);
+            Room::FRoomLiveInfo info;
+            if (pRoom)
+                info = pRoom->GetLiveInfo();
+
+            const char* pState = "idle";
+            if (info.State == ROOM_INGAME)      pState = "INGAME";
+            else if (room.isActive)             pState = "WAIT";
+
+            l << std::left << std::setw(9) << pState << std::right;
+
+            if (info.State == ROOM_INGAME)
+            {
+                l << std::setw(3) << (info.ElapsedSec / 60) << ":"
+                  << std::setw(2) << std::setfill('0') << (info.ElapsedSec % 60)
+                  << std::setfill(' ')
+                  << "   " << std::setw(3) << info.BlueGauge << "% : "
+                  << std::setw(3) << info.RedGauge << "%"
+                  << "         " << std::setw(2) << info.TankCount;
+            }
+            else
+            {
+                l << std::setw(38) << " ";
+            }
+
+            /*  이 방의 잡 큐에 밀려 있는 개수.
+                평소 0~1 이어야 정상 */
+            if (pRoom)
+                l << std::setw(6) << pRoom->GetWaitingJobCount();
+
+            /*  서버 검증이 거부한 횟수 */
+            if (pRoom)
+            {
+                Room::FRejectCounters rej = pRoom->GetRejectCount();
+                if (rej.Total() > 0)
+                {
+                    l << "   " << std::setw(4) << rej.Shot
+                      << " /" << std::setw(4) << rej.Respawn
+                      << " /" << std::setw(4) << rej.World
+                      << " /" << std::setw(4) << rej.Terrain
+                      << " /" << std::setw(4) << rej.Speed;
+                }
+            }
+
             line(l.str());
+        }
+
+        line("");
+        line(" 최근 이벤트");
+
+        std::deque<std::string> logs = CServerLog::Get().Snapshot();
+        for (size_t i = 0; i < CServerLog::MAX_LINES; ++i)
+        {
+            if (i < logs.size()) line("   " + logs[i]);
+            else                 line("");
         }
 
         SetConsoleCursorPosition(hConsole, { 0, 0 });

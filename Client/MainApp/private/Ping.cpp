@@ -108,7 +108,11 @@ void CPing::Set_Position()
 		if (y > XMVectorGetY(LayContactPos))
 		{
 			isUnder = true;
-			XMVectorSetY(LayContactPos, y);
+
+			/*  XMVectorSetY 는 새 벡터를 '돌려주는' 함수다. 예전에는 반환값을 버려서
+				지형 높이로 맞추는 이 줄이 아무 일도 하지 않았고, 핑이 지면에 붙지 않고
+				레이가 지나간 자리(지면보다 약간 아래)에 찍히고 있었다.               */
+			LayContactPos = XMVectorSetY(LayContactPos, y);
 			break;
 		}
 	}
@@ -124,9 +128,22 @@ _vector CPing::Get_Pos()
 	return LayContactPos;
 }
 
+/*  서버가 준 좌표로 덮어쓴다. 짝(드론 조작자)이 찍은 핑을 받았을 때만 부른다.
+
+	★ isDead 를 반드시 되돌려야 한다.
+	   이 객체는 AddObject 로 만들어지고, 그 안의 Initialize 가 인자 없는
+	   Set_Position() 을 부른다. 그건 '내 드론 카메라' 에서 지형으로 레이를 쏘는
+	   함수인데, 받는 쪽(조종수)의 드론 카메라는 엉뚱한 데를 보고 있으므로 대개 빗나간다.
+	   그러면 isDead 가 서서, 바로 뒤에 좌표를 제대로 넣어줘도 다음 프레임에 사라졌다.
+	   지금 시점에는 서버가 준 지형 위 좌표가 확정돼 있으니 되살린다.
+
+	   표시 시간(5초)도 여기서 다시 잰다 - 생성 시점이 아니라 좌표가 정해진 시점부터다.  */
 void CPing::Set_Position(float x, float y, float z)
 {
 	LayContactPos = XMVectorSet(x, y, z, 1.f);
+
+	isDead      = false;
+	m_TimeDelta = 0.f;
 }
 
 void CPing::Free()

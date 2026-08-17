@@ -3,16 +3,11 @@
 #include <string>
 #include <iostream>
 #include <mutex>
+#include <chrono>
 #include <type_traits>
 
 // ================================================================
 //  서버 전역 설정
-//
-//  ServerCore(루키스 프레임워크)를 걷어내면서 흩어져 있던 상수와
-//  락 선택을 이 파일 하나로 모았다. pch.h 가 이 헤더를 include 하므로
-//  모든 TU 가 같은 값을 본다(플래그가 멤버의 타입을 바꾸므로 이 일관성이
-//  필수 - 일부만 재컴파일되면 ODR 위반으로 메모리가 조용히 깨진다).
-//  값을 바꾸면 반드시 전체 리빌드할 것.
 // ================================================================
 
 #define DISABLE             0
@@ -21,7 +16,7 @@
 // ---- 네트워크 ----
 constexpr uint16_t SERVER_PORT        = 7777;
 constexpr int32_t  MAX_SESSION        = 1000;   // 세션 슬롯 수(고정 크기 array)
-constexpr int32_t  ACCEPT_POOL_SIZE   = 32;     // 미리 걸어두는 AcceptEx 개수
+constexpr int32_t  ACCEPT_POOL_SIZE   = 32;     // 미리 걸어두는 AcceptEx
 
 // ---- 게임 루프 ----
 constexpr int32_t  GAME_TICK_FPS      = 60;     // Room_Manager Update 주기
@@ -31,11 +26,40 @@ constexpr int32_t  DEBUG_PRINT_MS     = 500;    // 콘솔 대시보드 갱신 �
 constexpr int32_t  MAX_ROOM           = 10;
 
 // ================================================================
-//  락 방식 토글 (before/after 비교용)
-//  아래 값을 바꾸고 전체 리빌드.
+//  서버 검증용
 // ================================================================
-#define RW_LOCK_MUTEX       0   // std::mutex           (기준선)
-#define RW_LOCK_SPIN        1   // 직접 구현한 스핀락    (RWLock.h)
+
+constexpr int64_t  SHOT_COOLDOWN_MS    = 3000;
+constexpr int64_t  RESPAWN_COOLDOWN_MS = 5000;
+
+/*  클라 타이머가 서버보다 조금 빨리 돌거나 패킷이 몰려 도착할 수 있다.
+    정당한 플레이가 걸리지 않도록 마진                    */
+constexpr int64_t  COOLDOWN_TOLERANCE_MS = 150;
+
+// 월드 크기.
+constexpr float    WORLD_LIMIT_XZ      = 2000.f;
+
+/*  지형 높이 허용 범위 */
+constexpr float    TERRAIN_ALLOW_BELOW = 10.f;
+constexpr float    TERRAIN_ALLOW_ABOVE = 80.f;
+
+/*  이동 속도 검증 - 누적 방식.
+     시간이 흐르는 만큼 이동 허용량을 누적하고 감소가 적립을 넘을 때만 거부*/
+constexpr float    MAX_TANK_SPEED        = 40.f;   // 유닛/초
+constexpr float    MAX_ALLOWED_MOVE_DIST = MAX_TANK_SPEED * 0.5f;  // 지터 흡수용 상한
+
+
+
+inline int64_t GetNowMs()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+
+
+#define RW_LOCK_MUTEX       0   // std::mutex        
+#define RW_LOCK_SPIN        1   // 직접 구현한 스핀락   
 #define RW_LOCK_SHARED      2   // std::shared_mutex
 
 #define USE_RW_LOCK         RW_LOCK_MUTEX
@@ -71,8 +95,7 @@ static_assert(std::is_same<FRWLock, std::mutex>::value,
               "USE_RW_LOCK이 MUTEX인데 FRWLock이 mutex가 아니다");
 #endif
 
-// 한 스코프에서 여러 번 잠글 수 있도록 변수 이름에 줄번호를 붙인다.
-// __LINE__ 이 숫자로 바뀌기 전에 붙어버리는 것을 막으려고 한 겹 더 전개한다.
+// 한 스코프에서 여러 번 잠글 수 있도록 변수 이름에 줄번호를 붙인다
 #define SC_CONCAT_IMPL(a, b) a##b
 #define SC_CONCAT(a, b)      SC_CONCAT_IMPL(a, b)
 
@@ -81,7 +104,7 @@ static_assert(std::is_same<FRWLock, std::mutex>::value,
 
 // ================================================================
 //  기동 시 현재 설정 출력
-//  측정 로그에 이 태그를 남겨야 나중에 어느 빌드의 수치인지 비교가 된다.
+
 // ================================================================
 inline std::string GetServerConfigTag()
 {

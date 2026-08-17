@@ -27,6 +27,8 @@ bool Network_Manager::Initialize(const std::wstring& ip, uint16 port)
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 		return false;
 
+	_wsaStarted = true;		/* Disconnect 가 WSACleanup 을 딱 한 번만 부르도록 */
+
 	_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_socket == INVALID_SOCKET)
 		return false;
@@ -62,9 +64,7 @@ bool Network_Manager::Initialize(const std::wstring& ip, uint16 port)
 
 void Network_Manager::Disconnect()
 {
-	// exchange 를 통과한 스레드만 정리에 들어간다.
-	if (_connected.exchange(false) == false)
-		return;
+	_connected = false;
 
 	if (_socket != INVALID_SOCKET)
 	{
@@ -77,7 +77,11 @@ void Network_Manager::Disconnect()
 	if (_recvThread.joinable())
 		_recvThread.join();
 
-	WSACleanup();
+	if (_wsaStarted)
+	{
+		WSACleanup();
+		_wsaStarted = false;
+	}
 }
 
 // ================================================================

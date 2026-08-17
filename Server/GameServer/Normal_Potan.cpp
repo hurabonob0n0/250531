@@ -37,6 +37,10 @@ void Normal_Potan::SetInitData(Vec3& normalizedDirection, Vec3& startPos,uint8 T
 
     OwnerID = ID;
     _myPos = startPos;
+
+    /*  ★ 선분 판정의 시작점. 여기서 안 채우면 첫 틱에 (0,0,0) → 총구 선분이
+        만들어져 맵을 가로지르며 도중의 모든 탱크에 맞는다.  */
+    _prevPos = startPos;
     direction = normalizedDirection;   // 정규화된 방향벡터 멤버 변수로 저장                    // 초기 속도 멤버 변수로 고정
     velocity = {
         direction.X * speed,
@@ -50,6 +54,8 @@ void Normal_Potan::SetInitData(Vec3& normalizedDirection, Vec3& startPos,uint8 T
 
 void Normal_Potan::Process_Move(float deltaTime)
 {
+    Save_PrevPos();     // 이번 틱의 선분 시작점
+
     Vec3 gravity = { 0.f, -6.8f, 0.f };
 
     // 중력 가속도를 velocity에 더함 (v = v + a * dt)

@@ -95,11 +95,26 @@ public:
     CIOEvent*   GetAcceptEvent() { return &m_acceptEvent; }
 
     // ---- 이 세션에 붙어 있는 플레이어 ----
-    // 예전 ClientSession::_players 는 vector 였지만 실제로는 전부
-    // _players[0] 으로만 접근했다(로그인 안 한 세션에서는 그게 곧 크래시).
-    // 세션당 한 명으로 고정하고, 없으면 nullptr 을 돌려준다.
-    void        SetPlayer(PlayerRef pPlayer) { m_pPlayer = pPlayer; }
-    PlayerRef   GetPlayer()                  { return m_pPlayer; }
+    // 세션당 한 명으로 고정, 없으면 nullptr 을 돌려준다.
+
+    void        SetPlayer(PlayerRef pPlayer)
+    {
+        std::lock_guard<std::mutex> lock(m_playerLock);
+        m_pPlayer = std::move(pPlayer);
+    }
+    PlayerRef   GetPlayer()
+    {
+        std::lock_guard<std::mutex> lock(m_playerLock);
+        return m_pPlayer;
+    }
+    // 꺼내면서 동시에 비운다. Disconnect 가 딱 한 번 가져가기 위한 것.
+    PlayerRef   TakePlayer()
+    {
+        std::lock_guard<std::mutex> lock(m_playerLock);
+        PlayerRef p = std::move(m_pPlayer);
+        m_pPlayer.reset();
+        return p;
+    }
 
 private:
     void        ProcessRecvData(int32_t nNewBytes);
@@ -128,5 +143,6 @@ private:
     // accept
     CIOEvent m_acceptEvent{ IOType::Accept };
 
-    PlayerRef m_pPlayer;
+    PlayerRef  m_pPlayer;
+    std::mutex m_playerLock;   // m_pPlayer 전용. 짧게만 잡는다.
 };

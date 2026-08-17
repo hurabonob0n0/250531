@@ -71,7 +71,30 @@ public:
 
 	void SetSpawn(const Matrix4x4& mat, float PosinAngle, float PotapAngle);
 	bool isSpawned() { return Spawn; };
-	void SetUnSpawn() { Spawn = false; };
+	void SetUnSpawn(int64 nowMs) { Spawn = false; _deadAtMs = nowMs; };
+
+public:
+	// ================================================================
+	//  서버 검증용 상태 (안티치트)
+	// ================================================================
+
+	int64 GetLastShotMs() const { return _lastShotMs; }
+	void  SetLastShotTime(int64 nowMs) { _lastShotMs = nowMs; }
+
+	int64 GetDeadTimeMs()   const { return _deadAtMs; }
+
+	/*  정당한 순간이동(스폰/리스폰) 뒤에 부른다.
+	    안 부르면 스폰 좌표로 튄 것이 속도 위반으로 잡힌다.  */
+	void  ResetMoveCheck(int64 nowMs, const Vec3& pos)
+	{
+		_lastMoveMs      = nowMs;
+		_allowedMoveDist      = MAX_ALLOWED_MOVE_DIST;
+		_lastAcceptedPos = pos;
+	}
+
+	/*  이동 예산을 갱신하고 이번 이동이 허용되는지 답한다.
+	    허용되면 예산에서 이동 거리를 뺀다(거부되면 빼지 않는다).  */
+	bool CheckMoveSpeed(const Vec3& newPos, int64 nowMs);
 
 	uint64				playerId = 0;
 private:
@@ -84,6 +107,13 @@ private:
 	
 	
 	bool Spawn;
+
+	// ---- 서버 검증 상태 ----
+	int64				_lastShotMs = 0;    // 마지막 발포 시각(서버 기준)
+	int64				_deadAtMs   = 0;    // 사망 시각. 리스폰 쿨타임의 기준
+	int64				_lastMoveMs = 0;    // 마지막 위치 갱신 시각
+	float				_allowedMoveDist = 0.f;  // 남은 이동 허용량(유닛)
+	Vec3				_lastAcceptedPos;   // 마지막으로 통과시킨 좌표
 
 	OBB					_obbBox;
 	std::vector<Room_Ready_Data> passengers;

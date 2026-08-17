@@ -24,11 +24,6 @@ public:
 
 	void Process_Objectdata(RECV_Data input, int ID, int PlayerID);
 
-
-
-	// ★ 예전에는 vRooms 가 비어있지 않기만 하면 그대로 vRooms[roomID] 를 돌려줬다.
-	//   로비에 있는 플레이어의 RoomNum 은 ROBBY(9999) 라, 로비 상태에서
-	//   패킷이 하나만 와도 10칸짜리 벡터를 9999번으로 읽었다.
 	Room* Get_Room(uint32 roomID) {
 		if (roomID >= vRooms.size())
 			return nullptr;
@@ -37,26 +32,38 @@ public:
 
 	void		DeleteRoom(uint32 roomID);
 
-
+private:
+	// 예약이 끝난 방에 실제 명단 등록 잡을 넘긴다(Create/Enter 공통).
+	void Push_Accept_Player(Room* pRoom, PlayerRef player);
 
 public:
 
+
+
+public:
+	// ================================================================
+	//  로비 조작
+	//  아래 함수들은 방 상태를 직접 바꾸지 않고 잡 큐에 밀어 넣은 즉시 돌아온다.
+	// ================================================================
+
+	// 성공하면 방 번호, 실패하면 ROOM_CREATE_ERROR / ROOM_ENTER_ERROR.
+	// 성공 시 player->RoomNum 도 이 안에서 채운다.
 	int  Client_CreateRoom(PlayerRef player);
 	int  Client_EnterRoom(uint32 RoomID, PlayerRef player);
-	bool Client_LeaveRoom(uint32 RoomID, PlayerRef player);
 
+	// 자리를 즉시 반납하고, 명단 제거와 로비 통보는 방 잡에서 한다.
+	void Client_LeaveRoom(uint32 RoomID, PlayerRef player);
 
-	bool Client_ChangeINFO(uint32 ROOMID, uint64 PlayerID, Room_Ready_Data data);
-	bool Ready_Player(uint32 RoomID, uint64 PlayerID);
+	void Client_ChangeINFO(uint32 ROOMID, uint64 PlayerID, Room_Ready_Data data);
+	void Ready_Player(uint32 RoomID, uint64 PlayerID);
 	void Client_LOADING_FINISH(uint32 ROOMID);
 
 	void BroadCast_LobbyState(uint32 roomID);
-	void BroadCast_Game_Start(uint32 roomID);
 
-
+	// 전원 Ready 인지 확인하는 것까지 잡 안에서 한다(예전 Check_StartGame + BroadCast).
+	void Try_Start_Game(uint32 roomID);
 
 	void SetTankByRoomIndex(int RoomID,int64 pID,const Matrix4x4& mat, const float& PosinAngle, const float& PotapAngl);
-	bool Check_StartGame(uint32 RoomID);
 
 	std::vector<Room_Data> Client_ShowRoom();
 
