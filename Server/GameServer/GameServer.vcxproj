@@ -170,6 +170,7 @@
     <ClCompile Include="Packet_Handler.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomJobPool.cpp" />
     <ClCompile Include="Room_Manager.cpp" />
     <ClCompile Include="SGlobal.cpp" />
     <ClCompile Include="Session.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Drone.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="IOCP_Server.h" />
+    <ClInclude Include="JobQueue.h" />
     <ClInclude Include="Normal_Potan.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Packet_Handler.h" />
@@ -201,8 +203,10 @@
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="RWLock.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomJobPool.h" />
     <ClInclude Include="Room_Manager.h" />
     <ClInclude Include="SGlobal.h" />
+    <ClInclude Include="ServerLog.h" />
     <ClInclude Include="SendBuffer.h" />
     <ClInclude Include="ServerConfig.h" />
     <ClInclude Include="Session.h" />

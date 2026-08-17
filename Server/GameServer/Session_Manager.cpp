@@ -5,7 +5,12 @@ CSession_Manager* CSession_Manager::m_pInstance = nullptr;
 
 CSession_Manager::CSession_Manager()
 {
-    // m_sessions 배열은 shared_ptr 기본값(nullptr)으로 자동 초기화된다.
+    for (int32_t i = 0; i < MAX_SESSION; ++i)
+    {
+        m_sessions[i] = std::make_shared<CSession>();
+        m_sessions[i]->SetID(i);
+        m_inUse[i] = false;
+    }
 }
 
 int32_t CSession_Manager::Assign()
@@ -15,10 +20,9 @@ int32_t CSession_Manager::Assign()
 
     for (int32_t i = 0; i < MAX_SESSION; ++i)
     {
-        if (m_sessions[i] == nullptr)
+        if (!m_inUse[i])
         {
-            m_sessions[i] = std::make_shared<CSession>();
-            m_sessions[i]->SetID(i);
+            m_inUse[i] = true;      // 객체는 이미 있다. 쓰겠다는 표시만 한다.
             m_count++;
             return i;
         }
@@ -29,8 +33,6 @@ int32_t CSession_Manager::Assign()
 SessionRef CSession_Manager::Get_Session(int32_t nID)
 {
     if (nID < 0 || nID >= MAX_SESSION) return nullptr;
-
-    // 읽기 전용. 워커가 모든 완료(Accept/Recv/Send)마다 부르는 최다 호출 지점.
     READ_LOCK(m_lock);
     return m_sessions[nID];
 }
@@ -41,9 +43,9 @@ void CSession_Manager::Release(int32_t nID)
 
     WRITE_LOCK(m_lock);
 
-    if (m_sessions[nID] != nullptr)
+    if (m_inUse[nID])
     {
-        m_sessions[nID] = nullptr;
+        m_inUse[nID] = false;   // 객체는 다음 접속이 재사용
         m_count--;
     }
 }
@@ -59,7 +61,8 @@ void CSession_Manager::Broadcast(SendBufferRef sendBuffer)
         READ_LOCK(m_lock);
         for (int32_t i = 0; i < MAX_SESSION; ++i)
         {
-            if (m_sessions[i] && m_sessions[i]->IsConnected())
+            // 슬롯은 늘 채워져 있으므로 접속 여부만 본다.
+            if (m_inUse[i] && m_sessions[i]->IsConnected())
                 targets.push_back(m_sessions[i]);
         }
     }

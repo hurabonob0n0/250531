@@ -174,6 +174,10 @@ private:
 	SOCKET				_socket = INVALID_SOCKET;
 	std::atomic<bool>	_connected = false;
 	std::thread			_recvThread;
+
+	/*  WSAStartup 을 했는지. _connected 로 대신 판단하면 안 된다 -
+		수신 스레드가 스스로 끝나면서 _connected 를 내려버리기 때문이다.  */
+	bool				_wsaStarted = false;
 	std::mutex			_sendLock;      // send 는 스레드 하나만 들어가야 한다
 
 	// 수신 버퍼. 링버퍼가 아니라, 남은 조각을 배열 앞으로 당겨 이어 붙인다.

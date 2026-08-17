@@ -35,7 +35,7 @@ VertexOut VS(VertexIn vin)
 
 	// Fetch the material data.
     MaterialData matData = gMaterialData[gMaterialIndex];
-	
+
     // Transform to world space.
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosW = posW.xyz;

@@ -17,7 +17,7 @@ static Atomic<uint64> g_ClientID = 0;
 static Room* GetRoomOf(const PlayerRef& pPlayer)
 {
     if (!pPlayer) return nullptr;
-    return Room_Manager::Get_Instance()->Get_Room(static_cast<uint32>(pPlayer->RoomNum));
+    return Room_Manager::Get_Instance()->Get_Room(static_cast<uint32>(pPlayer->RoomNum.load()));
 }
 
 void CPacket_Handler::Handle(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -109,7 +109,7 @@ void CPacket_Handler::Handle_C_MOVEMENT(SessionRef pSession, uint8_t* pBuffer, i
     float posinRotation = 0.f;
     br >> potapRotation >> posinRotation;
 
-    int8 wheelSag[TANK_WHEEL_COUNT] = {};
+    std::array<int8, TANK_WHEEL_COUNT> wheelSag{};
     for (int i = 0; i < TANK_WHEEL_COUNT; ++i)
         br >> wheelSag[i];
 
@@ -117,7 +117,11 @@ void CPacket_Handler::Handle_C_MOVEMENT(SessionRef pSession, uint8_t* pBuffer, i
     if (br.IsUnderflow())
         return;
 
-    pRoom->SetTankStateQuat(tankIndex, pos, rot, potapRotation, posinRotation, wheelSag);
+    pRoom->PushJob([pRoom, tankIndex, pos, rot, potapRotation, posinRotation, wheelSag]()
+        {
+            pRoom->SetTankStateQuat(tankIndex, pos, rot,
+                                    potapRotation, posinRotation, wheelSag.data());
+        });
 }
 
 void CPacket_Handler::Handle_C_POS_MOVE(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -138,14 +142,17 @@ void CPacket_Handler::Handle_C_POS_MOVE(SessionRef pSession, uint8_t* pBuffer, i
     br >> pos.X >> pos.Y >> pos.Z
        >> rot.X >> rot.Y >> rot.Z >> rot.W;
 
-    int8 wheelSag[TANK_WHEEL_COUNT] = {};
+    std::array<int8, TANK_WHEEL_COUNT> wheelSag{};
     for (int i = 0; i < TANK_WHEEL_COUNT; ++i)
         br >> wheelSag[i];
 
     if (br.IsUnderflow())
         return;
 
-    pRoom->SetTankPosQuat(tankIndex, pos, rot, wheelSag);
+    pRoom->PushJob([pRoom, tankIndex, pos, rot, wheelSag]()
+        {
+            pRoom->SetTankPosQuat(tankIndex, pos, rot, wheelSag.data());
+        });
 }
 
 void CPacket_Handler::Handle_C_POSIN_MOVE(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -163,7 +170,10 @@ void CPacket_Handler::Handle_C_POSIN_MOVE(SessionRef pSession, uint8_t* pBuffer,
     float posinRotation = 0.f;
     br >> tankIndex >> potapRotation >> posinRotation;
 
-    pRoom->SetTankPosin(tankIndex, potapRotation, posinRotation);
+    pRoom->PushJob([pRoom, tankIndex, potapRotation, posinRotation]()
+        {
+            pRoom->SetTankPosin(tankIndex, potapRotation, posinRotation);
+        });
 }
 
 void CPacket_Handler::Handle_C_SHOT(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -183,8 +193,12 @@ void CPacket_Handler::Handle_C_SHOT(SessionRef pSession, uint8_t* pBuffer, int32
        >> initPos.X >> initPos.Y >> initPos.Z
        >> normalizedDir.X >> normalizedDir.Y >> normalizedDir.Z;
 
-    pRoom->CreateBullet(static_cast<int8>(pPlayer->playerID), tankIndex,
-                        WEAPON_NPOTAN, normalizedDir, initPos);
+    const int8 shooterID = static_cast<int8>(pPlayer->playerID);
+
+    pRoom->PushJob([pRoom, shooterID, tankIndex, normalizedDir, initPos]()
+        {
+            pRoom->CreateBullet(shooterID, tankIndex, WEAPON_NPOTAN, normalizedDir, initPos);
+        });
 }
 
 void CPacket_Handler::Handle_C_TANK_RESPAWN(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -209,8 +223,13 @@ void CPacket_Handler::Handle_C_TANK_RESPAWN(SessionRef pSession, uint8_t* pBuffe
     float posinRotation = 0.f;
     br >> potapRotation >> posinRotation;
 
-    pRoom->SetTankRespawn(tankIndex, mat, potapRotation, posinRotation);
-    pRoom->Send_RespawnPacket(tankIndex);
+    /*  둘을 한 잡에 묶는다. 따로 밀면 그 사이에 다른 패킷 잡이 끼어들어
+        "리스폰 통보는 갔는데 좌표는 아직 옛날 것" 인 순간이 생긴다. */
+    pRoom->PushJob([pRoom, tankIndex, mat, potapRotation, posinRotation]()
+        {
+            pRoom->SetTankRespawn(tankIndex, mat, potapRotation, posinRotation);
+            pRoom->Send_RespawnPacket(tankIndex);
+        });
 }
 
 void CPacket_Handler::Handle_C_DRONE_MOVE(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -229,7 +248,12 @@ void CPacket_Handler::Handle_C_DRONE_MOVE(SessionRef pSession, uint8_t* pBuffer,
 
     br >> droneIndex >> posX >> posY >> posZ >> yaw >> roll >> pitch;
 
-    pRoom->SetDroneState(droneIndex, Vec3(posX, posY, posZ), yaw, roll, pitch);
+    const Vec3 dronePos(posX, posY, posZ);
+
+    pRoom->PushJob([pRoom, droneIndex, dronePos, yaw, roll, pitch]()
+        {
+            pRoom->SetDroneState(droneIndex, dronePos, yaw, roll, pitch);
+        });
 }
 
 void CPacket_Handler::Handle_C_AIRDROP(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -246,7 +270,12 @@ void CPacket_Handler::Handle_C_AIRDROP(SessionRef pSession, uint8_t* pBuffer, in
     uint8 areaIndex = 0;
     br >> tankIndex >> areaIndex;
 
-    pRoom->CreateBomb(static_cast<uint8>(pPlayer->playerID), tankIndex, areaIndex);
+    const uint8 ownerID = static_cast<uint8>(pPlayer->playerID);
+
+    pRoom->PushJob([pRoom, ownerID, tankIndex, areaIndex]()
+        {
+            pRoom->CreateBomb(ownerID, tankIndex, areaIndex);
+        });
 }
 
 void CPacket_Handler::Handle_C_TANKSOUND(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -263,7 +292,10 @@ void CPacket_Handler::Handle_C_TANKSOUND(SessionRef pSession, uint8_t* pBuffer, 
     float engVol = 0.f, engPit = 0.f, trkVol = 0.f, trkPit = 0.f;
     br >> tankIndex >> engVol >> engPit >> trkVol >> trkPit;
 
-    pRoom->Send_SoundData(tankIndex, engVol, engPit, trkVol, trkPit);
+    pRoom->PushJob([pRoom, tankIndex, engVol, engPit, trkVol, trkPit]()
+        {
+            pRoom->Send_SoundData(tankIndex, engVol, engPit, trkVol, trkPit);
+        });
 }
 
 void CPacket_Handler::Handle_C_ADD_PING(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -280,7 +312,10 @@ void CPacket_Handler::Handle_C_ADD_PING(SessionRef pSession, uint8_t* pBuffer, i
     float x = 0.f, y = 0.f, z = 0.f;
     br >> tankIndex >> x >> y >> z;
 
-    pRoom->Send_PingData(tankIndex, x, y, z);
+    pRoom->PushJob([pRoom, tankIndex, x, y, z]()
+        {
+            pRoom->Send_PingData(tankIndex, x, y, z);
+        });
 }
 
 // ---- 방 ----
@@ -295,12 +330,9 @@ void CPacket_Handler::Handle_C_CREATE_ROOM(SessionRef pSession, uint8_t* /*pBuff
     PlayerRef pPlayer = pSession->GetPlayer();
     if (!pPlayer) return;
 
-    const int nRoomID = Room_Manager::Get_Instance()->Client_CreateRoom(pPlayer);
-    if (nRoomID == ROOM_CREATE_ERROR)
-        return;     // 빈 방이 없다
-
-    pPlayer->RoomNum = nRoomID;
-    Room_Manager::Get_Instance()->BroadCast_LobbyState(nRoomID);
+    /*  RoomNum 설정과 로비 통보는 Client_CreateRoom 안에서 한다.
+        (RoomNum 은 자리 예약과 같은 락 안에서, 통보는 명단 등록 잡 안에서) */
+    Room_Manager::Get_Instance()->Client_CreateRoom(pPlayer);
 }
 
 void CPacket_Handler::Handle_C_JOIN_ROOM(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -313,12 +345,8 @@ void CPacket_Handler::Handle_C_JOIN_ROOM(SessionRef pSession, uint8_t* pBuffer, 
     uint32        nRoomID = 0;
     br >> header >> nRoomID;
 
-    const int nResult = Room_Manager::Get_Instance()->Client_EnterRoom(nRoomID, pPlayer);
-    if (nResult == ROOM_ENTER_ERROR)
-        return;     // 입장 실패면 RoomNum 을 바꾸면 안 된다
-
-    pPlayer->RoomNum = nResult;
-    Room_Manager::Get_Instance()->BroadCast_LobbyState(nResult);
+    // 실패하면 RoomNum 을 건드리지 않는다(Client_EnterRoom 안에서 판단).
+    Room_Manager::Get_Instance()->Client_EnterRoom(nRoomID, pPlayer);
 }
 
 void CPacket_Handler::Handle_C_EXIT_ROOM(SessionRef pSession, uint8_t* /*pBuffer*/, int32_t /*nSize*/)
@@ -327,11 +355,14 @@ void CPacket_Handler::Handle_C_EXIT_ROOM(SessionRef pSession, uint8_t* /*pBuffer
     if (!pPlayer) return;
     if (pPlayer->RoomNum == ROBBY) return;
 
-    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum);
+    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum.load());
 
-    Room_Manager::Get_Instance()->Client_LeaveRoom(nRoomID, pPlayer);
-    Room_Manager::Get_Instance()->BroadCast_LobbyState(nRoomID);
+    /*  ★ RoomNum 을 먼저 되돌린다.
+        Client_LeaveRoom 이 자리를 반납한 순간부터 이 플레이어는 그 방 사람이
+        아니다. 나중에 되돌리면 그 사이 들어온 이동 패킷이 이미 나간 방의
+        잡 큐로 들어간다. 로비 통보는 퇴장 잡 안에서 한다.                  */
     pPlayer->RoomNum = ROBBY;
+    Room_Manager::Get_Instance()->Client_LeaveRoom(nRoomID, pPlayer);
 }
 
 void CPacket_Handler::Handle_C_CHANGE_INFO(SessionRef pSession, uint8_t* pBuffer, int32_t nSize)
@@ -346,10 +377,10 @@ void CPacket_Handler::Handle_C_CHANGE_INFO(SessionRef pSession, uint8_t* pBuffer
     Room_Ready_Data data{};
     br >> data.PlayerID >> data.Position >> data.Team >> data.IsReady;
 
-    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum);
+    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum.load());
 
-    if (Room_Manager::Get_Instance()->Client_ChangeINFO(nRoomID, pPlayer->playerID, data))
-        Room_Manager::Get_Instance()->BroadCast_LobbyState(nRoomID);
+    // 자리 충돌 검사와 로비 통보를 한 잡 안에서 한다.
+    Room_Manager::Get_Instance()->Client_ChangeINFO(nRoomID, pPlayer->playerID, data);
 }
 
 void CPacket_Handler::Handle_C_READY(SessionRef pSession, uint8_t* /*pBuffer*/, int32_t /*nSize*/)
@@ -357,10 +388,9 @@ void CPacket_Handler::Handle_C_READY(SessionRef pSession, uint8_t* /*pBuffer*/, 
     PlayerRef pPlayer = pSession->GetPlayer();
     if (!pPlayer || pPlayer->RoomNum == ROBBY) return;
 
-    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum);
+    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum.load());
 
-    if (Room_Manager::Get_Instance()->Ready_Player(nRoomID, pPlayer->playerID))
-        Room_Manager::Get_Instance()->BroadCast_LobbyState(nRoomID);
+    Room_Manager::Get_Instance()->Ready_Player(nRoomID, pPlayer->playerID);
 }
 
 void CPacket_Handler::Handle_C_GAMESTART(SessionRef pSession, uint8_t* /*pBuffer*/, int32_t /*nSize*/)
@@ -368,10 +398,10 @@ void CPacket_Handler::Handle_C_GAMESTART(SessionRef pSession, uint8_t* /*pBuffer
     PlayerRef pPlayer = pSession->GetPlayer();
     if (!pPlayer || pPlayer->RoomNum == ROBBY) return;
 
-    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum);
+    const uint32 nRoomID = static_cast<uint32>(pPlayer->RoomNum.load());
 
-    if (Room_Manager::Get_Instance()->Check_StartGame(nRoomID))
-        Room_Manager::Get_Instance()->BroadCast_Game_Start(nRoomID);
+    // 전원 Ready 확인과 시작 통보를 한 잡 안에서 한다.
+    Room_Manager::Get_Instance()->Try_Start_Game(nRoomID);
 }
 
 void CPacket_Handler::Handle_C_LOADING_FINISH(SessionRef pSession, uint8_t* /*pBuffer*/, int32_t /*nSize*/)
@@ -379,7 +409,8 @@ void CPacket_Handler::Handle_C_LOADING_FINISH(SessionRef pSession, uint8_t* /*pB
     PlayerRef pPlayer = pSession->GetPlayer();
     if (!pPlayer || pPlayer->RoomNum == ROBBY) return;
 
-    Room_Manager::Get_Instance()->Client_LOADING_FINISH(static_cast<uint32>(pPlayer->RoomNum));
+    Room_Manager::Get_Instance()->Client_LOADING_FINISH(
+        static_cast<uint32>(pPlayer->RoomNum.load()));
 }
 
 // ================================================================

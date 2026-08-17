@@ -5,11 +5,6 @@
 
 // ================================================================
 //  CSession_Manager - 세션 슬롯 풀
-//
-//  ServerCore 의 Service + ClientSessionManager(Set<ClientSessionRef>)
-//  두 개가 하던 일을 합쳤다. 접속마다 세션을 new 하지 않고
-//  고정 크기 배열의 빈 칸을 빌려준다. 슬롯 번호가 곧 세션 ID 이고,
-//  그 번호를 IOCP 완료키로 쓰기 때문에 조회가 O(1) 이다.
 // ================================================================
 class CSession_Manager
 {
@@ -46,12 +41,6 @@ public:
     void       Broadcast(SendBufferRef sendBuffer);
 
     int32_t    GetCount() { return m_count.load(); }
-
-    // 접속 수는 매 프레임 콘솔에 찍히므로 O(1) 원자 카운터로 센다.
-    // 배열 전체를 순회하면 그게 곧 측정 대상인 m_lock 을 초당 수만 번
-    // 잡는 짓이 되어 부하 측정을 오염시킨다.
-    //  - 증가: ProcessAccept 가 SetConnected(true) 직후
-    //  - 감소: CSession::Disconnect 의 exchange 를 통과한 스레드가 한 번만
     void       OnConnected()       { m_connectedCount.fetch_add(1); }
     void       OnDisconnected()    { m_connectedCount.fetch_sub(1); }
     int32_t    GetConnectedCount() { return m_connectedCount.load(); }
@@ -60,6 +49,9 @@ private:
     static CSession_Manager* m_pInstance;
 
     std::array<SessionRef, MAX_SESSION> m_sessions;
+
+    // 그 슬롯이 지금 쓰이는 중인가
+    std::array<bool, MAX_SESSION>       m_inUse{};
 
     FRWLock m_lock;     // 읽기/쓰기 락
 

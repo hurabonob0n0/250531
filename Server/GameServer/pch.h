@@ -15,6 +15,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+
+#include "ServerLog.h"   // SERVER_LOG
 #include <vector>
 #include <array>
 #include <map>
@@ -36,10 +38,6 @@ using namespace std;
 
 // ================================================================
 //  기본 타입
-//
-//  ServerCore/Types.h 에 있던 별칭 중 게임 로직이 실제로 쓰는 것만 남겼다.
-//  (IocpCoreRef / PacketSessionRef / SendBufferChunkRef 등 프레임워크
-//   전용 별칭은 그 프레임워크와 함께 사라졌다)
 // ================================================================
 using BYTE   = unsigned char;
 using int8   = __int8;
@@ -62,6 +60,6 @@ using Atomic = std::atomic<T>;
 #include "ServerConfig.h"
 #include "SendBuffer.h"
 
-// 순환 include 없이 서로를 가리킬 수 있도록 여기서 전방 선언 + 별칭만 둔다.
+// 순환 include 없이 서로를 가리킬 수 있도록 여기서 전방 선언
 using SessionRef = std::shared_ptr<class CSession>;
 using PlayerRef  = std::shared_ptr<class Player>;

@@ -563,6 +563,37 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			Toggle_Fullscreen();
 			return 0;
 		}
+		break;		/* Alt+F4 는 DefWindowProc 가 WM_CLOSE 로 바꿔준다 - 가로채지 말 것 */
+
+		/*  종료.
+
+			게임 중에는 Run() 이 매 프레임 SetCursorPos 로 커서를 화면 한가운데로
+			되돌린다(마우스 시점 조작 때문). 그래서 창의 X 버튼을 누를 수가 없었다.
+			전체 화면일 때는 X 버튼 자체가 없다.
+			그래서 키로 끄는 길을 하나 열어둔다.                                    */
+	case WM_KEYDOWN:
+		if (wParam == VK_ESCAPE)
+		{
+			/* 전체 화면이면 먼저 창 모드로 돌려놓는다. 안 그러면 확인 대화상자가
+			   전체 화면 창 뒤에 가려 아무것도 못 하게 된다. */
+			Apply_Fullscreen(false);
+
+			/* 게임이 ShowCursor(FALSE) 로 커서를 숨겨놨다. 대화상자를 쓰려면 되돌려야 한다. */
+			while (ShowCursor(TRUE) < 0) {}
+
+			const int iAnswer = MessageBox(hwnd, L"게임을 종료할까요?", L"종료",
+				MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
+
+			if (iAnswer == IDYES)
+			{
+				DestroyWindow(hwnd);		/* -> WM_DESTROY -> PostQuitMessage */
+			}
+			else
+			{
+				ShowCursor(FALSE);			/* 계속 하겠다면 다시 숨긴다 */
+			}
+			return 0;
+		}
 		break;
 
 		// 윈도우가 파괴될 때 WM_DESTORY가 보내집니다.
@@ -810,6 +841,25 @@ void CMainApp::CalculateFrameStats()
 
 void CMainApp::Free()
 {
+	/*  ★ 창을 닫아도 프로세스가 작업 관리자에 남던 원인이 여기 있었다.
+
+		수신 스레드가 recv() 에 막힌 채 살아 있고 소켓도 열려 있었다.
+		Network_Manager::Disconnect() 가 shutdown -> closesocket -> join 까지
+		제대로 하도록 짜여 있는데, 아무도 부르지 않아서 한 번도 실행되지 않았다.
+		그 상태로 프로세스를 끝내면 종료 처리 중에 스레드가 강제로 끊기면서
+		락을 쥔 채 죽어, DLL 정리 단계에서 서로를 기다리며 멈춰 선다.
+
+		FMOD 도 자기 스레드를 들고 있으므로 같이 정리한다.
+		순서가 중요하다 - 네트워크와 소리를 먼저 끊고 엔진을 내린다.               */
+	Network_Manager::GetInstance()->Disconnect();
+	Network_Manager::DestroyInstance();
+
+	FMOD_Manager::Get_Instance()->Destroy_Instance();
+
+	/* 커서를 창에 가둬 놨을 수 있으니 반드시 풀어준다(안 풀면 종료 후에도 갇힌다). */
+	ClipCursor(nullptr);
+	while (ShowCursor(TRUE) < 0) {}
+
 	m_GameInstance->Release_Engine();
 	m_PhysicsEngine->Release_Instance();
 
@@ -911,8 +961,25 @@ LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 {
 	switch (message)
 	{
+		/*  ★ 로비 창을 닫아도 프로세스가 안 죽던 원인이 여기였다.
+
+			WM_DESTROY 에서 PostQuitMessage 가 주석 처리돼 있어서, 창을 닫으면
+			창만 사라지고 WM_QUIT 은 나오지 않았다. 그러면 RunLobbyWindowLoop 의
+			while(true) 가 이미 파괴된 창에 계속 그리면서 영원히 돌고,
+			프로세스가 작업 관리자에 남는다.
+
+			WM_DESTROY 가 아니라 WM_CLOSE 에서 끝내는 이유:
+			게임을 시작할 때 우리가 직접 DestroyWindow(hWnd) 를 부르는데,
+			WM_DESTROY 에서 종료를 걸면 그때도 WM_QUIT 이 큐에 남아
+			이어서 도는 인게임 루프가 시작하자마자 빠져나온다.
+			WM_CLOSE 는 사용자가 X 를 누르거나 Alt+F4 했을 때만 오므로 둘이 구분된다.
+			(주석 처리해 둔 것도 아마 이 문제를 겪고 그런 것으로 보인다)          */
+	case WM_CLOSE:
+		DestroyWindow(hWnd);
+		PostQuitMessage(0);
+		return 0;
+
 	case WM_DESTROY:
-		//PostQuitMessage(0);
 		break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);

@@ -7,17 +7,6 @@
 
 using SessionRef = std::shared_ptr<class CSession>;
 
-// ================================================================
-//  CPacket_Handler
-//
-//  ServerPacketHandler 를 그대로 옮긴 것이다(이름만 프로젝트 규칙에 맞춤).
-//  달라진 점은 두 가지뿐이다.
-//    - 첫 인자가 PacketSessionRef& -> SessionRef
-//    - 패킷을 만들 때 GSendBufferManager 대신 MakeSendBuffer 를 쓴다
-//  와이어 포맷은 손대지 않았으므로 유니티 클라는 그대로 붙는다.
-//
-//  Handle_C_* = 받는 쪽 / Make_S_* = 보낼 버퍼를 만드는 쪽.
-// ================================================================
 class CPacket_Handler
 {
 public:

@@ -32,7 +32,10 @@ void CSession::Initialize()
         m_sending = false;
     }
 
-    m_pPlayer.reset();
+    {
+        std::lock_guard<std::mutex> lock(m_playerLock);
+        m_pPlayer.reset();
+    }
 }
 
 void CSession::RegisterRecv()
@@ -61,7 +64,7 @@ void CSession::RegisterRecv()
         int nErr = WSAGetLastError();
         if (nErr != WSA_IO_PENDING)
         {
-            std::cout << "[CSession] WSARecv 오류: " << nErr << std::endl;
+            SERVER_LOG("WSARecv 오류 " << nErr << "  ID=" << m_id);
             Disconnect();
         }
     }
@@ -115,7 +118,7 @@ void CSession::StartSend_Locked()
         int nErr = WSAGetLastError();
         if (nErr != WSA_IO_PENDING)
         {
-            std::cout << "[CSession] WSASend 오류: " << nErr << std::endl;
+            SERVER_LOG("WSASend 오류 " << nErr << "  ID=" << m_id);
             m_sending = false;
             m_sendingBuf.reset();
             Disconnect();
@@ -131,24 +134,24 @@ void CSession::Disconnect()
 
     CSession_Manager::Get_Instance()->OnDisconnected();
 
-    std::cout << "[CSession] 연결 해제. ID=" << m_id << std::endl;
+    SERVER_LOG("연결 해제  ID=" << m_id);
 
-    // ★ 예전에는 접속이 끊겨도 방에 플레이어가 그대로 남아 있었다.
-    //   (ClientSession::OnDisconnected 가 세션 목록에서만 지웠다)
-    //   인원 수가 안 줄어드니 방이 영원히 가득 찬 상태가 됐다.
-    PlayerRef pPlayer = m_pPlayer;
+    // 꺼내면서 비운다. 두 스레드가 동시에 들어와도 한쪽만 Player 를 가져간다.
+    PlayerRef pPlayer = TakePlayer();
     if (pPlayer)
     {
-        const uint64 nRoomNum = pPlayer->RoomNum;
+        const uint64 nRoomNum = pPlayer->RoomNum.exchange(ROBBY);
         if (nRoomNum != ROBBY)
         {
             Room_Manager::Get_Instance()->Client_LeaveRoom(
                 static_cast<uint32>(nRoomNum), pPlayer);
-            Room_Manager::Get_Instance()->BroadCast_LobbyState(
-                static_cast<uint32>(nRoomNum));
         }
-        pPlayer->OwenerSession.reset();
-        m_pPlayer.reset();
+        else
+        {
+            /*  로비에 있던 플레이어다. 어느 방의 _Players 에도 없으므로
+                이 Player 를 참조하는 방 잡이 없다. 여기서 끊어도 안전하다. */
+            pPlayer->OwenerSession.reset();
+        }
     }
 
     closesocket(m_socket);
@@ -173,8 +176,7 @@ void CSession::OnSendComplete()
 }
 
 // ----------------------------------------------------------------
-//  TCP 는 경계를 보장하지 않는다. 헤더의 size 만큼 모였을 때만 처리하고
-//  남은 조각은 배열 앞으로 당겨 다음 수신과 이어 붙인다.
+//  패킷 재조립
 // ----------------------------------------------------------------
 void CSession::ProcessRecvData(int32_t nNewBytes)
 {
@@ -193,8 +195,8 @@ void CSession::ProcessRecvData(int32_t nNewBytes)
         if (pHeader->size < sizeof(PacketHeader) ||
             pHeader->size > RECV_BUF_SIZE)
         {
-            std::cout << "[CSession] 비정상 패킷 크기=" << pHeader->size
-                      << " ID=" << m_id << " - 연결 종료" << std::endl;
+            SERVER_LOG("비정상 패킷 크기=" << pHeader->size
+                       << "  ID=" << m_id << " - 연결 종료");
             Disconnect();
             return;
         }

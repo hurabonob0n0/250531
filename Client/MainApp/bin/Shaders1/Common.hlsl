@@ -75,6 +75,7 @@ cbuffer cbPerObject : register(b0)
     float4 gTrackSagB;      // road wheel 5..7, w = on/off
     float4 gTrackParam;     // x = front wheel local x, y = rear wheel local x,
                             // z = wheel axle line local z, w = top run local z
+
 };
 
 //---------------------------------------------------------------------------------------

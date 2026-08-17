@@ -127,9 +127,50 @@ OBB2D Tank::GetOBB2D() const
 
 void Tank::Damage(int dmg)
 {
-	_hp -= dmg;
-	if (_hp < 0)
+	const int current = static_cast<int>(_hp);
+
+	if (dmg >= current)
 		_hp = 0;
+	else
+		_hp = static_cast<uint8>(current - dmg);
+}
+
+// ----------------------------------------------------------------
+//  이동 예산 - 시간이 흐르는 만큼 누적, 이동한 만큼 감소.
+// ----------------------------------------------------------------
+bool Tank::CheckMoveSpeed(const Vec3& newPos, int64 nowMs)
+{
+	if (_lastMoveMs == 0)
+	{
+		// 첫 갱신. 기준점만 잡고 통과시킨다.
+		ResetMoveCheck(nowMs, newPos);
+		return true;
+	}
+
+	const float elapsedSec = static_cast<float>(nowMs - _lastMoveMs) / 1000.f;
+	_lastMoveMs = nowMs;
+
+	if (elapsedSec > 0.f)
+	{
+		_allowedMoveDist += MAX_TANK_SPEED * elapsedSec;
+		if (_allowedMoveDist > MAX_ALLOWED_MOVE_DIST)
+			_allowedMoveDist = MAX_ALLOWED_MOVE_DIST;   // 오래 멈춰 있다 한 번에 튀는 것 방지
+	}
+
+	/*  마지막으로 승인한 좌표와 비교
+	    _myPos 는 Tank::Update 의 SyncPosFromMatrix 로 갱신*/
+	const float dx = newPos.X - _lastAcceptedPos.X;
+	const float dz = newPos.Z - _lastAcceptedPos.Z;
+
+	// 수평 이동만 본다. 낙하는 중력이라 최대 속도와 무관하다.
+	const float dist = std::sqrt(dx * dx + dz * dz);
+
+	if (dist > _allowedMoveDist)
+		return false;       // 초과 -> 거부
+
+	_allowedMoveDist -= dist;
+	_lastAcceptedPos = newPos;
+	return true;
 }
 
 bool Tank::IsDead() 
@@ -147,4 +188,8 @@ void Tank::SetSpawn(const Matrix4x4& mat, float PosinAngle, float PotapAngle)
 	_posinAngle = PosinAngle;
 	Spawn = true;
 	_hp = 100;
+
+	/*   스폰은 치트가 아님         */
+	const Vec3 spawnPos(mat.m[3][0], mat.m[3][1], mat.m[3][2]);
+	ResetMoveCheck(GetNowMs(), spawnPos);
 }
