@@ -60,14 +60,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 /*---------------------------------------------------------------------------
-	FBX → .bin 굽기 (개발용, D3D 없이 돈다)
-
-		00.MainApp.exe -bake
-
-	로 실행하면 로비도 창도 안 띄우고 모델만 구운 뒤 바로 끝난다.
-	모델(FBX)을 새로 넣거나 바꿨을 때 한 번만 돌리면 된다.
-	여기 목록은 아래 Initialize 의 AddPrototype 과 반드시 같아야 한다
-	(피벗행렬/type 이 다르면 모양이 틀어진다).
+	FBX -> bin 굽기
 ---------------------------------------------------------------------------*/
 static void Bake_All_Models()
 {
@@ -316,22 +309,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
 							Network_Manager::GetInstance()->MyControlTarget = CONTROL_TANK;
 						}
-
-						/*  ★ 예전에는 자리 1번이면 무조건 POS_MASTER 로 덮었다.
-							MASTER 는 혼자서 조종·조준·드론을 전부 하는 모드다(오프라인 테스트용).
-							포수가 같이 탄 상태에서 이걸 쓰면 한 탱크의 포탑 주인이 둘이 된다:
-
-							  - MASTER 는 LateTick 에서 RotPotap_And_Posin 으로 '자기 카메라'를 따라 포탑을 돌리고,
-							  - ClientPacketHandler 의 마스터 분기가 비어 있어(//마스터 포지션)
-							    포수가 보낸 포탑각을 그냥 버리며,
-							  - 게다가 C_MOVEMENT 로 자기 포탑각을 실어 보내 서버에 있는 포수 값을 덮는다.
-
-							그래서 2인 플레이에서 포수가 아무리 화면을 돌려도
-							1번 화면에서는 포탑이 따라 돌지 않았다.
-
-							이제 '이 탱크에 나 혼자일 때' 로 좁힌다. 혼자면 예전처럼 다 조작하고,
-							둘이면 1번은 홀수라 위에서 정해진 POS_DRIVER 로 남는다.
-							그러면 조종수는 차체만, 포수는 포탑만 주인이 되어 서로 덮어쓰지 않는다.   */
 						if (player.Position == 1 && playerList.size() == 1) {
 							Network_Manager::GetInstance()->MyPosMode = POS_MASTER;
 							CStateMgr::Get_Instance()->Set_GameMode(GM_TPS);
@@ -389,11 +366,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("Camera_Drone", "Camera", nullptr);
 
 
-	//TODOUI -> (모든 상황 전체 Render) 숫자 넣으면 그 숫자에 따라 출력되는 UI 만들기 (NumUI60X90),(NumUI30X40)
-	//			TeamPercentUI변경
-	//TODOUI -> (POSIN모드) -> AIR_STRIKE 스킬 UI, USEDRONE UI, AIRSTRIKE위에 쿨타임에 맞게 Render되는 빨간 쿨타임 박스 
-	//TODOUI -> (Drone모드) -> FOLLW TANK UI, Drone화면UI, Drone모드에서 탱크 조준UI 지우기
-
 	m_GameInstance->AddObject("UICrossHair", "UI", nullptr);
 	m_GameInstance->AddObject("UIReloading", "UI", nullptr);
 	m_GameInstance->AddObject("UIKill", "UI", nullptr);
@@ -415,9 +387,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->AddObject("UIHP", "UI", nullptr);//TODOUI -> HP바 변경, HP숫자 나오기
 	m_GameInstance->AddObject("UICompass", "UI", nullptr);//TODOUI -> 알파값 만들기
 
-	//m_GameInstance->AddObject("Effect", "Effect", &mat3);
-	//_matrix mat4 = XMMatrixScaling(30.f,30.f,30.f) * XMMatrixTranslation(0.f, 100.f, 0.f);
-	//m_GameInstance->AddObject("WinningTeam", "WinningTeam", &mat3);
 
 
 	m_GameInstance->AddObject("Tree", "Tree", nullptr);
@@ -432,9 +401,6 @@ HRESULT CMainApp::Initialize(HINSTANCE g_hInstance)
 	m_GameInstance->Execute_CommandList();
 
 	m_GameInstance->Flush_CommandQueue();
-	
-	//((CUI_VICTORY*)m_GameInstance->GetGameObject("UI", 9))->set_render();
-	//((CUI_DEFEAT*)m_GameInstance->GetGameObject("UI",10))->set_render();
 
 
 	if (Network_Manager::GetInstance()->isConnected()) {
@@ -477,7 +443,6 @@ int CMainApp::Run()
 					Network_Manager::GetInstance()->Dispatch(PacketQueueType::INGAME);
 				}
 				
-				//CStateMgr::Set_GameMode((GameMode)(((int)CStateMgr::Get_GameMode()+1)%3));
 
 				Update(m_Timer);
 				m_PhysicsEngine->CMyPhysicsEngine::Update_PhysX(m_Timer->DeltaTime());
@@ -541,13 +506,6 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// WM_SIZE는 사용자가 윈도우 크기를 변경할 때 보내집니다.
 	case WM_SIZE:
-		/*  ★ 여기서 m_ClientWidth/Height 를 덮으면 안 된다.
-			그 둘은 창 크기가 아니라 '렌더 해상도(백버퍼)' 이고, 창을 줄였다고
-			백버퍼가 따라 줄어드는 게 아니다. 예전 코드가 덮어쓰고 있었는데
-			초기화가 끝난 뒤라 아무 데도 안 쓰여서 티가 안 났을 뿐이다.
-
-			창 모드에서 사용자가 크기를 바꿨다면 그 크기를 기억해뒀다가
-			전체 화면에서 돌아올 때 복원한다.                                  */
 		if (!m_FullscreenState && wParam != SIZE_MINIMIZED)
 		{
 			m_WindowedWidth  = LOWORD(lParam);
@@ -563,14 +521,9 @@ LRESULT CMainApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			Toggle_Fullscreen();
 			return 0;
 		}
-		break;		/* Alt+F4 는 DefWindowProc 가 WM_CLOSE 로 바꿔준다 - 가로채지 말 것 */
+		break;	
 
-		/*  종료.
-
-			게임 중에는 Run() 이 매 프레임 SetCursorPos 로 커서를 화면 한가운데로
-			되돌린다(마우스 시점 조작 때문). 그래서 창의 X 버튼을 누를 수가 없었다.
-			전체 화면일 때는 X 버튼 자체가 없다.
-			그래서 키로 끄는 길을 하나 열어둔다.                                    */
+		/*  종료.                                 */
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE)
 		{
@@ -642,12 +595,6 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 		return false;
 	}
 
-	/*  예전에는 여기서 창을 1920x1080 WS_POPUP 으로 만들고 CW_USEDEFAULT 에 놓았다.
-		화면이 그보다 작은 노트북에서는 창이 화면 밖으로 나가 잘렸다.
-		(테두리가 없어서 옮기거나 줄일 수도 없었다)
-
-		이제 이 모니터에 들어가는 크기로 만든다. 렌더 해상도는 1920x1080 그대로라
-		화면이 작아도 잘리는 게 아니라 전체가 축소되어 보인다.                      */
 	Calc_WindowedSize(&m_WindowedWidth, &m_WindowedHeight);
 
 	RECT R = { 0, 0, m_WindowedWidth, m_WindowedHeight };
@@ -670,13 +617,6 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 		WS_OVERLAPPEDWINDOW, m_WindowedPosX, m_WindowedPosY,
 		iOuterW, iOuterH, 0, 0, m_hAppInst, 0);
 
-	/*RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
-	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-	int width = R.right - R.left;
-	int height = R.bottom - R.top;
-
-	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);*/
 
 	if (!m_hMainWnd)
 	{
@@ -690,22 +630,7 @@ HRESULT CMainApp::Initialize_MainWindow(HINSTANCE g_hInstance)
 	return S_OK;
 }
 
-/*===========================================================================
-	창 크기 / 전체 화면
 
-	렌더 해상도(백버퍼)는 늘 1920x1080 이다. 여기서 바꾸는 건 창 크기뿐이고,
-	백버퍼를 창에 맞춰 늘리고 줄이는 건 DXGI 가 한다(FLIP_DISCARD + 스트레치).
-
-	이렇게 나눈 이유:
-	  - UI 위치, 뷰포트, 조준선이 전부 1920x1080 기준으로 짜여 있다.
-	    백버퍼를 창 크기에 맞추면 그게 전부 어긋난다.
-	  - 백버퍼를 바꾸려면 ResizeBuffers + RTV/깊이버퍼 재생성이 필요한데,
-	    지금 WM_SIZE 는 값만 저장하고 아무것도 재생성하지 않는다.
-
-	전체 화면은 테두리 없는 창(borderless)이다. SetFullscreenState 를 쓰는
-	독점 전체화면은 해상도를 실제로 바꿔서 알트탭이 느리고, 모드 전환 때마다
-	버퍼를 다시 만들어야 한다. 얻는 게 없다.
-===========================================================================*/
 void CMainApp::Calc_WindowedSize(int* pOutWidth, int* pOutHeight) const
 {
 	/* 작업 표시줄을 뺀 실제로 쓸 수 있는 영역 */
@@ -841,16 +766,7 @@ void CMainApp::CalculateFrameStats()
 
 void CMainApp::Free()
 {
-	/*  ★ 창을 닫아도 프로세스가 작업 관리자에 남던 원인이 여기 있었다.
 
-		수신 스레드가 recv() 에 막힌 채 살아 있고 소켓도 열려 있었다.
-		Network_Manager::Disconnect() 가 shutdown -> closesocket -> join 까지
-		제대로 하도록 짜여 있는데, 아무도 부르지 않아서 한 번도 실행되지 않았다.
-		그 상태로 프로세스를 끝내면 종료 처리 중에 스레드가 강제로 끊기면서
-		락을 쥔 채 죽어, DLL 정리 단계에서 서로를 기다리며 멈춰 선다.
-
-		FMOD 도 자기 스레드를 들고 있으므로 같이 정리한다.
-		순서가 중요하다 - 네트워크와 소리를 먼저 끊고 엔진을 내린다.               */
 	Network_Manager::GetInstance()->Disconnect();
 	Network_Manager::DestroyInstance();
 
@@ -880,11 +796,6 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 	wc.lpszClassName = L"LobbyWnd";
 	RegisterClass(&wc);
 
-	/*  예전엔 1024x880 을 그대로 창 크기로 줬다. 두 가지가 문제였다.
-		 - AdjustWindowRect 를 안 해서 테두리와 제목 표시줄만큼 클라이언트가 작았다.
-		 - 세로 768 노트북에서는 창이 화면을 넘어가 아래쪽 버튼이 안 보였다.
-		이제 화면에 들어가는 크기로 만들고, 모자라면 비율을 유지한 채 줄인다.
-		그리는 쪽(GameLobby::Render)이 StretchBlt 로 맞춰 늘린다.               */
 	RECT WorkArea = {};
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &WorkArea, 0);
 
@@ -917,7 +828,7 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 	Game_Lobby.Initialize(hWnd);
 
 	constexpr double desiredFPS = 60.0;
-	constexpr double desiredFrameTime = 1000.0 / desiredFPS; // 16.66 ms
+	constexpr double desiredFrameTime = 1000.0 / desiredFPS; // 16ms
 
 	bool bStartGame = false;
 
@@ -944,13 +855,7 @@ bool RunLobbyWindowLoop(HINSTANCE hInstance, int showCmd)
 				break;
 			}
 		}
-		//auto frameEnd = chrono::high_resolution_clock::now();
-		//auto elapsed = chrono::duration_cast<chrono::milliseconds>(frameEnd - frameStart).count();
 
-		//if (elapsed < desiredFrameTime)
-		//{
-		//	Sleep(static_cast<DWORD>(desiredFrameTime - elapsed));
-		//}
 	}
 
 	Game_Lobby.Release();
@@ -961,19 +866,6 @@ LRESULT CALLBACK LobbyWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 {
 	switch (message)
 	{
-		/*  ★ 로비 창을 닫아도 프로세스가 안 죽던 원인이 여기였다.
-
-			WM_DESTROY 에서 PostQuitMessage 가 주석 처리돼 있어서, 창을 닫으면
-			창만 사라지고 WM_QUIT 은 나오지 않았다. 그러면 RunLobbyWindowLoop 의
-			while(true) 가 이미 파괴된 창에 계속 그리면서 영원히 돌고,
-			프로세스가 작업 관리자에 남는다.
-
-			WM_DESTROY 가 아니라 WM_CLOSE 에서 끝내는 이유:
-			게임을 시작할 때 우리가 직접 DestroyWindow(hWnd) 를 부르는데,
-			WM_DESTROY 에서 종료를 걸면 그때도 WM_QUIT 이 큐에 남아
-			이어서 도는 인게임 루프가 시작하자마자 빠져나온다.
-			WM_CLOSE 는 사용자가 X 를 누르거나 Alt+F4 했을 때만 오므로 둘이 구분된다.
-			(주석 처리해 둔 것도 아마 이 문제를 겪고 그런 것으로 보인다)          */
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
 		PostQuitMessage(0);
@@ -1001,11 +893,9 @@ void CMainApp::UpdateFMODListener()
         worldMat = cam->Get_WorldMatrix();
     }
 
-    // 2) 월드 행렬 → 오디오 포즈 (FMOD_VECTOR)
     FMOD_VECTOR pos{}, fwd{}, up{};
     ExtractFMODPoseFromWorld(worldMat, pos, fwd, up);
 
-    // 3) 도플러용 속도 (카메라 전환 시 스파이크 방지)
     static FMOD_VECTOR prevPos{0,0,0};
     static bool hasPrev = false;
     static bool prevDrone = isDrone;
@@ -1025,7 +915,7 @@ void CMainApp::UpdateFMODListener()
     }
     prevPos = pos; hasPrev = true;
 
-    // 4) FMOD 리스너 갱신 (오버로드 추가 필요)
+    // FMOD 리스너 갱신 (오버로드 추가 필요)
     FMOD_Manager::Get_Instance()->SetListener(pos, vel, fwd, up);
 }
 

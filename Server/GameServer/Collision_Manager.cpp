@@ -46,48 +46,54 @@ bool CollisionManager::Check_Terrain_Collision(GameObject* object)
 
 }
 
-// ================================================================
-//  선 - OBB
-//  OBB 를 세 축의 평행판 세 쌍이 겹친 것으로 본다
-// ================================================================
-bool CollisionManager::CheckCollision_Segment_OBB3D(const Vec3& p0, const Vec3& p1,
+/*  선분 OBB
+    startOnAxis : 선분 시작점이 그 축 위 어디에 있나. 상자 중심이 0
+    moveOnAxis  : 선분이 t 0 -> 1 동안 그 축 방향으로 얼마나 가나
+    halfExtent  : 그 축 방향으로 잰 상자의 반 크기
+  */
+bool CollisionManager::CheckCollision_Segment_OBB3D(const Vec3& startPos, const Vec3& endPos,
 													const OBB& obb, Vec3* pOutHit)
 {
-	const Vec3 dir = p1 - p0;           // 방향 + 길이
-	const Vec3 m   = p0 - obb.center;   // OBB 중심 기준 시작점
+	const Vec3 moveVector      = endPos - startPos;
+	const Vec3 startFromCenter = startPos - obb.center;
 
-	const float half[3] = { obb.halfSize.X, obb.halfSize.Y, obb.halfSize.Z };
+	const float halfExtents[3] = { obb.halfSize.X, obb.halfSize.Y, obb.halfSize.Z };
 
-	float tMin = 0.f;
-	float tMax = 1.f;
+	float tOverlapStart = 0.f;
+	float tOverlapEnd   = 1.f;
 
 	for (int i = 0; i < 3; ++i)
 	{
-		const float e = m.Dot(obb.axis[i]);     // 시작점의 이 축 좌표
-		const float f = dir.Dot(obb.axis[i]);   // 이 축으로 얼마나 가는가
-		const float h = half[i];
+		const float startOnAxis = startFromCenter.Dot(obb.axis[i]);   // 시작점의 이 축 좌표
+		const float moveOnAxis  = moveVector.Dot(obb.axis[i]);        // 이 축으로 가는 거리
+		const float halfExtent  = halfExtents[i];
 
-		if (fabsf(f) < 1e-6f)
+		if (fabsf(moveOnAxis) < 1e-6f)
 		{
-			// 이 축과 거의 평행하다. 시작점이 이미 판 밖이면 영영 못 만난다.
-			if (e < -h || e > h)
+			if (startOnAxis < -halfExtent || startOnAxis > halfExtent)
 				return false;
 			continue;
 		}
 
-		float t1 = (-h - e) / f;
-		float t2 = ( h - e) / f;
-		if (t1 > t2) { const float tmp = t1; t1 = t2; t2 = tmp; }
+		float tEnter = (-halfExtent - startOnAxis) / moveOnAxis;      // 가까운 벽에 닿는 시각
+		float tExit  = ( halfExtent - startOnAxis) / moveOnAxis;      // 먼 벽을 벗어나는 시각
 
-		if (t1 > tMin) tMin = t1;
-		if (t2 < tMax) tMax = t2;
+		if (tEnter > tExit)                                           // 뒤로 가는 축이면 순서가 뒤집힌다
+		{
+			const float temp = tEnter;
+			tEnter = tExit;
+			tExit  = temp;
+		}
 
-		if (tMin > tMax)
-			return false;       // 교집합이 비었다
+		if (tEnter > tOverlapStart) tOverlapStart = tEnter;           // 교집합의 시작을 늦춘다
+		if (tExit  < tOverlapEnd)   tOverlapEnd   = tExit;            // 교집합의 끝을 당긴다
+
+		if (tOverlapStart > tOverlapEnd)                              // 겹치는 시간대가 없다
+			return false;
 	}
 
 	if (pOutHit)
-		*pOutHit = p0 + dir * tMin;
+		*pOutHit = startPos + moveVector * tOverlapStart;             // 처음 닿은 지점
 
 	return true;
 }

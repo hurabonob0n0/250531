@@ -125,18 +125,11 @@ public:
 
 	void SetMyMatrix(_float4x4 mat);
 
-	/*  서버가 준 바퀴 서스펜션(int8 14개)을 받아둔다.
-		Set_Tank_Element_from_ServerData 가 이걸로 바퀴와 궤도를 움직인다.
-		보간하지 않는다 - 30Hz 로 들어오는 데다 진폭이 0.4 뿐이라
-		위치처럼 계단이 눈에 띄지 않고, 오히려 보간 비용만 든다.              */
+	/*  서버가 준 바퀴 서스펜션(int8 14개)을 받아둔다.           */
 	void Set_WheelSagFromServer(const int8* pWheelSag);
 
-private:		/* 네트워크 보간 (Level 1) */
-	/*  서버는 60Hz 로 상태를 보내는데 화면은 165fps 로 그린다.
-		받은 값을 그대로 대입하면 한 값을 2~3 프레임 붙들고 있다가 튄다.
-		그래서 받은 즉시 쓰지 않고 '목표' 로 두고, 다음 패킷이 올 때까지
-		직전 값에서 목표까지 나눠서 이동한다. 그만큼(≈1패킷 간격) 늦게
-		보이는 대신 끊김이 사라진다.                                      */
+private:
+ 
 	struct FNetSnapshot
 	{
 		_float3	vPos	= { 0.f, 0.f, 0.f };
@@ -161,17 +154,10 @@ private:		/* 네트워크 보간 (Level 1) */
 					   bool isChassis, bool isTurret);
 	void Update_NetInterpolation(float fTimeDelta);
 
-	/*  송신 주기를 렌더 프레임에서 떼어낸다.
-		예전엔 매 프레임 보냈다(165fps = 초당 165번). 서버는 60Hz 로 도니
-		보낸 것의 2/3 는 다음 틱 전에 덮여서 그냥 버려진다.
-		수신측 보간이 들어간 뒤로는 낮춰도 티가 나지 않는다.               */
+	/*  송신 주기를 렌더 프레임에서 떼어낸다   */
 	float	m_fNetSendTimer = 0.f;
 
-	/*  이 탱크의 바퀴 서스펜션을 int8 로 낮춰 담아둔 것.
-		- 내 탱크(운전수/마스터)면 Update_Wheels_And_Track 이 PhysX 값으로 채우고,
-		  송신할 때 그대로 실어 보낸다.
-		- 남의 탱크면 서버에서 받은 값이 들어오고, 그걸로 바퀴와 궤도를 움직인다.
-		예전에는 아예 보내지 않아서 남의 탱크 바퀴가 쉴 때 위치에 붙어 있었다.     */
+	/*  이 탱크의 바퀴 서스펜션을 int8 로 낮춰 담아둔 것.  */
 	int8	m_WheelSagWire[TANK_WHEEL_COUNT] = {};
 
 private:		//For PosinCrosshair

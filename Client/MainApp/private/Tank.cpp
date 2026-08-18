@@ -18,10 +18,7 @@ static inline AudioVec3 ToAudio(const XMFLOAT3& v) { return AudioVec3(v.x, v.y, 
 static inline AudioVec3 ToAudio(const XMVECTOR& v) { XMFLOAT3 t; XMStoreFloat3(&t, v); return ToAudio(t); }
 
 /*  이 클라가 서버로 상태를 올리는 주기. 렌더 프레임과 무관하다.
-	서버 틱이 60Hz 라 그보다 자주 보내봐야 다음 틱 전에 덮여서 그냥 버려진다.
-	30Hz 로 둔 것은 여유(틱 하나를 놓쳐도 다음 게 곧 온다)와 트래픽 사이의 타협이고,
-	수신측 보간이 들어간 뒤라 화면에서는 165Hz 와 구분되지 않는다.
-	(나머지 네트워크 상수는 Update_NetInterpolation 위의 익명 namespace 에 있다) */
+	서버 틱이 60Hz 라 그보다 자주 보내봐야 다음 틱 전에 덮여서 그냥 버려진다. */
 static const float NET_SEND_INTERVAL = 1.f / 30.f;
 
 
@@ -194,12 +191,7 @@ void CTank::LateTick(float fTimeDelta)
 
 	if (_myPlayer) {
 
-		/*  송신 주기를 렌더 프레임에서 떼어낸다.
-			예전엔 프레임마다 보냈는데(165fps = 초당 165번) 서버는 60Hz 로 도니
-			보낸 것의 2/3 는 다음 틱 전에 덮여 그냥 버려졌다.
-			수신측 보간이 들어갔으므로 30Hz 로 낮춰도 화면에서 티가 나지 않는다.
-			★ 발사(SendShootDataToServer)는 여기 걸지 말 것 - 그건 주기적 상태가
-			   아니라 사건이라, 늦추면 그대로 조작 지연이 된다.                   */
+		/*  송신 주기를 렌더 프레임에서 떼어낸다. */
 		m_fNetSendTimer += fTimeDelta;
 
 		const bool isSendTurn = (m_fNetSendTimer >= NET_SEND_INTERVAL);
@@ -506,26 +498,6 @@ void CTank::UpdateAudio(float dt)
 		AudioVec3 v = AudioVec3(0, 0, 0); // 물리 속도 벡터가 있으면 대입
 		if (_engineCh) { FMOD_VECTOR fp{ p.x,p.y,p.z }, fv{ v.x,v.y,v.z }; _engineCh->set3DAttributes(&fp, &fv); }
 		if (_trackCh) { FMOD_VECTOR fp{ p.x,p.y,p.z }, fv{ v.x,v.y,v.z }; _trackCh->set3DAttributes(&fp, &fv); }
-
-		// 4) 엔진: 볼륨/피치는 RPM 기반
-		//if (_engineCh) {
-		//	float enginevol = _engineVolBase + _engineVolGain * _rpmSm;                         // 0.35 ~ 0.80
-		//	float pitch = _enginePitchLo + (_enginePitchHi - _enginePitchLo) * _rpmSm;      // 0.95 ~ 1.30
-		//	_engineCh->setVolume(enginevol);
-		//	_engineCh->setPitch(pitch);
-		//}
-
-		//// 5) 궤도: 움직일 때만 들리게(볼륨/피치도 RPM 기반)
-		//if (_trackCh) {
-		//	float moveGate = _isMoving ? 1.0f : 0.0f;
-		//	float drive = moveGate * (0.25f + 0.75f * _rpmSm); // 이동 중 최소 볼륨 보장
-		//	float vol = (_trackVolBase + _trackVolGain * drive) * _trackMixGain;
-		//	float pitch = _trackPitchLo + (_trackPitchHi - _trackPitchLo) * _rpmSm;
-
-
-		//	_trackCh->setVolume(vol);
-		//	_trackCh->setPitch(pitch);
-		//}
 
 		float engVol = _engineVolBase + _engineVolGain * _rpmSm;
 		float engPit = _enginePitchLo + (_enginePitchHi - _enginePitchLo) * _rpmSm;
@@ -975,26 +947,12 @@ void CTank::Set_Tank_Element_from_Engine()
 
 	XMMATRIX matPosin = XMMatrixRotationY(XMConvertToRadians(m_fPosinRotation));
 
-	//if(m_fPosinRotation  )
-
-	/*XMMATRIX matPosinforDir = XMMatrixRotationX(-m_fPosinRotation);
-
-	_vector worldforward = XMVectorSet(0, 0, 1, 0);
-	worldforward = XMVector4Transform(worldforward, m_TransformCom->Get_WorldMatrix());
-	worldforward = XMVector4Transform(worldforward, matPotap);
-	worldforward = XMVector4Transform(worldforward, matPosinforDir);*/
-
-	/*XMFLOAT3 vRight;
-	XMFLOAT3 vUp;*/
-
 	m_VIBuffer->Set_Transform_Matrix(0, mat); // Chassis
 	m_VIBuffer->Set_Transform_Matrix(1, matPotap); // Potap
 	//m_VIBuffer->Set_Transform_Matrix(2, matPosin);
 
 
-	/* 바퀴 14개 + 궤도 2개를 여기서 한 번에 놓는다.
-	   예전에는 PhysX 월드행렬을 그대로 썼는데, 그러면 바퀴가 궤도 안쪽으로 밀린다.
-	   자세한 건 Update_Wheels_And_Track 주석 참고. */
+	/* 바퀴 14개 + 궤도 2개를 여기서 한 번에 놓는다.. */
 	const _matrix PhysXWheelMatrices[14] =
 	{
 		L1Mat, L2Mat, L3Mat, L4Mat, L5Mat, L6Mat, L7Mat,
@@ -1019,10 +977,10 @@ void CTank::Set_Tank_Element_from_Engine()
 /*===========================================================================
 	궤도 구부리기
 
-	메쉬 번호는 Model.cpp 의 s_ParentOfMesh 표와 같은 순서다.
+	메쉬 번호는 Model.cpp 의 s_ParentOfMesh 표와 같은 순서.
 	왼쪽 바퀴는 앞에서 뒤로 24, 26, 28, 30, 32, 34, 36 이고
-	오른쪽은 46, 37, 35, 33, 44, 48, 42 다 (Tank.cpp 의 L1~L7 / R1~R7 순서와 동일).
-	궤도는 38(왼쪽 Chain_01), 39(오른쪽 Chain_02).
+	오른쪽은 46, 37, 35, 33, 44, 48, 42.
+	궤도는 38
 ===========================================================================*/
 namespace
 {
@@ -1080,12 +1038,6 @@ void CTank::Update_Wheels_And_Track(_fmatrix ChassisWorld, const _matrix* pPhysX
 	if (!m_isTrackSagReady)
 		return;
 
-	/* PhysX 가 주는 바퀴 위치는 좌우로 x = ±1.3 인데(chassisDims.x 로 계산한다),
-	   모델의 바퀴는 x = ±1.61 이고 궤도 폭도 거기에 맞춰져 있다.
-	   그 값을 그대로 쓰면 바퀴가 궤도 안쪽으로 0.3칸 밀려 그려져서 궤도 밖으로 삐져나온다.
-
-	   그래서 바퀴는 '모델 제자리'에 두고, PhysX 에서는 상하 이동량(서스펜션)만 가져온다.
-	   궤도도 똑같은 값으로 구부리므로 둘이 절대 어긋나지 않는다. */
 	const _matrix ChassisInverse = XMMatrixInverse(nullptr, ChassisWorld);
 
 	for (int iSide = 0; iSide < 2; ++iSide)
@@ -1122,18 +1074,6 @@ void CTank::Update_Wheels_And_Track(_fmatrix ChassisWorld, const _matrix* pPhysX
 
 /*===========================================================================
 	네트워크 보간
-
-	서버는 GAME_TICK_FPS(60) 로 S_ALL_TANK_STATE 를 보내고 화면은 165fps 로 돈다.
-	받은 행렬을 그대로 Set_WorldMatrix 하면 같은 값을 2~3 프레임 붙들다가 튀어서
-	원격 탱크가 뚝뚝 끊기고, 포수는 자기 차체를 서버에서 받으므로 화면 전체가 떨린다.
-
-	여기서는 받은 값을 '목표' 로만 두고, 다음 패킷이 올 때까지 직전 값에서 목표까지
-	나눠서 이동한다. 결과적으로 한 패킷 간격(≈16.7ms)만큼 과거를 그리게 되지만,
-	그 대신 매 프레임 값이 갱신되므로 끊김이 사라진다.
-
-	★ 외삽(t>1 로 계속 밀기)은 하지 않는다. 지형 위의 탱크를 미래로 밀면
-	   땅이나 벽을 뚫고 들어갔다가 되돌아오는 게 더 눈에 띈다.
-	   패킷이 끊긴 동안에는 마지막 값에 멈춰 있는 편이 낫다.
 ===========================================================================*/
 namespace
 {
@@ -1208,20 +1148,11 @@ void CTank::Push_NetState(const _float4x4& World, float fPotap, float fPosin,
 	}
 	else
 	{
-		/*  ★ 출발점은 '직전 목표' 가 아니라 '지금 화면에 그려지고 있는 값' 이다.
-			두 가지가 이것 때문에 해결된다.
-			 - 이전 보간이 덜 끝난 채 새 패킷이 오면, 직전 목표에서 출발할 경우
-			   아직 가지도 않은 지점으로 순간이동했다가 다시 움직인다.
-			 - 한 프레임에 패킷이 2개 도착하면(수신 큐가 밀렸을 때) 첫 번째 값은
-			   화면에 한 번도 안 나오는데, 그걸 출발점으로 삼으면 뒤로 튄다.       */
+		/*  출발점은 직전 목표 가 아니라 지금 화면에 그려지고 있는 값*/
 		m_NetPrev	= m_NetDisplay;
 		m_NetTarget	= New;
 
-		/*  실제 도착 간격을 재서 평활한다. 서버 틱 지터 + 네트워크 지터가 있어
-			1/60 로 고정하면 매번 조금씩 남거나 모자란다.
-			단 같은 프레임에 두 번 들어온 경우(간격 0)는 표본이 아니므로 버린다.
-			안 버리면 간격이 계속 짧아져서, 목표에 일찍 도착한 뒤 다음 패킷까지
-			멈춰 있는 - 즉 지금 없애려는 그 끊김이 도로 생긴다.                  */
+		/*  실제 도착 간격을 재서 구한다 */
 		if (m_fNetSinceRecv >= NET_INTERVAL_MIN)
 		{
 			const float fMeasured = min(m_fNetSinceRecv, NET_INTERVAL_MAX);
@@ -1300,15 +1231,7 @@ void CTank::Set_Tank_Element_from_ServerData()
 	//여기서 받은 데이터로 매트릭스 바꿔줌
 	m_VIBuffer->Invalidate_Bones();
 
-	/*  바퀴 14개 + 궤도.
-		예전엔 여기서 바퀴를 '쉴 때 위치 × 월드행렬' 로만 놓아서, 남의 탱크는
-		아무리 험한 지형을 달려도 서스펜션이 굳어 있었다(궤도도 마찬가지).
-		이제 서버가 바퀴 높이를 int8 14개로 실어 보내므로 그걸 얹는다.
-
-		★ 여기는 내 탱크의 Update_Wheels_And_Track 과 규약이 다르다.
-		   저쪽은 Invalidate_Bones 앞에서 Set_Transform_Matrix(mesh + 3, ...) 을 쓰고,
-		   여기는 뒤에서 Set_Combined_Matrix(mesh, ...) 를 쓴다.
-		   둘 다 각자의 호출 순서에서 동작하는 것이니 섞지 말 것.               */
+	/*  바퀴 14개 + 궤도  */
 	const _matrix ChassisWorld = m_TransformCom->Get_WorldMatrix();
 
 	for (int iSide = 0; iSide < 2; ++iSide)
@@ -1518,21 +1441,6 @@ void CTank::Tick_For_Posin_Image(float fTimeDelta)
 	float angleDiffX = m_fPotapRotation - m_fCamPotapRot;
 	float angleDiffY = m_fCamPosinRot - m_fPosinRotation;
 
-	//// 스케일링.
-	//if (angleDiffX == 0.f && angleDiffY == 0.f) {
-	//	m_fSameTime += fTimeDelta;
-	//	if (m_fSameTime > 3.f)
-	//		m_fSameTime = 3.f;
-	//}
-	//else
-	//{
-	//	/*m_fSameTime -= fTimeDelta;
-	//	if (m_fSameTime < 0)
-	//		m_fSameTime = 0.f;*/
-	//	m_fSameTime = 0.f;
-	//}
-
-	//float fScale = 1.f - m_fSameTime * 0.29f;
 
 	m_QuadWorldTransform->Set_Scale(0.05f);
 
