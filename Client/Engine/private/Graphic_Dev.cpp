@@ -7,6 +7,18 @@ CGraphic_Dev::CGraphic_Dev() {};
 
 void CGraphic_Dev::Initialize(WindowInfo windowInfo)
 {
+#if defined(DEBUG) | defined(_DEBUG)
+    // D3D12 디버그 레이어를 활성화 합니다.
+    {
+        ID3D12Debug* debugController;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+            debugController->EnableDebugLayer();  // 디버그 레이어 활성화
+            debugController->Release();
+        }
+        if (debugController != nullptr) debugController->Release();
+    } // 메모리 누수 디버깅 체크용 코드
+#endif
+
     if(FAILED(CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory))))
         MSG_BOX("Failed to Create : dxgiFactory");
 
@@ -16,10 +28,16 @@ void CGraphic_Dev::Initialize(WindowInfo windowInfo)
         IID_PPV_ARGS(&m_Device)
     );
 
-    Set_WindowInfo(windowInfo);
+#if defined(_DEBUG)
+    Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
+    if (SUCCEEDED(m_Device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+    {
+        infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+        infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+    }
+#endif
 
-    //if (FAILED(m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence))))
-    //    MSG_BOX("Failed to Create : Fence");
+    Set_WindowInfo(windowInfo);
 
     m_RtvDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);                         
     m_DsvDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -238,31 +256,6 @@ void CGraphic_Dev::OnResize()
     m_ScissorRect = { 0, 0, m_ClientWidth, m_ClientHeight };
 }
 
-//void CGraphic_Dev::FlushCommandQueue()
-//{
-//    m_CurrentFence++;
-//
-//    // 커맨드들의 처리는 GPU에서 진행되기 때문에 언제 커맨드들이 처리됬는지를 CPU에서 알기 힘듭니다.
-//    // 그러므로 모든 커맨드가 처리됬을 때 새 펜스 지점을 설정하는 인스트럭션을 커맨드 큐에 추가합니다.
-//    // Signal()을 호출하기 전에 제출한 커맨드들이 처리되기 전까지 새 펜스 지점은 설정되지 않습니다.
-//    if (FAILED(m_CommandQueue->Signal(m_Fence, m_CurrentFence)))
-//        MSG_BOX("Failed to Signal : Fence");
-//
-//    // GPU가 새 펜스 지점까지의 명령들을 완료할 때까지 기다립니다.
-//    if (m_Fence->GetCompletedValue() < m_CurrentFence)
-//    {
-//        HANDLE eventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
-//
-//        // GPU가 새 펜스 지점에 도달했으면 이벤트를 발동시킵니다.
-//        if (FAILED(m_Fence->SetEventOnCompletion(m_CurrentFence, eventHandle)))
-//            MSG_BOX("Failed to Create : Event");
-//
-//        // GPU가 새 펜스를 설정하고 이벤트가 발동될때까지 기다립니다.
-//        WaitForSingleObject(eventHandle, INFINITE);
-//        CloseHandle(eventHandle);
-//    }
-//}
-
 ID3D12Resource* CGraphic_Dev::CurrentBackBuffer() const
 {
     return m_SwapChainBuffer[m_CurrBackBuffer];
@@ -412,15 +405,5 @@ void CGraphic_Dev::Free()
 
     Safe_Release(m_Device);
     Safe_Release(m_dxgiFactory);
-//#if defined(DEBUG) | defined(_DEBUG)
-    // D3D12 디버그 레이어를 활성화 합니다.
-    {
-        ID3D12Debug* debugController;
-        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-            debugController->EnableDebugLayer();  // 디버그 레이어 활성화
-            debugController->Release();
-        }
-        if (debugController != nullptr) debugController->Release();
-    } // 메모리 누수 디버깅 체크용 코드
-//#endif
+
 }

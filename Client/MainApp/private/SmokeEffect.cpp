@@ -31,7 +31,7 @@ HRESULT CSmokeEffect::Initialize(void* pArg)
 
 	m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 
-	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("EffectMat", MD));
+	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Material("SmokeEffectMat", MD));
 
 	m_VIBuffer = (CVIBuffer_Quad*)m_GameInstance->Get_Component("VIBuffer_QuadCom");
 

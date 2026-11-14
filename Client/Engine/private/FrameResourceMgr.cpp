@@ -38,6 +38,26 @@ void CFrameResourceMgr::BeginFrame()
 
 	auto& frame = m_FrameResources[m_CurrentFrameIndex];
 
+#if defined(_DEBUG)
+	// [측정] 펜스 대기 시간 통계. 1초마다 출력 창에 평균을 찍는다.
+	static LARGE_INTEGER s_Freq = {};
+	static LARGE_INTEGER s_ReportStart = {};
+	static double s_WaitSumMs = 0.0;	// 1초 동안 대기한 시간 합
+	static double s_WaitMaxMs = 0.0;	// 1초 동안 가장 길었던 대기
+	static UINT   s_FrameCount = 0;		// 1초 동안 BeginFrame 호출 수
+	static UINT   s_WaitCount = 0;		// 그중 실제로 기다린 프레임 수
+
+	if (s_Freq.QuadPart == 0)
+	{
+		QueryPerformanceFrequency(&s_Freq);
+		QueryPerformanceCounter(&s_ReportStart);
+	}
+
+	LARGE_INTEGER waitBegin, waitEnd;
+	QueryPerformanceCounter(&waitBegin);
+	bool bWaited = false;
+#endif
+
 	// GPU가 이 FrameResource를 아직 사용 중이면 기다림
 	if (m_MainFence->GetCompletedValue() < frame->Get_Fence_Value())
 	{
@@ -45,7 +65,39 @@ void CFrameResourceMgr::BeginFrame()
 		m_MainFence->SetEventOnCompletion(frame->Get_Fence_Value(), eventHandle);
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
+#if defined(_DEBUG)
+		bWaited = true;
+#endif
 	}
+
+#if defined(_DEBUG)
+	QueryPerformanceCounter(&waitEnd);
+	const double waitMs = double(waitEnd.QuadPart - waitBegin.QuadPart) * 1000.0 / double(s_Freq.QuadPart);
+
+	s_WaitSumMs += waitMs;
+	if (waitMs > s_WaitMaxMs) s_WaitMaxMs = waitMs;
+	++s_FrameCount;
+	if (bWaited) ++s_WaitCount;
+
+	const double elapsedSec = double(waitEnd.QuadPart - s_ReportStart.QuadPart) / double(s_Freq.QuadPart);
+	if (elapsedSec >= 1.0)
+	{
+		wchar_t buf[256];
+		swprintf_s(buf, L"[FenceWait] FrameResources=%u | FPS=%.1f | avg wait=%.3f ms | max wait=%.3f ms | waited %u/%u frames\n",
+			m_NumFrames,
+			s_FrameCount / elapsedSec,
+			s_WaitSumMs / s_FrameCount,
+			s_WaitMaxMs,
+			s_WaitCount, s_FrameCount);
+		OutputDebugStringW(buf);
+
+		s_ReportStart = waitEnd;
+		s_WaitSumMs = 0.0;
+		s_WaitMaxMs = 0.0;
+		s_FrameCount = 0;
+		s_WaitCount = 0;
+	}
+#endif
 }
 
 void CFrameResourceMgr::Reset_CommandList_and_Allocator(ID3D12PipelineState* PSO)
