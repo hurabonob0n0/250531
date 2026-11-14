@@ -1,5 +1,34 @@
 #include "Graphic_Dev.h"
 #include "GameInstance.h"
+#include <dxgi1_5.h>    // IDXGIFactory5, DXGI_FEATURE_PRESENT_ALLOW_TEARING
+
+namespace
+{
+    // Flip 모델 창 모드에서는 Present(0, 0)이어도 DWM이 주사율마다 한 번만 화면을 바꾼다.
+    // 주사율 제한 없이 그리려면 스왑체인과 Present 둘 다 tearing을 허용해야 한다.
+    bool s_bAllowTearing = false;
+
+    bool CheckTearingSupport(IDXGIFactory4* pFactory4)
+    {
+        BOOL allowTearing = FALSE;
+        Microsoft::WRL::ComPtr<IDXGIFactory5> factory5;
+        if (SUCCEEDED(pFactory4->QueryInterface(IID_PPV_ARGS(&factory5))))
+        {
+            if (FAILED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing))))
+                allowTearing = FALSE;
+        }
+        return allowTearing == TRUE;
+    }
+
+    // CreateSwapChain과 ResizeBuffers는 같은 플래그를 써야 한다.
+    UINT GetSwapChainFlags()
+    {
+        UINT flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+        if (s_bAllowTearing)
+            flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+        return flags;
+    }
+}
 
 IMPLEMENT_SINGLETON(CGraphic_Dev)
 
@@ -109,7 +138,11 @@ void CGraphic_Dev::CreateSwapChain()
     sd.OutputWindow = m_hMainWnd;
     sd.Windowed = !m_isFullScreen;
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    s_bAllowTearing = CheckTearingSupport(m_dxgiFactory);
+    sd.Flags = GetSwapChainFlags();
+#if defined(_DEBUG)
+    OutputDebugStringW(s_bAllowTearing ? L"[SwapChain] Tearing supported" : L"[SwapChain] Tearing NOT supported");
+#endif
 
     // 참고: 스왑 체인은 큐를 이용해서 플러시를 수행합니다.
     if(FAILED(m_dxgiFactory->CreateSwapChain(
@@ -178,7 +211,7 @@ void CGraphic_Dev::OnResize()
         SwapChainBufferCount,
         m_ClientWidth, m_ClientHeight,
         m_BackBufferFormat,
-        DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH))))
+        GetSwapChainFlags()))))
         MSG_BOX("Failed to ResizeBuffer");
 
     m_CurrBackBuffer = 0;
@@ -383,7 +416,16 @@ void CGraphic_Dev::Present()
     m_CommandQueue->ExecuteCommandLists(1, cmdLists);
 
     // 백 버퍼와 프론트 버퍼를 교체합니다.
-    m_SwapChain->Present(0, 0);
+    // ALLOW_TEARING은 창 모드에서만 쓸 수 있다. 전체 화면(exclusive)에서 넘기면 Present가 실패한다.
+    UINT presentFlags = 0;
+    if (s_bAllowTearing)
+    {
+        BOOL bFullscreen = FALSE;
+        m_SwapChain->GetFullscreenState(&bFullscreen, nullptr);
+        if (!bFullscreen)
+            presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
+    }
+    m_SwapChain->Present(0, presentFlags);
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
 
 }
