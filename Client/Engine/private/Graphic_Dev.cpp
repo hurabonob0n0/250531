@@ -38,14 +38,20 @@ void CGraphic_Dev::Initialize(WindowInfo windowInfo)
 {
 #if defined(DEBUG) | defined(_DEBUG)
     // D3D12 디버그 레이어를 활성화 합니다.
+    // [수정 전] 성공 시 Release를 두 번 호출(이중 Release), 실패 시 초기화 안 된 포인터에 Release
+    //{
+    //    ID3D12Debug* debugController;
+    //    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+    //        debugController->EnableDebugLayer();  // 디버그 레이어 활성화
+    //        debugController->Release();
+    //    }
+    //    if (debugController != nullptr) debugController->Release();
+    //} // 메모리 누수 디버깅 체크용 코드
     {
-        ID3D12Debug* debugController;
-        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-            debugController->EnableDebugLayer();  // 디버그 레이어 활성화
-            debugController->Release();
-        }
-        if (debugController != nullptr) debugController->Release();
-    } // 메모리 누수 디버깅 체크용 코드
+        Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+            debugController->EnableDebugLayer();  // 디버그 레이어 활성화. 스코프를 벗어나면 ComPtr가 Release
+    }
 #endif
 
     if(FAILED(CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory))))
@@ -444,6 +450,17 @@ void CGraphic_Dev::Free()
     Safe_Release(m_CommandList);
     Safe_Release(m_CommandListAlloc);
     Safe_Release(m_CommandQueue);
+
+#if defined(_DEBUG)
+    // Device를 놓기 직전에 아직 살아 있는 D3D 객체를 종류별로 출력한다.
+    // 프로세스 종료 시의 자동 보고(simple reporting)는 주소만 나와서 원인을 찾기 어렵다.
+    // 여기서 Device 자신은 항상 보인다(m_Device + 이 QueryInterface 참조). 그 외의 객체가 누수 후보다
+    {
+        Microsoft::WRL::ComPtr<ID3D12DebugDevice> debugDevice;
+        if (m_Device && SUCCEEDED(m_Device->QueryInterface(IID_PPV_ARGS(&debugDevice))))
+            debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+    }
+#endif
 
     Safe_Release(m_Device);
     Safe_Release(m_dxgiFactory);
