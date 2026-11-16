@@ -52,5 +52,6 @@ void CFrameResource::Free()
     Safe_Release(m_PassCB);
     Safe_Release(m_ObjectCB);
     Safe_Release(m_MaterialCB);
+    Safe_Release(m_InstanceCB);
 }
 

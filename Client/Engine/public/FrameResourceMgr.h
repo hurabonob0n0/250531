@@ -38,6 +38,7 @@ private:
 
 	ID3D12Fence*	m_MainFence = nullptr;
 	UINT64			m_MainFenceValue = 0;
+	HANDLE			m_FenceEvent = nullptr;	// reused by BeginFrame and Flush_CommandQueue (auto-reset)
 
 	ID3D12GraphicsCommandList*	m_CommandList = nullptr;
 	ID3D12CommandQueue*			m_CommandQueue = nullptr;

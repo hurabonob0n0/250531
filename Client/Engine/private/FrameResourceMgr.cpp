@@ -13,6 +13,11 @@ void CFrameResourceMgr::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLi
 
 	m_MainFenceValue = 0;
 
+	// 펜스 대기용 이벤트. auto-reset이라 대기가 끝나면 자동으로 비신호 상태로 돌아가 재사용할 수 있다
+	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	if (m_FenceEvent == nullptr)
+		MSG_BOX("Failed to Create : Fence Event");
+
 	m_CurrentFrameIndex = 0;
 
 	m_NumFrames = frameCount;
@@ -61,10 +66,8 @@ void CFrameResourceMgr::BeginFrame()
 	// GPU가 이 FrameResource를 아직 사용 중이면 기다림
 	if (m_MainFence->GetCompletedValue() < frame->Get_Fence_Value())
 	{
-		HANDLE eventHandle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		m_MainFence->SetEventOnCompletion(frame->Get_Fence_Value(), eventHandle);
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
+		m_MainFence->SetEventOnCompletion(frame->Get_Fence_Value(), m_FenceEvent);
+		WaitForSingleObject(m_FenceEvent, INFINITE);
 #if defined(_DEBUG)
 		bWaited = true;
 #endif
@@ -142,15 +145,12 @@ void CFrameResourceMgr::Flush_CommandQueue()
 	// GPU가 새 펜스 지점까지의 명령들을 완료할 때까지 기다립니다.
 	if (m_MainFence->GetCompletedValue() < m_MainFenceValue)
 	{
-		HANDLE eventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
-
 		// GPU가 새 펜스 지점에 도달했으면 이벤트를 발동시킵니다.
-		if (FAILED(m_MainFence->SetEventOnCompletion(m_MainFenceValue, eventHandle)))
-			MSG_BOX("Failed to Create : Event");
+		if (FAILED(m_MainFence->SetEventOnCompletion(m_MainFenceValue, m_FenceEvent)))
+			MSG_BOX("Failed to Set : Fence Event");
 
 		// GPU가 새 펜스를 설정하고 이벤트가 발동될때까지 기다립니다.
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
+		WaitForSingleObject(m_FenceEvent, INFINITE);
 	}
 }
 
@@ -171,6 +171,11 @@ void CFrameResourceMgr::Free()
 	for (auto& frameResource : m_FrameResources)
 		Safe_Release(frameResource);
 	Safe_Release(m_MainFence);
+	if (m_FenceEvent)
+	{
+		CloseHandle(m_FenceEvent);
+		m_FenceEvent = nullptr;
+	}
 	Safe_Release(m_CommandList);
 	Safe_Release(m_CommandQueue);
 }
