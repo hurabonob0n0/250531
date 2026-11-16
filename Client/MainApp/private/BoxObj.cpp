@@ -26,8 +26,10 @@ HRESULT CBoxObj::Initialize(void* pArg)
    /* MaterialData MD{};
 
     XMStoreFloat4x4( &MD.MatTransform, XMMatrixIdentity());
-    MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BrickDiffuse", CTexture::Create(L"../bin/Models/Basic/bricks.dds"));
-    MD.NormalMapIndex = m_GameInstance->Add_Texture("BrickNormal", CTexture::Create(L"../bin/Models/Basic/bricks_nmap.dds"));
+    //MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BrickDiffuse", CTexture::Create(L"../bin/Models/Basic/bricks.dds"));
+    MD.DiffuseMapIndex = m_GameInstance->Add_Texture("BrickDiffuse", L"../bin/Models/Basic/bricks.dds");
+    //MD.NormalMapIndex = m_GameInstance->Add_Texture("BrickNormal", CTexture::Create(L"../bin/Models/Basic/bricks_nmap.dds"));
+    MD.NormalMapIndex = m_GameInstance->Add_Texture("BrickNormal", L"../bin/Models/Basic/bricks_nmap.dds");
 
     Set_MatIndex(m_GameInstance->Add_Material("BrickMat", MD));*/
 

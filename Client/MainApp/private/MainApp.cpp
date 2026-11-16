@@ -94,6 +94,8 @@ static void Bake_All_Models()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd){
 	//_CrtSetBreakAlloc(8420);
+	//_CrtSetBreakAlloc(14455);
+	//_CrtSetBreakAlloc(14461);
 
 	if (nullptr != cmdLine && nullptr != strstr(cmdLine, "-bake"))
 	{

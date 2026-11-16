@@ -26,7 +26,8 @@ HRESULT CUI_AirDrop::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIAirDrop", CTexture::Create(L"../bin/Models/FinalUI/AIRSTRIKEUI.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIAirDrop", CTexture::Create(L"../bin/Models/FinalUI/AIRSTRIKEUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIAirDrop", L"../bin/Models/FinalUI/AIRSTRIKEUI.dds");
 
 	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIAirDrop", mat));
 

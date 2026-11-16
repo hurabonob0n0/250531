@@ -16,7 +16,8 @@ HRESULT CSmokeEffect::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 
-	MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("SMokeEffect_D", CTexture::Create(L"../bin/Models/Effect/SmokeEffect.dds"));
+	//MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("SMokeEffect_D", CTexture::Create(L"../bin/Models/Effect/SmokeEffect.dds"));
+	MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("SMokeEffect_D", L"../bin/Models/Effect/SmokeEffect.dds");
 	MD.NormalMapIndex = 0;//m_GameInstance->Add_Texture("Effect_N", CTexture::Create(L"../bin/Models/Effect/Explode_8x8.dds"));
 	XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
 

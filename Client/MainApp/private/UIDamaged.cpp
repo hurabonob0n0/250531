@@ -27,7 +27,8 @@ HRESULT CUIDamaged::Initialize(void* pArg)
 
     MaterialData mat{};
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIDamaged", CTexture::Create(L"../bin/Models/UI/8.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIDamaged", CTexture::Create(L"../bin/Models/UI/8.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIDamaged", L"../bin/Models/UI/8.dds");
 
     m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIDamaged", mat));
 

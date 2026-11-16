@@ -213,8 +213,10 @@ void CTree::Load_TreeInfos()
 		MaterialData MD{};
 
 		XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
-		MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
-		MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
+		//MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds"));
+		MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkD", L"../bin/Models/Tree/Dead_Tree_02_Bark_Base_Color.dds");
+		//MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", CTexture::Create(L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds"));
+		MD.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("BarkN", L"../bin/Models/Tree/Dead_Tree_02_Bark_Normal.dds");
 		ti.m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("BarkMat", MD));
 		
 		m_TreeInfos.push_back(ti);

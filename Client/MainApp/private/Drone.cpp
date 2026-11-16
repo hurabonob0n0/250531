@@ -36,7 +36,8 @@ HRESULT CDrone::Initialize(void* pArg)
     MaterialData MD{};
 
     XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
-    MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("DroneD", CTexture::Create(L"../bin/Models/Drone/Drone.dds"));
+    //MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("DroneD", CTexture::Create(L"../bin/Models/Drone/Drone.dds"));
+    MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("DroneD", L"../bin/Models/Drone/Drone.dds");
     MD.NormalMapIndex = 200;// CGameInstance::Get_Instance()->Add_Texture("DroneD", CTexture::Create(L"../bin/Models/Drone/Drone.dds"));
     m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("DroneMat", MD));
     m_CBBindingCom->Set_TexCoordMatrix(XMMatrixIdentity());

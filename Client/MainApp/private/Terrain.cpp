@@ -33,8 +33,10 @@ HRESULT CTerrain::Initialize(void* pArg)
     m_VIBufferCom = (CVIBuffer_Terrain*)m_GameInstance->Get_Component("TerrainCom",this);
 
     MaterialData mat{};
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", CTexture::Create(L"../bin/Models/TerrainDDS/Diffuse.dds"));
-    mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", CTexture::Create(L"../bin/Models/TerrainDDS/Normal.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", CTexture::Create(L"../bin/Models/TerrainDDS/Diffuse.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", L"../bin/Models/TerrainDDS/Diffuse.dds");
+    //mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", CTexture::Create(L"../bin/Models/TerrainDDS/Normal.dds"));
+    mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", L"../bin/Models/TerrainDDS/Normal.dds");
     mat.Roughness = 0.9f;
     mat.FresnelR0 = XMFLOAT3{ 0.f,0.f,0.f };
     m_CBBindingCom->Set_MaterialIndex( m_GameInstance->Add_Material("TerrainMat", mat));

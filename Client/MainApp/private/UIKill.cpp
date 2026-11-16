@@ -27,7 +27,8 @@ HRESULT CUIKill::Initialize(void* pArg)
 
     MaterialData mat{};
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIKill", CTexture::Create(L"../bin/Models/UI/9.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIKill", CTexture::Create(L"../bin/Models/UI/9.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("UIKill", L"../bin/Models/UI/9.dds");
 
     m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("UIKill", mat));
 

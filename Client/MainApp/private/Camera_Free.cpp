@@ -28,7 +28,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_CBBindingCom = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 
-	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Texture("SkyBox", CTexture::Create(L"../bin/Models/SkyBox/desertcube1024.dds"), CTextureMgr::TT_TEXTURECUBE));
+	//m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Texture("SkyBox", CTexture::Create(L"../bin/Models/SkyBox/desertcube1024.dds"), CTextureMgr::TT_TEXTURECUBE));
+	m_CBBindingCom->Set_MaterialIndex(m_GameInstance->Add_Texture("SkyBox", L"../bin/Models/SkyBox/desertcube1024.dds", CTextureMgr::TT_TEXTURECUBE));
 
 	CVIBuffer_Geos::BASIC_SUBMESHES BS = CVIBuffer_Geos::BS_SPHERE;
 

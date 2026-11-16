@@ -27,15 +27,18 @@ HRESULT CUICrossHair::Initialize(void* pArg)
 
     MaterialData mat{};
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("TPSAIM", CTexture::Create(L"../bin/Models/FinalUI/TPSAIM.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("TPSAIM", CTexture::Create(L"../bin/Models/FinalUI/TPSAIM.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("TPSAIM", L"../bin/Models/FinalUI/TPSAIM.dds");
 
     TPSMatIndex = m_GameInstance->Add_Material("TPSAIM", mat);
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FPSCrossHair", CTexture::Create(L"../bin/Models/FinalUI/FPSCrossHair.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FPSCrossHair", CTexture::Create(L"../bin/Models/FinalUI/FPSCrossHair.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FPSCrossHair", L"../bin/Models/FinalUI/FPSCrossHair.dds");
 
     FPSMatIndex = m_GameInstance->Add_Material("FPSCrossHair", mat);
 
-    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DroneCrossHair", CTexture::Create(L"../bin/Models/FinalUI/ForDroneUI.dds"));
+    //mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DroneCrossHair", CTexture::Create(L"../bin/Models/FinalUI/ForDroneUI.dds"));
+    mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DroneCrossHair", L"../bin/Models/FinalUI/ForDroneUI.dds");
 
     DroneMatIndex = m_GameInstance->Add_Material("DroneCrossHair", mat);
 

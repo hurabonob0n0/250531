@@ -51,44 +51,64 @@ HRESULT CTank::Initialize_Prototype()
 	matindex = CGameInstance::Get_Instance()->Get_Mat_Size();
 
 	MaterialData mat{};
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_D", L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glacis_N", L"../bin/Models/TankDDS/M1A2_Glacis_Plate_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Glacis", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_D", L"../bin/Models/TankDDS/M1A2_Glass_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Glass_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Glass_N", L"../bin/Models/TankDDS/M1A2_Glass_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Glass", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Fences_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Fences_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Fences_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_D", L"../bin/Models/TankDDS/M1A2_Fences_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Fences_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Fence_N", L"../bin/Models/TankDDS/M1A2_Fences_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Fence", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Wheels_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Wheels_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Wheels_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_D", L"../bin/Models/TankDDS/M1A2_Wheels_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Wheels_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Wheels_N", L"../bin/Models/TankDDS/M1A2_Wheels_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Wheels", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Turret_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Turret_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Turret_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_D", L"../bin/Models/TankDDS/M1A2_Turret_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Turret_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Turret_N", L"../bin/Models/TankDDS/M1A2_Turret_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Turret", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_W_Base_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_W_Base_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_W_Base_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_D", L"../bin/Models/TankDDS/M1A2_W_Base_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_W_Base_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_W_N", L"../bin/Models/TankDDS/M1A2_W_Base_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_W", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Sprocket_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Sprocket_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Sprocket_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_D", L"../bin/Models/TankDDS/M1A2_Sprocket_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Sprocket_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Sprocket_N", L"../bin/Models/TankDDS/M1A2_Sprocket_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Sprocket", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Tracks_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Tracks_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_D", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Tracks_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_D", L"../bin/Models/TankDDS/M1A2_Tracks_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_N", CTexture::Create(L"../bin/Models/TankDDS/M1A2_Tracks_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_Tracks_N", L"../bin/Models/TankDDS/M1A2_Tracks_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_Tracks", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_D", CTexture::Create(L"../bin/Models/TankDDS/M2-50_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_N", CTexture::Create(L"../bin/Models/TankDDS/M2-50_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_D", CTexture::Create(L"../bin/Models/TankDDS/M2-50_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_D", L"../bin/Models/TankDDS/M2-50_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_N", CTexture::Create(L"../bin/Models/TankDDS/M2-50_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M250_N", L"../bin/Models/TankDDS/M2-50_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_M250", mat);
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_D", CTexture::Create(L"../bin/Models/TankDDS/M240P_Base_color.dds"));
-	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_N", CTexture::Create(L"../bin/Models/TankDDS/M240P_Normal.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_D", CTexture::Create(L"../bin/Models/TankDDS/M240P_Base_color.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_D", L"../bin/Models/TankDDS/M240P_Base_color.dds");
+	//mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_N", CTexture::Create(L"../bin/Models/TankDDS/M240P_Normal.dds"));
+	mat.NormalMapIndex = CGameInstance::Get_Instance()->Add_Texture("Tank_M240P_N", L"../bin/Models/TankDDS/M240P_Normal.dds");
 	CGameInstance::Get_Instance()->Add_Material("Tank_M240P", mat);
 
 	return S_OK;
@@ -124,7 +144,8 @@ void CTank::Initialize_For_PosinQuad()
 	m_CBBindingQuad = (CBBinding*)m_GameInstance->Get_Component("CBBindingCom", nullptr);
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Posin", CTexture::Create(L"../bin/Models/FinalUI/cross.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Posin", CTexture::Create(L"../bin/Models/FinalUI/cross.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Posin", L"../bin/Models/FinalUI/cross.dds");
 
 	m_CBBindingQuad->Set_MaterialIndex(m_GameInstance->Add_Material("PosinMat", mat));
 

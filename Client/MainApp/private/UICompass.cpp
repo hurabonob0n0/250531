@@ -30,7 +30,8 @@ HRESULT CUICompass::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CompassUI", CTexture::Create(L"../bin/Models/FinalUI/ComapssBar.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CompassUI", CTexture::Create(L"../bin/Models/FinalUI/ComapssBar.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CompassUI", L"../bin/Models/FinalUI/ComapssBar.dds");
 
 	m_CBBinding->Set_MaterialIndex(m_GameInstance->Add_Material("CompassUI", mat));
 

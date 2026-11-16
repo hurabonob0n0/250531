@@ -19,7 +19,8 @@ HRESULT CPing::Initialize_Prototype()
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("PingTex", CTexture::Create(L"../bin/Models/FinalUI/Ping.dds"));
+	//mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("PingTex", CTexture::Create(L"../bin/Models/FinalUI/Ping.dds"));
+	mat.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("PingTex", L"../bin/Models/FinalUI/Ping.dds");
 
 	m_MatIndex = CGameInstance::Get_Instance()->Add_Material("PingMat", mat);
 

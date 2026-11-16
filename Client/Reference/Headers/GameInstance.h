@@ -99,6 +99,9 @@ public: //For TextureMgr
 	int Add_Texture(string texname, CTexture* texInstance, CTextureMgr::TEXTURETYPE TT = CTextureMgr::TT_TEXTURE2D) {
 		return m_TextureMgr->Add_Texture(texname, texInstance, TT);
 	}
+	int Add_Texture(string texname, const wchar_t* Filename, CTextureMgr::TEXTURETYPE TT = CTextureMgr::TT_TEXTURE2D) {
+		return m_TextureMgr->Add_Texture(texname, Filename, TT);
+	}
 	ID3D12DescriptorHeap* Get_SRVDescriptorHeap() { return m_TextureMgr->Get_DescriptorHeap(); }
 	void Set_DescriptorHeap() { m_TextureMgr->Set_DescriptorHeap(); }
 	void Add_ShadowMap(ID3D12Resource** Resource) { m_TextureMgr->Add_ShadowMap(Resource); }

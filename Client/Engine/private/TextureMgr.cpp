@@ -102,13 +102,41 @@
 
 IMPLEMENT_SINGLETON(CTextureMgr);
 
-_uint CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT)
+// 이름으로 등록된 텍스처를 찾는다. 1-based index, 없으면 0 (0번 슬롯은 섀도우맵이라 텍스처 인덱스로는 안 쓰인다)
+_uint CTextureMgr::Find_Texture(const string& texname) const
 {
-	// vector를 순회하여 이름이 같은 텍스처가 있는지 확인
 	for (size_t i = 0; i < m_Textures.size(); ++i)
 	{
 		if (m_Textures[i].first == texname)
-			return i + 1; // 기존처럼 1-based index 반환
+			return static_cast<_uint>(i + 1);
+	}
+	return 0;
+}
+
+// 파일 경로를 받는 버전. 이미 등록된 이름이면 파일을 읽지 않고 인덱스만 돌려준다
+_uint CTextureMgr::Add_Texture(const string& texname, const wchar_t* Filename, TEXTURETYPE TT)
+{
+	_uint existing = Find_Texture(texname);
+	if (existing != 0)
+		return existing;
+
+	return Add_Texture(texname, CTexture::Create(Filename), TT);
+}
+
+_uint CTextureMgr::Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT)
+{
+	// [수정 전] 같은 이름이 있으면 인덱스만 반환하고 texInstance를 해제하지 않음 → CTexture와 GPU 텍스처 누수
+	//// vector를 순회하여 이름이 같은 텍스처가 있는지 확인
+	//for (size_t i = 0; i < m_Textures.size(); ++i)
+	//{
+	//	if (m_Textures[i].first == texname)
+	//		return i + 1; // 기존처럼 1-based index 반환
+	//}
+	_uint existing = Find_Texture(texname);
+	if (existing != 0)
+	{
+		Safe_Release(texInstance);
+		return existing;
 	}
 
 	// 존재하지 않으면 새로 추가

@@ -58,6 +58,8 @@ private:
 
 public:
 	_uint Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT = TT_TEXTURE2D);
+	_uint Add_Texture(const string& texname, const wchar_t* Filename, TEXTURETYPE TT = TT_TEXTURE2D);	// loads the file only if texname is not registered yet
+	_uint Find_Texture(const string& texname) const;	// 1-based index, 0 if not found
 	void Add_ShadowMap(ID3D12Resource** Resource);
 	ID3D12Resource* Get_Texture(string texname);
 	void Make_DescriptorHeap();

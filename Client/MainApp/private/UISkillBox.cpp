@@ -27,16 +27,20 @@ HRESULT CUISkillBox::Initialize(void* pArg)
 	__super::Initialize(pArg);
 
 	MaterialData mat{};
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("AIRSTRIKESKILL", CTexture::Create(L"../bin/Models/FinalUI/AIRSTRIKESKILL.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("AIRSTRIKESKILL", CTexture::Create(L"../bin/Models/FinalUI/AIRSTRIKESKILL.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("AIRSTRIKESKILL", L"../bin/Models/FinalUI/AIRSTRIKESKILL.dds");
 	AIRSTRIKESKILL_BoxMat = m_GameInstance->Add_Material("AIRSTRIKESKILL", mat);	
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DRONESKILL", CTexture::Create(L"../bin/Models/FinalUI/DRONESKILL.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DRONESKILL", CTexture::Create(L"../bin/Models/FinalUI/DRONESKILL.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("DRONESKILL", L"../bin/Models/FinalUI/DRONESKILL.dds");
 	DRONESKILL_BoxMat = m_GameInstance->Add_Material("DRONESKILL", mat);	
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FALLOWSKILL", CTexture::Create(L"../bin/Models/FinalUI/FALLOWSKILL.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FALLOWSKILL", CTexture::Create(L"../bin/Models/FinalUI/FALLOWSKILL.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("FALLOWSKILL", L"../bin/Models/FinalUI/FALLOWSKILL.dds");
 	FALLOWSKILL_BoxMat = m_GameInstance->Add_Material("FALLOWSKILL", mat);	
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CoolTimeBoxUI", CTexture::Create(L"../bin/Models/FinalUI/CoolTimeBoxUI.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CoolTimeBoxUI", CTexture::Create(L"../bin/Models/FinalUI/CoolTimeBoxUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CoolTimeBoxUI", L"../bin/Models/FinalUI/CoolTimeBoxUI.dds");
 	COLLTIME_BoxMat = m_GameInstance->Add_Material("CoolTimeBoxUI", mat);
 
 	m_CBBinding->Set_MaterialIndex(COLLTIME_BoxMat);

@@ -30,7 +30,8 @@ HRESULT CZet::Initialize(void* pArg)
 	MaterialData MD{};
 
 	XMStoreFloat4x4(&MD.MatTransform, XMMatrixIdentity());
-	MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("ZetD", CTexture::Create(L"../bin/Models/Zet/Zet_D.dds"));
+	//MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("ZetD", CTexture::Create(L"../bin/Models/Zet/Zet_D.dds"));
+	MD.DiffuseMapIndex = CGameInstance::Get_Instance()->Add_Texture("ZetD", L"../bin/Models/Zet/Zet_D.dds");
 	MD.NormalMapIndex = 200;// CGameInstance::Get_Instance()->Add_Texture("DroneD", CTexture::Create(L"../bin/Models/Drone/Drone.dds"));
 	m_CBBindingCom->Set_MaterialIndex(CGameInstance::Get_Instance()->Add_Material("ZetMat", MD));
 	m_CBBindingCom->Set_TexCoordMatrix(XMMatrixIdentity());

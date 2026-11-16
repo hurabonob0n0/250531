@@ -27,15 +27,18 @@ HRESULT CUITeamPercent::Initialize(void* pArg)
 
 	MaterialData mat{};
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CaptureUI", CTexture::Create(L"../bin/Models/FinalUI/CaptureUI.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CaptureUI", CTexture::Create(L"../bin/Models/FinalUI/CaptureUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("CaptureUI", L"../bin/Models/FinalUI/CaptureUI.dds");
 
 	BlankMatIndex = m_GameInstance->Add_Material("CaptureUI", mat);
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("BlueCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/BlueCaptureUI.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("BlueCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/BlueCaptureUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("BlueCaptureUI", L"../bin/Models/FinalUI/BlueCaptureUI.dds");
 
 	BlueMatIndex = m_GameInstance->Add_Material("BlueCaptureUI", mat);
 
-	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("RedCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/RedCaptureUI.dds"));
+	//mat.DiffuseMapIndex = m_GameInstance->Add_Texture("RedCaptureUI", CTexture::Create(L"../bin/Models/FinalUI/RedCaptureUI.dds"));
+	mat.DiffuseMapIndex = m_GameInstance->Add_Texture("RedCaptureUI", L"../bin/Models/FinalUI/RedCaptureUI.dds");
 
 	RedMatIndex = m_GameInstance->Add_Material("RedCaptureUI", mat);
 
