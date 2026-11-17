@@ -487,34 +487,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\bin\Shaders\TankVS.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\Shaders\TankPS.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\bin\Shaders\Common.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\LightingUtil.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\bin\Shaders\CommonTank.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\Shaders\Default.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\Shaders\Sky.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\bin\Shaders\Effect.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders\UI.hlsl">
-      <Filter>ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\Shaders\Shadows.hlsl">
       <Filter>ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Common.hlsl">
@@ -526,17 +508,11 @@
     <FxCompile Include="..\bin\Shaders1\LightingUtil.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\bin\Shaders1\ShadowDebug.hlsl">
-      <Filter>shader</Filter>
-    </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Shadows.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Sky.hlsl">
       <Filter>shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\bin\ShaderFiles\LightingUtil.hlsl">
-      <Filter>Shaderfile</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\Shaders1\Default3.hlsl">
       <Filter>ShaderFiles</Filter>
