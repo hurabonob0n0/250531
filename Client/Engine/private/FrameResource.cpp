@@ -20,7 +20,8 @@ void CFrameResource::Initialize(ID3D12Device* device)
 
 void CFrameResource::Set_PassConstants(_uint index)
 {
-    GETCOMMANDLIST->SetGraphicsRootConstantBufferView(1, m_PassCB->Resource()->GetGPUVirtualAddress() + index * sizeof(PassConstants));
+    GETCOMMANDLIST->SetGraphicsRootConstantBufferView(1, m_PassCB->Resource()->GetGPUVirtualAddress() + index 
+        * d3dUtil::CalcConstantBufferByteSize( sizeof(PassConstants)));
 }
 
 void CFrameResource::Set_Materials()
