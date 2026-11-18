@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "FrameResourceMgr.h"
 
+static int DebugMode = 0;
+
 CRenderer::CRenderer(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, class CGameInstance* pGameInstance) : CComponent(pDevice, pCommandList)
 {
     m_GameInstance = pGameInstance;
@@ -76,6 +78,7 @@ HRESULT CRenderer::Initialize_Prototype()
 HRESULT CRenderer::Initialize(void* pArg)
 {
     __super::Initialize(pArg);
+    
     return S_OK;
 }
 
@@ -113,6 +116,14 @@ void CRenderer::Render()
     m_GameInstance->Set_CurrentFramePBMats(0);
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);
     m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    
+    if (m_GameInstance->Key_Down(VK_RIGHT))
+        DebugMode += 1;
+
+    if (DebugMode > 2)
+        DebugMode = 0;
+
+    m_CommandList->SetGraphicsRoot32BitConstant(7, DebugMode, 0);
 
     Render_Priority();
     

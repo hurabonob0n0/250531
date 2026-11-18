@@ -98,11 +98,14 @@ CRootSignature* CRootSignature::CreateDefaultGraphicsRootSignature()
 	// slot 4: ShadowMap Texture (t1, space0)
 	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
 
-	// slot 5: Texture2D gTextureMaps[10] (t1~t10, space0)
+	// slot 5: Texture2D gTextureMaps[500] (t2~, space0)
 	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 500, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	// slot 6: StructuredBuffer<InstanceBuffer> at t1, space1
 	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_ALL);
+	
+	// slot 7: Root Constant (b2)
+	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 2, 0, D3D12_SHADER_VISIBILITY_ALL, 1);
 
 	auto staticSamplers = GetStaticSamplers();
 

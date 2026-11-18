@@ -145,6 +145,9 @@ cbuffer cbPass : register(b1)
     Light gLights[MaxLights];
 };
 
+cbuffer cbDebug : register(b2)
+{ uint gDebugMode; }
+
 //---------------------------------------------------------------------------------------
 // Transforms a normal map sample to world space.
 //---------------------------------------------------------------------------------------

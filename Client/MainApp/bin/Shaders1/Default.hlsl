@@ -95,6 +95,11 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 normalMapSample = gTextureMaps[normalMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
 	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 
+    if (gDebugMode == 1) {
+        bumpedNormalW = bumpedNormalW * 0.5f + 0.5f;
+        return float4(bumpedNormalW, 1.f);
+    }
+    
 	// Uncomment to turn off normal mapping.
     //bumpedNormalW = pin.NormalW;
 
@@ -107,6 +112,11 @@ float4 PS(VertexOut pin) : SV_Target
     // Only the first light casts a shadow.
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
     shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+    if (gDebugMode == 2)
+    {
+        float s = shadowFactor[0];
+        return float4(s, s, s, 1.f);
+    }
 
     const float shininess = (1.0f - roughness) * normalMapSample.a;
     Material mat = { diffuseAlbedo, fresnelR0, shininess };
@@ -148,6 +158,7 @@ float4 PS(VertexOut pin) : SV_Target
         litColor.b += 0.1f;
     else if (gObjPad1 == 3)
         litColor.rgb -= 0.1f;
+    
     
     return litColor;
 
