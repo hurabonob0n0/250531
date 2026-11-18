@@ -124,9 +124,6 @@
     <Filter Include="01.DefaultObj\Drone">
       <UniqueIdentifier>{13d53018-77b1-4a38-8ed9-882fdd59e133}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaderfile">
-      <UniqueIdentifier>{ce8f14ab-cd8b-4c21-b068-878e6efa9294}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Camera\Camera_Drone">
       <UniqueIdentifier>{35333502-ece4-457d-a81b-84790e080fe0}</UniqueIdentifier>
     </Filter>

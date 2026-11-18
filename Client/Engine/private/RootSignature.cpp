@@ -43,7 +43,7 @@ CRootSignature* CRootSignature::PushTable(D3D12_DESCRIPTOR_RANGE_TYPE rangeType,
 	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParam.DescriptorTable.NumDescriptorRanges = 1;
 	rootParam.DescriptorTable.pDescriptorRanges = &mRanges.back();
-	rootParam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParam.ShaderVisibility = visibility;
 
 	mParams.push_back(rootParam);
 

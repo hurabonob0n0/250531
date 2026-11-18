@@ -8,7 +8,7 @@ class CRootSignature : public CBase
 private:
 	CRootSignature() {
 		constexpr int kMaxRangeSize = 32;
-		mRanges.resize(kMaxRangeSize);
+		mRanges.reserve(kMaxRangeSize);
 	};
 	virtual ~CRootSignature() = default;
 
