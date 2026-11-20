@@ -29,8 +29,7 @@ CVIBuffer::CVIBuffer(CVIBuffer& rhs) : CComponent(rhs)
 	Safe_AddRef(m_VertexBufferGPU);
 	Safe_AddRef(m_IndexBufferGPU);
 
-	Safe_AddRef(m_CommandList);
-	Safe_AddRef(m_Device);
+	// m_CommandList / m_Device are already AddRef'd by CComponent(rhs)
 }
 
 void CVIBuffer::Create_Buffer(ID3D12Resource** GPU, ID3D12Resource** Uploader, const void* initData, UINT64 byteSize)
