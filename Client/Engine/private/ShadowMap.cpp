@@ -82,12 +82,18 @@ void CShadowMap::Late_Update()
 	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, lightView));
 
 	// Ortho frustum in light space encloses scene.
-	float l = sphereCenterLS.x - 300.f;
+	/*float l = sphereCenterLS.x - 300.f;
 	float b = sphereCenterLS.y - 300.f;
 	float n = sphereCenterLS.z - 300.f;
 	float r = sphereCenterLS.x + 300.f;
 	float t = sphereCenterLS.y + 300.f;
-	float f = sphereCenterLS.z + 300.f;
+	float f = sphereCenterLS.z + 300.f;*/
+	float l = sphereCenterLS.x - 200.f;
+	float b = sphereCenterLS.y - 200.f;
+	float n = sphereCenterLS.z - 200.f;
+	float r = sphereCenterLS.x + 200.f;
+	float t = sphereCenterLS.y + 200.f;
+	float f = sphereCenterLS.z + 200.f;
 
 	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 
