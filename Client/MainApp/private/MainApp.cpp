@@ -799,6 +799,7 @@ void CMainApp::Free()
 {
 	m_GameInstance->Release_Engine();
 	m_PhysicsEngine->Release_Instance();
+	FMOD_Manager::Destroy_Instance();	// Shutdown + delete, after objects holding channels are freed
 
 	Safe_Release(m_Timer);
 	Safe_Release(m_Input_Dev);
