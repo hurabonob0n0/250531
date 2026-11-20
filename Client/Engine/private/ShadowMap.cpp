@@ -71,6 +71,7 @@ void CShadowMap::Late_Update()
 	XMVECTOR lightDir = XMVectorSet(0.57735f, -0.57735f, 0.57735f, 0.f);
 	XMVECTOR lightPos = -2.0f * 300.f* lightDir;
 	XMVECTOR targetPos = m_TankTransform->Get_State(CTransform::STATE_POSITION);//XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	lightPos += targetPos;
 	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
 
