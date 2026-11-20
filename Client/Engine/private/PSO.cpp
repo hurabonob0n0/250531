@@ -115,7 +115,7 @@ CPSO* CPSO::SetForSkyBox() {
     m_PsoDesc.DepthStencilState = depthStencilDesc;
 
     m_PsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-
+    
     return this;
 }
 
@@ -132,8 +132,12 @@ CPSO* CPSO::setForBlending()
 CPSO* CPSO::setForShadow()
 {
     m_PsoDesc.RasterizerState.DepthBias = 10000;
+    //m_PsoDesc.RasterizerState.DepthBias = 0;
     m_PsoDesc.RasterizerState.DepthBiasClamp = 10.0f;
     m_PsoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+    /*m_PsoDesc.RasterizerState.DepthBias = 0.f;
+    m_PsoDesc.RasterizerState.DepthBiasClamp = 0.0f;
+    m_PsoDesc.RasterizerState.SlopeScaledDepthBias = 0.0f;*/
     m_PsoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
     m_PsoDesc.NumRenderTargets = 0;
 
