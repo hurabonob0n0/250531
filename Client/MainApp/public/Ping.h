@@ -37,7 +37,7 @@ public:
 
 private:
 	CVIBuffer_Quad* m_VIBuffer;
-	CBBinding* m_CBBindingCom;
+	CBBinding* m_CBBindingCom = nullptr;
 	class CTerrain* m_Terrain;
 	CTransform* m_CameraFree;
 	CTransform* m_DroneCamera;

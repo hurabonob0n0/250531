@@ -136,5 +136,5 @@ void CShadowMap::Late_Update()
 
 void CShadowMap::Free()
 {
-	
+	Safe_Release(m_Resource);
 }

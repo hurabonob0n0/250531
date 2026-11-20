@@ -133,6 +133,7 @@ void CPing::Set_Position(float x, float y, float z)
 void CPing::Free()
 {
 	Safe_Release(m_VIBuffer);
+	Safe_Release(m_CBBindingCom);
 
 	__super::Free();
 }

@@ -239,4 +239,6 @@ void CTextureMgr::Free()
 		Safe_Release(pair.second);
 
 	m_Textures.clear();
+
+	Safe_Release(srvDescriptorHeap);
 }

@@ -202,6 +202,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_FrameResourceMgr);
 	// D3D 리소스를 가진 매니저는 Graphic_Dev(Device)보다 먼저 해제한다.
 	// Graphic_Dev::Free()의 ReportLiveDeviceObjects에 정상 텍스처가 누수로 섞여 나오지 않게 하기 위함
+	Safe_Release(m_ShadowMap);
 	Safe_Release(m_TextureMgr);
 	Safe_Release(m_MaterialMgr);
 	Safe_Release(m_Graphic_Dev);

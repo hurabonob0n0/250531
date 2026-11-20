@@ -228,6 +228,10 @@ void CTree::Free()
 	for (auto& VIBuffer : m_VIBuffers)
 		Safe_Release(VIBuffer);
 
+	// Load_TreeInfos() clones one CBBinding per tree (150)
+	for (auto& TI : m_TreeInfos)
+		Safe_Release(TI.m_CBBindingCom);
+
 	__super::Free();
 }
 
