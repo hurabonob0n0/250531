@@ -59,4 +59,4 @@
       범위가 딱 탱크 주변이라서. 더 내리려면 PSO.cpp 의 setForShadow() 에 있는
       DepthBias(10000) / SlopeScaledDepthBias(1.0) 도 같이 올려야 한다.
 ---------------------------------------------------------------------------*/
-#define SHADOWMAP_SIZE          4096
+#define SHADOWMAP_SIZE          8192
