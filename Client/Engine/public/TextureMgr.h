@@ -59,8 +59,9 @@ private:
 public:
 	_uint Add_Texture(string texname, CTexture* texInstance, TEXTURETYPE TT = TT_TEXTURE2D);
 	_uint Add_Texture(const string& texname, const wchar_t* Filename, TEXTURETYPE TT = TT_TEXTURE2D);	// loads the file only if texname is not registered yet
-	_uint Find_Texture(const string& texname) const;	// 1-based index, 0 if not found
+	_uint Find_Texture(const string& texname) const;	// texture index, 0 (= pink default texture) if not found
 	void Add_ShadowMap(ID3D12Resource** Resource);
+	void Add_DefaultTexture();	// registers the pink texture as texture index 0. Call once right after Make_DescriptorHeap
 	ID3D12Resource* Get_Texture(string texname);
 	void Make_DescriptorHeap();
 	void Set_DescriptorHeap();
@@ -71,7 +72,16 @@ public:
 	ID3D12DescriptorHeap* Get_DescriptorHeap() { return srvDescriptorHeap; }
 	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_CPUSRVDescriptorHeap() { return hDescriptor; }
 
+	// Heap layout: see Engine_Config.h (SRV_ENGINE_RESERVED)
+	// Engine-only region [0, SRV_ENGINE_RESERVED): shadow map, HDR, Bloom ...
+	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_EngineSrvCpuHandle(_uint slot) const;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_EngineSrvGpuHandle(_uint slot) const;
+	// Texture region: start of gTextureMaps (root slot 5), and one texture (e.g. sky cube map, root slot 3)
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureTableGpuHandle() const;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureGpuHandle(_uint texIndex) const;
+
 private:
+	_int Find_Index(const string& texname) const;	// -1 if not found
 	ID3D12DescriptorHeap* srvDescriptorHeap;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor;
 

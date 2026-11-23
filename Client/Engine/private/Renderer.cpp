@@ -89,7 +89,7 @@ void CRenderer::Render()
     m_GameInstance->Set_DescriptorHeap();
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
     m_GameInstance->Set_CurrentFramePBMats(1);
-    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_TextureTableGpuHandle());	// gTextureMaps[0] = 힙 SRV_ENGINE_RESERVED 칸
     //m_GameInstance->Set_ViewPort_and_ScissorRect();
     m_CommandList->RSSetViewports(1, &m_GameInstance->m_ShadowMap->mViewport);
     m_CommandList->RSSetScissorRects(1, &m_GameInstance->m_ShadowMap->mScissorRect);
@@ -115,7 +115,7 @@ void CRenderer::Render()
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
     m_GameInstance->Set_CurrentFramePBMats(0);
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);
-    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_TextureTableGpuHandle());	// gTextureMaps[0] = 힙 SRV_ENGINE_RESERVED 칸
     
     if (m_GameInstance->Key_Down(VK_RIGHT))
         DebugMode += 1;

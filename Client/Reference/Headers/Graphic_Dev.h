@@ -45,6 +45,8 @@ public: // For SwapChain
 	ID3D12Resource* CurrentBackBuffer() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
+	// 엔진 오프스크린 RT용 RTV 칸 (0 ~ RTV_ENGINE_RESERVED-1). 백버퍼 RTV 바로 뒤에 있다
+	D3D12_CPU_DESCRIPTOR_HANDLE EngineRtv(UINT slot) const;
 
 public: //For 
 

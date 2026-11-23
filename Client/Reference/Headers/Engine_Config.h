@@ -60,3 +60,26 @@
       DepthBias(10000) / SlopeScaledDepthBias(1.0) 도 같이 올려야 한다.
 ---------------------------------------------------------------------------*/
 #define SHADOWMAP_SIZE          8192
+
+/*---------------------------------------------------------------------------
+    디스크립터 힙 구간 (2주차 Bloom 준비)
+
+    SRV 힙 (shader-visible, 하나만 바인딩 가능하므로 구간을 나눠 쓴다)
+      [0 ~ SRV_ENGINE_RESERVED-1]   엔진 전용: 그림자맵, HDR, Bloom ...
+      [SRV_ENGINE_RESERVED ~ ]      TextureMgr 텍스처. 텍스처 인덱스 0 = 분홍 기본 텍스처
+      힙 칸 = SRV_ENGINE_RESERVED + 텍스처 인덱스
+      slot 5 테이블은 SRV_ENGINE_RESERVED 칸부터 바인딩 → gTextureMaps[i] = 텍스처 인덱스 i
+      MAX_TEXTURE_COUNT 는 Common.hlsl 의 gTextureMaps[500] 배열 크기와 같아야 한다
+
+    RTV 힙 (셰이더가 안 읽으므로 SetDescriptorHeaps 와 무관)
+      [0 ~ SwapChainBufferCount-1]  백버퍼
+      [그 뒤 RTV_ENGINE_RESERVED 칸] 엔진 오프스크린 RT: HDR 씬, Bloom 핑퐁 ...
+---------------------------------------------------------------------------*/
+#define SRV_ENGINE_RESERVED     16
+#define MAX_TEXTURE_COUNT       500
+#define SRV_HEAP_SIZE           (SRV_ENGINE_RESERVED + MAX_TEXTURE_COUNT)
+
+// 엔진 전용 SRV 칸 번호 (0 ~ SRV_ENGINE_RESERVED-1)
+#define SRV_SLOT_SHADOWMAP      0
+
+#define RTV_ENGINE_RESERVED     4

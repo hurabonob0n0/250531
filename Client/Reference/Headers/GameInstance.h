@@ -39,6 +39,7 @@ public:		//For_GraphicDev
 	void Present() { m_Graphic_Dev->Present(); }
 	void OnResize() { m_Graphic_Dev->OnResize(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const { return m_Graphic_Dev->DepthStencilView(); }
+	D3D12_CPU_DESCRIPTOR_HANDLE Get_EngineRtv(UINT slot) const { return m_Graphic_Dev->EngineRtv(slot); }
 	void Set_ViewPort_and_ScissorRect() { m_Graphic_Dev->Set_ViewPort_and_ScissorRect(); }
 	UINT						Get_DSVSize() { return m_Graphic_Dev->Get_DSVSize(); }
 
@@ -106,6 +107,11 @@ public: //For TextureMgr
 	void Set_DescriptorHeap() { m_TextureMgr->Set_DescriptorHeap(); }
 	void Add_ShadowMap(ID3D12Resource** Resource) { m_TextureMgr->Add_ShadowMap(Resource); }
 	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_CPUSRVDescriptorHeap() { return m_TextureMgr->Get_CPUSRVDescriptorHeap(); }
+	// SRV heap regions (Engine_Config.h): engine-only slots, texture table start, one texture
+	CD3DX12_CPU_DESCRIPTOR_HANDLE Get_EngineSrvCpuHandle(_uint slot) const { return m_TextureMgr->Get_EngineSrvCpuHandle(slot); }
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_EngineSrvGpuHandle(_uint slot) const { return m_TextureMgr->Get_EngineSrvGpuHandle(slot); }
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureTableGpuHandle() const { return m_TextureMgr->Get_TextureTableGpuHandle(); }
+	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureGpuHandle(_uint texIndex) const { return m_TextureMgr->Get_TextureGpuHandle(texIndex); }
 
 public: //For PSOMgr
 	ID3D12PipelineState* GetPSO(const string& PSOName) const { return m_PSOMgr->Get(PSOName); }

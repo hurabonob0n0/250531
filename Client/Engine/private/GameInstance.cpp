@@ -146,7 +146,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_TextureMgr = CTextureMgr::Get_Instance();
 	m_TextureMgr->Resize_TexMap();
 	m_TextureMgr->Make_DescriptorHeap();
-	
+	m_TextureMgr->Add_DefaultTexture();	// 텍스처 인덱스 0 = 분홍. MainApp 텍스처보다 먼저 등록해야 실제 텍스처가 1번부터 된다
+
 	m_ShadowMap = CShadowMap::Get_Instance();
 	m_ShadowMap->Initialize();
 	

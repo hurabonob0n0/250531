@@ -159,8 +159,7 @@ void CCamera_Free::LateTick(float fTimeDelta)
 
 void CCamera_Free::Render()
 {
-	CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor(m_GameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-	skyTexDescriptor.Offset(m_CBBindingCom->Get_MaterialIndex(), m_GameInstance->Get_CBVUAVSRVHeapSize());
+	CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor = m_GameInstance->Get_TextureGpuHandle(m_CBBindingCom->Get_MaterialIndex());	// 여기서 MaterialIndex 는 텍스처 인덱스. 힙 칸 = 16 + 인덱스
 	GETCOMMANDLIST->SetGraphicsRootDescriptorTable(3, skyTexDescriptor);
 
 	m_CBBindingCom->Set_On_Shader();

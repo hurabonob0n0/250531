@@ -161,7 +161,8 @@ void CGraphic_Dev::CreateSwapChain()
 void CGraphic_Dev::CreateRtvAndDsvDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
-    rtvHeapDesc.NumDescriptors = SwapChainBufferCount;
+    // 백버퍼 + 엔진 오프스크린 RT(HDR, Bloom 핑퐁 ...) 칸. Engine_Config.h 참고
+    rtvHeapDesc.NumDescriptors = SwapChainBufferCount + RTV_ENGINE_RESERVED;
     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     rtvHeapDesc.NodeMask = 0;
@@ -311,6 +312,15 @@ D3D12_CPU_DESCRIPTOR_HANDLE CGraphic_Dev::CurrentBackBufferView() const
 D3D12_CPU_DESCRIPTOR_HANDLE CGraphic_Dev::DepthStencilView() const
 {
     return m_DsvHeap->GetCPUDescriptorHandleForHeapStart();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE CGraphic_Dev::EngineRtv(UINT slot) const
+{
+    assert(slot < RTV_ENGINE_RESERVED);
+    return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+        m_RtvHeap->GetCPUDescriptorHandleForHeapStart(),
+        SwapChainBufferCount + slot,
+        m_RtvDescriptorSize);
 }
 
 void CGraphic_Dev::LogAdapters()

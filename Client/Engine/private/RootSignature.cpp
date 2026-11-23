@@ -98,8 +98,8 @@ CRootSignature* CRootSignature::CreateDefaultGraphicsRootSignature()
 	// slot 4: ShadowMap Texture (t1, space0)
 	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
 
-	// slot 5: Texture2D gTextureMaps[500] (t2~, space0)
-	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 500, D3D12_SHADER_VISIBILITY_PIXEL);
+	// slot 5: Texture2D gTextureMaps[500] (t2~, space0). MAX_TEXTURE_COUNT 와 셰이더 배열 크기를 맞출 것. 테이블 시작은 힙 SRV_ENGINE_RESERVED 칸
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, MAX_TEXTURE_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	// slot 6: StructuredBuffer<InstanceBuffer> at t1, space1
 	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 1, 1, D3D12_SHADER_VISIBILITY_ALL);

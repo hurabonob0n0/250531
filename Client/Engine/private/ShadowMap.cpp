@@ -13,7 +13,7 @@ void CShadowMap::Initialize()
 	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
 	m_Device = pGameInstance->Get_Device();
 
-	mhGpuSrv = pGameInstance->Get_SRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	mhGpuSrv = pGameInstance->Get_EngineSrvGpuHandle(SRV_SLOT_SHADOWMAP);	// 엔진 예약 구간 0번 (Engine_Config.h)
 	
 	mhCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(pGameInstance->DepthStencilView(), pGameInstance->Get_DSVSize());
 
