@@ -1,4 +1,4 @@
-#include "RootSignature.h"
+﻿#include "RootSignature.h"
 #include "GameInstance.h"
 
 CRootSignature* CRootSignature::Push(D3D12_ROOT_PARAMETER_TYPE paramType, UINT shaderRegister, UINT registerSpace, D3D12_SHADER_VISIBILITY visibility, UINT num32BitValues)
@@ -124,6 +124,43 @@ CRootSignature* CRootSignature::CreateDefaultGraphicsRootSignature()
 	D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errBlob);
 
 	GETDEVICE->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+
+	Safe_Release(signatureBlob);
+	Safe_Release(errBlob);
+
+	return this;
+}
+
+// 포스트프로세스(풀스크린 삼각형) 패스용. 입력 텍스처 하나 + 작은 상수 몇 개면 충분해서 DefaultRS 와 따로 만든다
+// HDR 복사, bright pass, 가우시안 블러, 합성/톤매핑이 모두 이 RS 를 쓴다
+CRootSignature* CRootSignature::CreatePostProcessRootSignature()
+{
+	// slot 0: 입력 텍스처 (t0). HDR RT, Bloom 핑퐁 RT 의 SRV 를 패스마다 바꿔 끼운다
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// slot 1: 루트 상수 (b0) 4개. 임계값, 블러 방향, 노출 같은 패스별 값 (아직 안 씀)
+	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 0, 0, D3D12_SHADER_VISIBILITY_PIXEL, 4);
+
+	// 정적 샘플러는 DefaultRS 와 같은 s0~s6 (Common.hlsl 과 레지스터 번호 일치)
+	auto staticSamplers = GetStaticSamplers();
+
+	// 정점 버퍼를 안 쓰므로 ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT 플래그가 필요 없다
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.NumParameters		= static_cast<UINT>(mParams.size());
+	rootSignatureDesc.pParameters		= mParams.data();
+	rootSignatureDesc.NumStaticSamplers = static_cast<UINT>(staticSamplers.size());
+	rootSignatureDesc.pStaticSamplers	= staticSamplers.data();
+	rootSignatureDesc.Flags				= D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errBlob);
+	if (errBlob)
+		OutputDebugStringA(static_cast<const char*>(errBlob->GetBufferPointer()));
+	if (SUCCEEDED(hr))
+		GETDEVICE->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+	else
+		MSG_BOX("Failed to Serialize : PostProcess RootSignature");
 
 	Safe_Release(signatureBlob);
 	Safe_Release(errBlob);

@@ -38,6 +38,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	//RootSignatureMgr
 	m_RootSignatureMgr = CRootSignatureMgr::Get_Instance();
 	m_RootSignatureMgr->Register("DefaultRS", CRootSignature::Create()->CreateDefaultGraphicsRootSignature());
+	m_RootSignatureMgr->Register("PostProcessRS", CRootSignature::Create()->CreatePostProcessRootSignature());
 
 	//ShaderMgr
 	m_ShaderMgr = CShader_Mgr::Get_Instance();
@@ -62,27 +63,39 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShaderMgr->AddShader("BulletPathVS", CShader::ST_VS, L"../bin/Shaders1/BulletInstance.hlsl", nullptr);
 	m_ShaderMgr->AddShader("BulletPathPS", CShader::ST_PS, L"../bin/Shaders1/BulletInstance.hlsl", nullptr);
 
+	m_ShaderMgr->AddShader("PostProcessVS", CShader::ST_VS, L"../bin/Shaders1/PostProcess.hlsl", nullptr);
+	m_ShaderMgr->AddShader("CopyToBackBufferPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", nullptr);
+
 	//PSOMgr
+	// 렌더타겟 포맷 기준으로 PSO 를 두 묶음으로 나눈다 (PSO 의 RTVFormats 는 실제 바인딩한 RT 포맷과 같아야 한다)
+	//   HDR RT (HDR_FORMAT)          : Default, Sky, PosNor, Effect, Ping, BulletPath  → SetRTVFormat(HDR_FORMAT)
+	//   백버퍼 (R8G8B8A8_UNORM, 기본) : UI, CopyToBackBuffer
+	//   RT 없음                      : Shadow
 	m_PSOMgr = CPSOMgr::Get_Instance();
 
 	m_PSOMgr->AddPSO("DefaultPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("DefaultVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("DefaultPS"))->
-		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->Create_PSO());
+		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		SetRTVFormat(HDR_FORMAT)->
+		Create_PSO());
 
 	m_PSOMgr->AddPSO("SkyPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_POS_NOR_TEX)->
 		SetVS(m_ShaderMgr->GetShaderObj("SkyVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("SkyPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
-		SetForSkyBox()->Create_PSO());
+		SetForSkyBox()->
+		SetRTVFormat(HDR_FORMAT)->
+		Create_PSO());
 
 	m_PSOMgr->AddPSO("PosNorPSO", CPSO::Create()->
 		SetInputLayout(CPSO::IT_MESH)->
 		SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("PosNorPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+		SetRTVFormat(HDR_FORMAT)->
 		Create_PSO());
 
 	m_PSOMgr->AddPSO("EffectPSO", CPSO::Create()->
@@ -90,8 +103,9 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetVS(m_ShaderMgr->GetShaderObj("EffectVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("EffectPS"))->
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
-		set_Disable_Depth_Write()-> 
+		set_Disable_Depth_Write()->
 		set_Blend_Enable()->
+		SetRTVFormat(HDR_FORMAT)->
 		Create_PSO());
 
 	m_PSOMgr->AddPSO("UIPSO", CPSO::Create()->
@@ -112,6 +126,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		set_Blend_Enable()->
 		set_Disable_Depth_Write()->
 		set_Disable_Depth_Test()->
+		SetRTVFormat(HDR_FORMAT)->		// RG_BLEND 안에서 Ping 이 ChangePSO 로 바꿔 쓰므로 HDR RT 기준
 		Create_PSO());			//그리는 순서는 유아이보다 먼저 그리는 방법은 PosinImage처럼
 
 	m_PSOMgr->AddPSO("ShadowPSO", CPSO::Create()->
@@ -129,6 +144,19 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
 		set_Blend_Enable()->
 		set_Disable_Depth_Write()->
+		SetRTVFormat(HDR_FORMAT)->
+		Create_PSO());
+
+	// HDR RT → 백버퍼 풀스크린 복사 (톤매핑 전 임시). 정점 버퍼 없음, 깊이 안 씀
+	// DSV 포맷은 기본값(D24S8) 그대로: 백버퍼 패스에서 메인 DSV 를 같이 바인딩해 두기 때문
+	m_PSOMgr->AddPSO("CopyToBackBufferPSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("CopyToBackBufferPS"))->
+		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
+		set_Disable_Depth_Test()->
+		set_Disable_Depth_Write()->
+		set_Cull_None()->
 		Create_PSO());
 
 	//Renderer

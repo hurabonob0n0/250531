@@ -109,21 +109,29 @@ void CRenderer::Render()
 
 #pragma region Normal Pass
     //m_GameInstance->Reset_CommandList_and_Allocator(m_GameInstance->GetPSO("SkyPSO"));
+    // [수정 전] 메인 패스를 백버퍼에 바로 그렸다
+    //m_GameInstance->Set_BackBuffer_and_DSV();
+
+    // 1) 씬은 HDR RT 에 그린다 (PIXEL_SHADER_RESOURCE → RENDER_TARGET)
+    CRenderTarget* pHDR = m_GameInstance->m_HDRTarget;
+    pHDR->Transition(m_CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    m_GameInstance->Set_ViewPort_and_ScissorRect();    // 그림자 패스가 바꿔 둔 뷰포트를 화면 크기로 되돌림
+    pHDR->Clear(m_CommandList);
+    D3D12_CPU_DESCRIPTOR_HANDLE hdrRtv = pHDR->Get_RTV();
+    D3D12_CPU_DESCRIPTOR_HANDLE dsv = m_GameInstance->DepthStencilView();
+    m_CommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    m_CommandList->OMSetRenderTargets(1, &hdrRtv, true, &dsv);
+
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("SkyPSO"));
-    m_GameInstance->Set_BackBuffer_and_DSV();
     m_GameInstance->Set_DescriptorHeap();
-    m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
-    m_GameInstance->Set_CurrentFramePBMats(0);
-    m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);
-    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_TextureTableGpuHandle());	// gTextureMaps[0] = 힙 SRV_ENGINE_RESERVED 칸
-    
+
     if (m_GameInstance->Key_Down(VK_RIGHT))
         DebugMode += 1;
 
     if (DebugMode > 2)
         DebugMode = 0;
 
-    m_CommandList->SetGraphicsRoot32BitConstant(7, DebugMode, 0);
+    Bind_DefaultRS_for_MainPass();
 
     Render_Priority();
     
@@ -141,6 +149,24 @@ void CRenderer::Render()
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("BulletPathPSO"));
     Render_BulletPath();
 
+    // 2) HDR RT 를 다 그렸으니 셰이더가 읽을 수 있는 상태로 (RENDER_TARGET → PIXEL_SHADER_RESOURCE)
+    pHDR->Transition(m_CommandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+    // 3) 백버퍼로 전환 (PRESENT → RENDER_TARGET, 클리어, 백버퍼 + 메인 DSV 바인딩)
+    //    복사 패스가 화면 전체를 덮으므로 백버퍼 클리어는 사실상 필요 없지만 기존 함수를 그대로 쓴다
+    m_GameInstance->Set_BackBuffer_and_DSV();
+
+    // 4) HDR → 백버퍼 풀스크린 복사 (임시. 다음 단계에서 Bloom 합성 + 톤매핑으로 바뀐다)
+    //    HDR(R16G16B16A16_FLOAT)과 백버퍼(R8G8B8A8_UNORM)는 포맷이 달라 CopyResource 를 못 쓴다 → 셰이더로 그린다
+    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("CopyToBackBufferPSO"));
+    m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("PostProcessRS"));
+    m_CommandList->SetGraphicsRootDescriptorTable(0, pHDR->Get_SRV());
+    m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_CommandList->DrawInstanced(3, 1, 0, 0);
+
+    // 5) UI 는 톤매핑 영향을 받지 않게 백버퍼에 직접 그린다
+    //    루트시그니처를 바꾸면 이전 바인딩이 전부 무효가 되므로 DefaultRS 를 다시 바인딩한다
+    Bind_DefaultRS_for_MainPass();
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("UIPSO"));
     Render_UI();
     
@@ -149,6 +175,17 @@ void CRenderer::Render()
     PassNum = 2;
 
 #pragma endregion Normal Pass
+}
+
+// 메인 패스(씬, UI)가 쓰는 DefaultRS 와 패스 공통 바인딩
+// SetGraphicsRootSignature 를 다시 부르면 루트 인자가 전부 초기화되므로, RS 를 바꿨다 돌아올 때마다 같이 다시 건다
+void CRenderer::Bind_DefaultRS_for_MainPass()
+{
+    m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
+    m_GameInstance->Set_CurrentFramePBMats(0);                                                      // slot 1 PassCB(메인 카메라), slot 2 머티리얼
+    m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);        // slot 4 그림자맵
+    m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_TextureTableGpuHandle());  // slot 5 gTextureMaps[0] = 힙 SRV_ENGINE_RESERVED 칸
+    m_CommandList->SetGraphicsRoot32BitConstant(7, DebugMode, 0);                                    // slot 7 디버그 모드
 }
 
 void CRenderer::Render_Priority()

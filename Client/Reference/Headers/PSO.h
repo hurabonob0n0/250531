@@ -31,6 +31,9 @@ public:
     CPSO* set_Disable_Depth_Write();
     CPSO* set_Blend_Enable();
     CPSO* set_Disable_Depth_Test();
+    CPSO* SetRTVFormat(DXGI_FORMAT format);  // default R8G8B8A8_UNORM (back buffer). HDR scene PSOs use HDR_FORMAT
+    CPSO* SetNoInputLayout();                // fullscreen triangle made from SV_VertexID, no vertex buffer
+    CPSO* set_Cull_None();
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

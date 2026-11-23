@@ -24,6 +24,8 @@ public:
 
 public:
 	CRootSignature* CreateDefaultGraphicsRootSignature();
+	// post process (fullscreen pass): slot 0 = SRV table t0 (input texture), slot 1 = root constants b0 (4 x 32bit), static samplers s0~s6
+	CRootSignature* CreatePostProcessRootSignature();
 	 
 	vector<D3D12_ROOT_PARAMETER>	mParams{};
 	vector<D3D12_DESCRIPTOR_RANGE>	mRanges{};

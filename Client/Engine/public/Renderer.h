@@ -44,6 +44,7 @@ private:
 	void Render_Blend();
 	void Render_UI();
 	void Render_BulletPath();
+	void Bind_DefaultRS_for_MainPass();	// DefaultRS + PassCB(0) + shadow map + texture table + debug mode
 
 private:
 	//Todo : 나중에 PSO, RootSignature, FrameResource 등등 렌더링에 필요한 것들을 모두 모아놓고 Render()함수 안에서 처리하도록 만든다.

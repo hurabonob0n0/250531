@@ -176,6 +176,28 @@ CPSO* CPSO::set_Disable_Depth_Test()
     return this;
 }
 
+// PSO 의 RTV 포맷은 실제로 바인딩한 렌더타겟 포맷과 같아야 한다 (다르면 Debug Layer 에러)
+// HDR RT 에 그리는 PSO 는 HDR_FORMAT, 백버퍼에 그리는 PSO(UI, 복사)는 기본값 R8G8B8A8_UNORM
+CPSO* CPSO::SetRTVFormat(DXGI_FORMAT format)
+{
+    m_PsoDesc.NumRenderTargets = 1;
+    m_PsoDesc.RTVFormats[0] = format;
+    return this;
+}
+
+// 정점 버퍼 없이 VS 가 SV_VertexID 로 정점을 만드는 경우 (풀스크린 삼각형)
+CPSO* CPSO::SetNoInputLayout()
+{
+    m_PsoDesc.InputLayout = { nullptr, 0 };
+    return this;
+}
+
+CPSO* CPSO::set_Cull_None()
+{
+    m_PsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    return this;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;
