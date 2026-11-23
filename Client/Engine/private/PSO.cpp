@@ -198,6 +198,16 @@ CPSO* CPSO::set_Cull_None()
     return this;
 }
 
+// 깊이 버퍼를 바인딩하지 않는 패스용 (Bloom bright pass / blur: 절반 해상도라 메인 DSV 와 크기도 안 맞는다)
+// DSVFormat 을 UNKNOWN 으로 해야 DSV 없이 그려도 PSO 와 바인딩 상태가 일치한다
+CPSO* CPSO::SetNoDepthStencil()
+{
+    m_PsoDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
+    m_PsoDesc.DepthStencilState.DepthEnable = FALSE;
+    m_PsoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    return this;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;

@@ -65,6 +65,11 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 
 	m_ShaderMgr->AddShader("PostProcessVS", CShader::ST_VS, L"../bin/Shaders1/PostProcess.hlsl", nullptr);
 	m_ShaderMgr->AddShader("CopyToBackBufferPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", nullptr);
+	// 같은 파일에서 진입점만 다르게: CShader 는 진입점 이름을 "PS" 로 고정하므로 #define 으로 고른다
+	{
+		static const D3D_SHADER_MACRO brightPassDefines[] = { { "BRIGHT_PASS", "1" }, { nullptr, nullptr } };
+		m_ShaderMgr->AddShader("BrightPassPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", brightPassDefines);
+	}
 
 	//PSOMgr
 	// 렌더타겟 포맷 기준으로 PSO 를 두 묶음으로 나눈다 (PSO 의 RTVFormats 는 실제 바인딩한 RT 포맷과 같아야 한다)
@@ -159,6 +164,17 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		set_Cull_None()->
 		Create_PSO());
 
+	// Bloom bright pass: HDR RT(전체 해상도) → Bloom A(절반 해상도, HDR_FORMAT). 깊이 버퍼 없음
+	m_PSOMgr->AddPSO("BrightPassPSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("BrightPassPS"))->
+		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
+		SetRTVFormat(HDR_FORMAT)->
+		SetNoDepthStencil()->
+		set_Cull_None()->
+		Create_PSO());
+
 	//Renderer
 	m_MainRenderer = CRenderer::Create(Get_Device(),Get_CommandList(),this);
 	m_ComponentMgr->AddPrototype("RendererCom", m_MainRenderer);
@@ -187,6 +203,20 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 			Get_EngineRtv(RTV_SLOT_HDR),
 			Get_EngineSrvCpuHandle(SRV_SLOT_HDR),
 			Get_EngineSrvGpuHandle(SRV_SLOT_HDR));
+
+		// Bloom 핑퐁 RT 2장 (절반 해상도). 블러는 넓게 퍼질수록 좋고 픽셀 수가 1/4 이라 싸다
+		// A: bright pass 결과 → 세로 블러 결과(최종 bloom), B: 가로 블러 결과(중간)
+		const UINT bloomWidth = (Get_ClientWidth() + 1) / 2;
+		const UINT bloomHeight = (Get_ClientHeight() + 1) / 2;
+		const UINT bloomRtv[2] = { RTV_SLOT_BLOOM_A, RTV_SLOT_BLOOM_B };
+		const UINT bloomSrv[2] = { SRV_SLOT_BLOOM_A, SRV_SLOT_BLOOM_B };
+		for (int i = 0; i < 2; ++i)
+		{
+			m_BloomTarget[i] = CRenderTarget::Create(bloomWidth, bloomHeight, HDR_FORMAT, hdrClearColor,
+				Get_EngineRtv(bloomRtv[i]),
+				Get_EngineSrvCpuHandle(bloomSrv[i]),
+				Get_EngineSrvGpuHandle(bloomSrv[i]));
+		}
 	}
 
 	m_Graphic_Dev->Execute_CommandList();
@@ -241,6 +271,8 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_FrameResourceMgr);
 	// D3D 리소스를 가진 매니저는 Graphic_Dev(Device)보다 먼저 해제한다.
 	// Graphic_Dev::Free()의 ReportLiveDeviceObjects에 정상 텍스처가 누수로 섞여 나오지 않게 하기 위함
+	Safe_Release(m_BloomTarget[0]);
+	Safe_Release(m_BloomTarget[1]);
 	Safe_Release(m_HDRTarget);
 	Safe_Release(m_ShadowMap);
 	Safe_Release(m_TextureMgr);

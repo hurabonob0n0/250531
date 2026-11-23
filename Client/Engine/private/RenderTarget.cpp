@@ -105,6 +105,19 @@ void CRenderTarget::Clear(ID3D12GraphicsCommandList* pCommandList)
 	pCommandList->ClearRenderTargetView(m_Rtv, m_ClearColor, 0, nullptr);
 }
 
+void CRenderTarget::Bind_as_Output(ID3D12GraphicsCommandList* pCommandList)
+{
+	assert(m_State == D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	// 뷰포트가 RT 크기와 다르면 일부만 그려지거나 밖으로 잘린다 (절반 해상도 RT 에 화면 크기 뷰포트 → 왼쪽 위 1/4 만 보임)
+	D3D12_VIEWPORT viewport = { 0.f, 0.f, static_cast<float>(m_Width), static_cast<float>(m_Height), 0.f, 1.f };
+	D3D12_RECT scissor = { 0, 0, static_cast<LONG>(m_Width), static_cast<LONG>(m_Height) };
+	pCommandList->RSSetViewports(1, &viewport);
+	pCommandList->RSSetScissorRects(1, &scissor);
+
+	pCommandList->OMSetRenderTargets(1, &m_Rtv, FALSE, nullptr);
+}
+
 CRenderTarget* CRenderTarget::Create(UINT width, UINT height, DXGI_FORMAT format, const FLOAT clearColor[4],
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv, D3D12_CPU_DESCRIPTOR_HANDLE srvCpu, D3D12_GPU_DESCRIPTOR_HANDLE srvGpu)
 {

@@ -82,11 +82,19 @@
 // 엔진 전용 SRV 칸 번호 (0 ~ SRV_ENGINE_RESERVED-1)
 #define SRV_SLOT_SHADOWMAP      0
 #define SRV_SLOT_HDR            1
+#define SRV_SLOT_BLOOM_A        2       // HDR 바로 뒤에 붙여 둔다 → 합성 패스에서 HDR+Bloom 을 2칸 테이블 하나로 바인딩
+#define SRV_SLOT_BLOOM_B        3
 
 #define RTV_ENGINE_RESERVED     4
 
 // 엔진 전용 RTV 칸 번호 (0 ~ RTV_ENGINE_RESERVED-1, 백버퍼 뒤 위치)
 #define RTV_SLOT_HDR            0
+#define RTV_SLOT_BLOOM_A        1
+#define RTV_SLOT_BLOOM_B        2
+
+// Bloom bright pass 휘도 임계값 기본값. 지금 씬 조명은 거의 0~1 범위라 1.0 이면 남는 게 거의 없다
+// 실행 중 위/아래 화살표로 조절, B 키로 bright pass 결과 보기 (CRenderer)
+#define BLOOM_THRESHOLD_DEFAULT 0.8f
 
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

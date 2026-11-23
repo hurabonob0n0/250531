@@ -34,6 +34,9 @@ public:
 	// 생성할 때 넣은 클리어 값과 같은 색으로 지운다 (다르면 Debug Layer 경고 + 빠른 클리어 못 씀)
 	void Clear(ID3D12GraphicsCommandList* pCommandList);
 
+	// 이 RT 하나만 출력으로 바인딩 (깊이 없음) + 뷰포트/시저를 이 RT 크기로. 절반 해상도 Bloom 패스용
+	void Bind_as_Output(ID3D12GraphicsCommandList* pCommandList);
+
 public:
 	ID3D12Resource*					Get_Resource() const { return m_Resource; }
 	D3D12_CPU_DESCRIPTOR_HANDLE		Get_RTV() const { return m_Rtv; }

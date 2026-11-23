@@ -182,6 +182,8 @@ private:
 public:
 	CShadowMap*				m_ShadowMap;
 	CRenderTarget*			m_HDRTarget = nullptr;	// HDR scene RT (HDR_FORMAT, RTV_SLOT_HDR / SRV_SLOT_HDR). Bloom step 1
+	// Bloom ping-pong RTs at half resolution. [0] = A (bright pass output, final blurred bloom), [1] = B (blur temp)
+	CRenderTarget*			m_BloomTarget[2] = { nullptr, nullptr };
 };
 
 END
