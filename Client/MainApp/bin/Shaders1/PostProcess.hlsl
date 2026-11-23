@@ -9,12 +9,14 @@
 // CShader 가 진입점 이름을 "VS"/"PS" 로 고정하므로, PS 는 #define 으로 골라 컴파일한다
 //   (없음)        : HDR → 백버퍼 복사   (CopyToBackBufferPS)
 //   BRIGHT_PASS   : Bloom bright pass   (BrightPassPS)
+//   BLUR          : 분리형 가우시안 1방향 (BlurPS)
 //=============================================================================
 
 Texture2D gInput : register(t0);
 
 // 루트 상수 (PostProcessRS slot 1, 32비트 4개)
 //   bright pass : x = 휘도 임계값
+//   blur        : xy = 한 텍셀만큼의 uv 이동 방향 (가로 = (1/width, 0), 세로 = (0, 1/height))
 cbuffer cbPostProcess : register(b0)
 {
     float4 gPostParams;
@@ -61,6 +63,35 @@ float4 PS(VertexOut pin) : SV_Target
     float contribution = max(luminance - threshold, 0.0f) / max(luminance, 1e-4f);
 
     return float4(hdr * contribution, 1.0f);
+}
+
+#elif defined(BLUR)
+
+// 분리형 가우시안 블러 (한 방향). 가로 패스 → 세로 패스 두 번이면 2D 가우시안과 같다
+//   2D 9x9 = 81 샘플 → 가로 9 + 세로 9 = 18 샘플 (가우시안은 x, y 로 분리되는 함수라 가능)
+//
+// 9탭 커널을 선형 샘플링으로 5번에 읽는다
+//   9탭 가중치 = 이항계수 12번째 줄 가운데 (924, 792, 495, 220, 66) / 4070 (바깥 작은 값은 버리고 합이 1이 되게)
+//             = 0.2270, 0.1946, 0.1216, 0.0541, 0.0162
+//   이웃한 두 텍셀 사이를 가중치 비율대로 찍으면 하드웨어 선형 보간이 두 텍셀 가중합을 한 번에 해 준다
+//   탭 1,2 → 오프셋 (1*0.1946 + 2*0.1216) / 0.3162 = 1.3846, 가중치 0.1946 + 0.1216 = 0.3162
+//   탭 3,4 → 오프셋 (3*0.0541 + 4*0.0162) / 0.0703 = 3.2308, 가중치 0.0541 + 0.0162 = 0.0703
+static const float kOffsets[3] = { 0.0f, 1.3846153846f, 3.2307692308f };
+static const float kWeights[3] = { 0.2270270270f, 0.3162162162f, 0.0702702703f };
+
+float4 PS(VertexOut pin) : SV_Target
+{
+    float2 texelStep = gPostParams.xy;
+
+    float3 color = gInput.Sample(gsamLinearClamp, pin.TexC).rgb * kWeights[0];
+    [unroll]
+    for (int i = 1; i < 3; ++i)
+    {
+        float2 offset = texelStep * kOffsets[i];
+        color += gInput.Sample(gsamLinearClamp, pin.TexC + offset).rgb * kWeights[i];
+        color += gInput.Sample(gsamLinearClamp, pin.TexC - offset).rgb * kWeights[i];
+    }
+    return float4(color, 1.0f);
 }
 
 #else

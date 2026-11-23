@@ -96,5 +96,8 @@
 // 실행 중 위/아래 화살표로 조절, B 키로 bright pass 결과 보기 (CRenderer)
 #define BLOOM_THRESHOLD_DEFAULT 0.8f
 
+// 가우시안 블러 반복 횟수 (가로+세로 1회 = 1). 9탭을 반복하면 퍼지는 반경이 √N 배로 커진다
+#define BLOOM_BLUR_ITERATIONS   3
+
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

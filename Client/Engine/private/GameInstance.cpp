@@ -69,6 +69,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	{
 		static const D3D_SHADER_MACRO brightPassDefines[] = { { "BRIGHT_PASS", "1" }, { nullptr, nullptr } };
 		m_ShaderMgr->AddShader("BrightPassPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", brightPassDefines);
+		static const D3D_SHADER_MACRO blurDefines[] = { { "BLUR", "1" }, { nullptr, nullptr } };
+		m_ShaderMgr->AddShader("BlurPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", blurDefines);
 	}
 
 	//PSOMgr
@@ -169,6 +171,17 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetNoInputLayout()->
 		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("BrightPassPS"))->
+		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
+		SetRTVFormat(HDR_FORMAT)->
+		SetNoDepthStencil()->
+		set_Cull_None()->
+		Create_PSO());
+
+	// Bloom 분리형 가우시안 (가로/세로 공용, 방향은 루트 상수로). Bloom A ↔ B 핑퐁
+	m_PSOMgr->AddPSO("BlurPSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("BlurPS"))->
 		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
 		SetRTVFormat(HDR_FORMAT)->
 		SetNoDepthStencil()->
