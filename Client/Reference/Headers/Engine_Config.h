@@ -81,5 +81,12 @@
 
 // 엔진 전용 SRV 칸 번호 (0 ~ SRV_ENGINE_RESERVED-1)
 #define SRV_SLOT_SHADOWMAP      0
+#define SRV_SLOT_HDR            1
 
 #define RTV_ENGINE_RESERVED     4
+
+// 엔진 전용 RTV 칸 번호 (0 ~ RTV_ENGINE_RESERVED-1, 백버퍼 뒤 위치)
+#define RTV_SLOT_HDR            0
+
+// HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
+#define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

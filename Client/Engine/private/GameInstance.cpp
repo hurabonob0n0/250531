@@ -150,7 +150,17 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 
 	m_ShadowMap = CShadowMap::Get_Instance();
 	m_ShadowMap->Initialize();
-	
+
+	// HDR 씬 렌더타겟 (Bloom 1단계). 백버퍼와 같은 해상도, RTV/SRV 는 엔진 예약 칸에 만든다
+	// 클리어 값 = Clear() 에서 쓰는 색. 메인 패스는 스카이가 먼저 화면 전체를 덮으므로 검정이면 충분
+	{
+		const FLOAT hdrClearColor[4] = { 0.f, 0.f, 0.f, 1.f };
+		m_HDRTarget = CRenderTarget::Create(Get_ClientWidth(), Get_ClientHeight(), HDR_FORMAT, hdrClearColor,
+			Get_EngineRtv(RTV_SLOT_HDR),
+			Get_EngineSrvCpuHandle(SRV_SLOT_HDR),
+			Get_EngineSrvGpuHandle(SRV_SLOT_HDR));
+	}
+
 	m_Graphic_Dev->Execute_CommandList();
 
 	m_FrameResourceMgr->Flush_CommandQueue();
@@ -203,6 +213,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_FrameResourceMgr);
 	// D3D 리소스를 가진 매니저는 Graphic_Dev(Device)보다 먼저 해제한다.
 	// Graphic_Dev::Free()의 ReportLiveDeviceObjects에 정상 텍스처가 누수로 섞여 나오지 않게 하기 위함
+	Safe_Release(m_HDRTarget);
 	Safe_Release(m_ShadowMap);
 	Safe_Release(m_TextureMgr);
 	Safe_Release(m_MaterialMgr);

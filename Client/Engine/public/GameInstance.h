@@ -13,6 +13,7 @@
 #include "MaterialMgr.h"
 #include "Random_Manager.h"
 #include "ShadowMap.h"
+#include "RenderTarget.h"
 
 BEGIN(Engine)
 
@@ -40,6 +41,8 @@ public:		//For_GraphicDev
 	void OnResize() { m_Graphic_Dev->OnResize(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const { return m_Graphic_Dev->DepthStencilView(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE Get_EngineRtv(UINT slot) const { return m_Graphic_Dev->EngineRtv(slot); }
+	UINT Get_ClientWidth() const { return m_Graphic_Dev->Get_ClientWidth(); }
+	UINT Get_ClientHeight() const { return m_Graphic_Dev->Get_ClientHeight(); }
 	void Set_ViewPort_and_ScissorRect() { m_Graphic_Dev->Set_ViewPort_and_ScissorRect(); }
 	UINT						Get_DSVSize() { return m_Graphic_Dev->Get_DSVSize(); }
 
@@ -178,6 +181,7 @@ private:
 
 public:
 	CShadowMap*				m_ShadowMap;
+	CRenderTarget*			m_HDRTarget = nullptr;	// HDR scene RT (HDR_FORMAT, RTV_SLOT_HDR / SRV_SLOT_HDR). Bloom step 1
 };
 
 END

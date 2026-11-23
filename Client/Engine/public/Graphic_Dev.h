@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Base.h"
 
 BEGIN(Engine)
@@ -47,6 +47,9 @@ public: // For SwapChain
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 	// 엔진 오프스크린 RT용 RTV 칸 (0 ~ RTV_ENGINE_RESERVED-1). 백버퍼 RTV 바로 뒤에 있다
 	D3D12_CPU_DESCRIPTOR_HANDLE EngineRtv(UINT slot) const;
+	// 렌더 해상도 (= 백버퍼 크기). 창 크기와는 다르다 (MainApp WM_SIZE 주석 참고)
+	UINT Get_ClientWidth() const { return static_cast<UINT>(m_ClientWidth); }
+	UINT Get_ClientHeight() const { return static_cast<UINT>(m_ClientHeight); }
 
 public: //For 
 
