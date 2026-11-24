@@ -517,5 +517,11 @@
     <FxCompile Include="..\bin\Shaders1\BulletInstance.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\PostProcess.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\Shaders1\DeferredLighting.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
