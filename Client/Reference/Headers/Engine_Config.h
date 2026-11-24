@@ -110,7 +110,9 @@
 /*---------------------------------------------------------------------------
     Deferred 렌더링 G-Buffer (2주차 후반)
 
-    [0] 알베도  RGBA8_UNORM   : rgb = diffuseAlbedo(머티리얼 x 텍스처), a = shininess
+    [0] 알베도  RGBA8_UNORM_SRGB : rgb = diffuseAlbedo(머티리얼 x 텍스처, 선형 값), a = shininess
+                                  셰이더는 선형 값을 쓰고 읽는다. 하드웨어가 쓸 때 sRGB 로 감고 읽을 때 푼다
+                                  (선형 그대로 8비트에 담으면 어두운 색이 계단지게 뭉친다. 알파는 변환 안 됨)
     [1] 노멀    RGBA16_FLOAT  : xyz = 월드 노멀 (노멀맵 적용 후). 8비트면 면이 계단지게 보여서 16비트
     [2] 재질    RGBA8_UNORM   : rgb = FresnelR0, a = 조명 방식 플래그 (0 기본 / 0.5 그림자·반사 없음(PosNor) / 1 조명 없음)
     [3] 발광    RGBA16_FLOAT  : rgb = 조명 뒤에 더하는 색 (팀 색, 경계선 등. 음수도 있어서 FLOAT)
@@ -123,7 +125,7 @@
         2 Deferred (조명 영역)    : 점광원마다 화면에서 덮는 사각형만 그려 가산 블렌딩
 ---------------------------------------------------------------------------*/
 #define GBUFFER_COUNT           4
-#define GBUFFER_FORMAT_ALBEDO   DXGI_FORMAT_R8G8B8A8_UNORM
+#define GBUFFER_FORMAT_ALBEDO   DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
 #define GBUFFER_FORMAT_NORMAL   DXGI_FORMAT_R16G16B16A16_FLOAT
 #define GBUFFER_FORMAT_MATERIAL DXGI_FORMAT_R8G8B8A8_UNORM
 #define GBUFFER_FORMAT_EMISSIVE DXGI_FORMAT_R16G16B16A16_FLOAT

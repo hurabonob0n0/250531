@@ -15,7 +15,7 @@
 //   POINT_LIGHT_VOLUME  : 점광원 영역 패스. 점광원 하나 = 인스턴스 하나 = 화면 사각형. 가산 블렌딩
 //
 // Common.hlsl 을 그대로 include 해서 Forward 와 똑같은 조명 함수(ComputeLighting, ComputePointLight,
-// CalcShadowFactor, SchlickFresnel)를 쓴다. 다른 점은 위치와 노멀을 G-Buffer 에서 얻는다는 것뿐
+// CalcShadowFactor, SchlickFresnelRoughness)를 쓴다. 다른 점은 위치와 노멀을 G-Buffer 에서 얻는다는 것뿐
 //=============================================================================
 
 #include "Common.hlsl"
@@ -218,7 +218,8 @@ float4 PS(VertexOut pin) : SV_Target
     {
         float3 r = reflect(-toEyeW, normalW);
         float4 reflectionColor = gCubeMap.Sample(gsamLinearWrap, r);
-        float3 fresnelFactor = SchlickFresnel(fresnelR0, normalW, r);
+        reflectionColor.rgb = SRGBToLinear(reflectionColor.rgb);   // 큐브맵도 sRGB 텍스처
+        float3 fresnelFactor = SchlickFresnelRoughness(fresnelR0, normalW, r, shininess);   // 거친 표면은 스치는 각도에서도 거울이 되지 않게
         litColor.rgb += shininess * fresnelFactor * reflectionColor.rgb;
     }
 

@@ -213,9 +213,11 @@ void CCamera_Free::PassCBSetting()
 	pc.InvRenderTargetSize = XMFLOAT2(1.0f / 1920, 1.0f / 1080);
 	pc.NearZ = 1.0f;
 	pc.FarZ = 10000.0f;
-	pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
+	/*pc.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };*/
+	pc.AmbientLight = { 0.1f, 0.1f, 0.1f, 1.0f };
 	pc.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
-	pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	/*pc.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };*/
+	pc.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
 	pc.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
 	pc.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
 	pc.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };

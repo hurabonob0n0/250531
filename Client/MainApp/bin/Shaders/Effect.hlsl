@@ -30,6 +30,12 @@ VertexOut VS(VertexIn vin)
     return vout;
 }
 
+// sRGB texture -> linear (same as Shaders1/Common.hlsl). Effects blend into the linear HDR RT
+float3 SRGBToLinear(float3 c)
+{
+    return (c <= 0.04045f) ? c / 12.92f : pow(max((c + 0.055f) / 1.055f, 0.0f), 2.4f);
+}
+
 float4 PS(VertexOut pin) : SV_Target
 {
     MaterialData matData = gMaterialData[gMaterialIndex];
@@ -40,6 +46,8 @@ float4 PS(VertexOut pin) : SV_Target
     
     if (color.a <= 0.01f)
         discard;
+
+    color.rgb = SRGBToLinear(color.rgb);
     
     return color;
 	

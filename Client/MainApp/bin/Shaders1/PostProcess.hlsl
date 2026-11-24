@@ -28,6 +28,15 @@ cbuffer cbPostProcess : register(b0)
 SamplerState gsamPointClamp  : register(s1);
 SamplerState gsamLinearClamp : register(s3);
 
+// 선형 → sRGB (Common.hlsl 과 같은 함수. 이 파일은 Common.hlsl 을 include 하지 않아서 따로 둔다)
+// 백버퍼는 R8G8B8A8_UNORM 그대로 두고 셰이더에서 감마를 입힌다
+//   (백버퍼를 _SRGB RTV 로 만들면 하드웨어가 해 주지만, 그러면 UI 처럼 sRGB 텍스처를 그대로 찍는 패스까지 다 바꿔야 한다)
+float3 LinearToSRGB(float3 c)
+{
+    c = saturate(c);
+    return (c <= 0.0031308f) ? c * 12.92f : 1.055f * pow(c, 1.0f / 2.4f) - 0.055f;
+}
+
 struct VertexOut
 {
     float4 PosH : SV_POSITION;
@@ -138,7 +147,9 @@ float4 PS(VertexOut pin) : SV_Target
     else
         ldr = saturate(hdr);    // 톤매핑 없음: 1 넘는 값은 잘려서 하얗게 뭉친다
 
-    return float4(ldr, 1.0f);
+    // 선형 → sRGB. 모니터는 입력 값을 약 2.2 제곱해서 빛을 낸다 → 미리 1/2.2 제곱(감마 인코딩)해 둬야 계산한 밝기가 그대로 보인다
+    // 선형 0.18(중간 회색) → 0.46. 이걸 안 하면 어두운 쪽이 실제보다 훨씬 어둡게 눌려 보인다
+    return float4(LinearToSRGB(ldr), 1.0f);
 }
 
 #else
@@ -150,7 +161,7 @@ float4 PS(VertexOut pin) : SV_Target
 float4 PS(VertexOut pin) : SV_Target
 {
     float3 hdr = gInput.Sample(gsamLinearClamp, pin.TexC).rgb;
-    return float4(saturate(hdr), 1.0f);
+    return float4(LinearToSRGB(hdr), 1.0f);     // 디버그 보기도 최종 화면과 같은 감마로
 }
 
 #endif

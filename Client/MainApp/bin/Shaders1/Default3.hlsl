@@ -60,7 +60,8 @@ GBufferOut PS(VertexOut pin)
 {
     MaterialData matData = gMaterialData[gMaterialIndex];
     float4 diffuseAlbedo = matData.DiffuseAlbedo;
-    diffuseAlbedo *= gTextureMaps[matData.DiffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+    float4 diffuseTex = gTextureMaps[matData.DiffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+    diffuseAlbedo *= float4(SRGBToLinear(diffuseTex.rgb), diffuseTex.a);	// sRGB texture -> linear
 
     GBufferOut gout;
     gout.Albedo   = float4(diffuseAlbedo.rgb, 1.0f);           // shininess 1
@@ -81,7 +82,8 @@ float4 PS(VertexOut pin) : SV_Target
     float roughness = matData.Roughness;
     uint diffuseMapIndex = matData.DiffuseMapIndex;
 	
-    diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+    float4 diffuseTex = gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+    diffuseAlbedo *= float4(SRGBToLinear(diffuseTex.rgb), diffuseTex.a);	// sRGB texture -> linear
     
     
 	// Interpolating normal can unnormalize it, so renormalize it.

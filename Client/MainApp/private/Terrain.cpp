@@ -37,7 +37,7 @@ HRESULT CTerrain::Initialize(void* pArg)
     mat.DiffuseMapIndex = m_GameInstance->Add_Texture("Terrain_D", L"../bin/Models/TerrainDDS/Diffuse.dds");
     //mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", CTexture::Create(L"../bin/Models/TerrainDDS/Normal.dds"));
     mat.NormalMapIndex = m_GameInstance->Add_Texture("Terrain_N", L"../bin/Models/TerrainDDS/Normal.dds");
-    mat.Roughness = 0.9f;
+    mat.Roughness = 0.97f;	// 0.9 -> 0.97: shininess = (1 - roughness) * normal.a, cube map reflection about 1/3
     mat.FresnelR0 = XMFLOAT3{ 0.f,0.f,0.f };
     m_CBBindingCom->Set_MaterialIndex( m_GameInstance->Add_Material("TerrainMat", mat));
     m_CBBindingCom->Set_Pad0(1);

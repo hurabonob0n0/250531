@@ -149,6 +149,26 @@ cbuffer cbDebug : register(b2)
 { uint gDebugMode; }
 
 //---------------------------------------------------------------------------------------
+// Linear workflow (gamma correction)
+// Color textures and the sky cube map are stored in sRGB (gamma ~2.2, more precision in the
+// darks for the eye). Lighting math (N.L, adding lights, blending) is only correct on linear
+// values, so color samples are decoded here, everything is lit / blended / tonemapped in
+// linear space, and CompositePS encodes back to sRGB right before the back buffer.
+// Normal maps, roughness, depth etc. are data, not color: never decode those.
+// (Exact sRGB curve: a short linear piece near black + a 2.4 power. ~= pow(c, 2.2))
+//---------------------------------------------------------------------------------------
+float3 SRGBToLinear(float3 c)
+{
+    return (c <= 0.04045f) ? c / 12.92f : pow(max((c + 0.055f) / 1.055f, 0.0f), 2.4f);
+}
+
+float3 LinearToSRGB(float3 c)
+{
+    c = saturate(c);
+    return (c <= 0.0031308f) ? c * 12.92f : 1.055f * pow(c, 1.0f / 2.4f) - 0.055f;
+}
+
+//---------------------------------------------------------------------------------------
 // Deferred G-Buffer (Engine_Config.h GBUFFER_*). Written by Default.hlsl / Default3.hlsl
 // with GBUFFER defined, read by DeferredLighting.hlsl.
 //   SV_Target0 albedo   RGBA8   : rgb = diffuse albedo, a = shininess

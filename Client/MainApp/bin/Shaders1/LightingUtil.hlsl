@@ -41,13 +41,35 @@ float3 SchlickFresnel(float3 R0, float3 normal, float3 lightVec)
     return reflectPercent;
 }
 
+//---------------------------------------------------------------------------------------
+// Schlick Fresnel with a roughness-dependent ceiling (the "fresnelSchlickRoughness" form
+// used for image based lighting, S. Lagarde 2011 / LearnOpenGL IBL).
+//
+// Plain Schlick goes to 1.0 at grazing angles whatever R0 is, so even a rough surface
+// (terrain: R0 = 0, shininess 0.03) turned into a mirror when the camera looked along it:
+// a sky-colored film over the ground that got stronger the flatter the camera was.
+// Real rough surfaces don't do that: their micro facets face many directions, so at a
+// grazing angle most of them are hidden or reflect somewhere else. Capping the grazing
+// value at max(gloss, R0) keeps the effect on glossy things (tank metal) and removes it
+// from rough ones.
+//   gloss = shininess (0 = fully rough, 1 = mirror)
+//---------------------------------------------------------------------------------------
+float3 SchlickFresnelRoughness(float3 R0, float3 normal, float3 lightVec, float gloss)
+{
+    float cosIncidentAngle = saturate(dot(normal, lightVec));
+
+    float f0 = 1.0f - cosIncidentAngle;
+    float3 F90 = max(float3(gloss, gloss, gloss), R0);
+    return R0 + (F90 - R0) * (f0 * f0 * f0 * f0 * f0);
+}
+
 float3 BlinnPhong(float3 lightStrength, float3 lightVec, float3 normal, float3 toEye, Material mat)
 {
     const float m = mat.Shininess * 256.0f;
     float3 halfVec = normalize(toEye + lightVec);
 
     float roughnessFactor = (m + 8.0f)*pow(max(dot(halfVec, normal), 0.0f), m) / 8.0f;
-    float3 fresnelFactor = SchlickFresnel(mat.FresnelR0, halfVec, lightVec);
+    float3 fresnelFactor = SchlickFresnelRoughness(mat.FresnelR0, halfVec, lightVec, mat.Shininess);
 
     float3 specAlbedo = fresnelFactor*roughnessFactor;
 

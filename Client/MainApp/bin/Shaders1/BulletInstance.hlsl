@@ -74,6 +74,9 @@ float4 PS(VertexOut pin) : SV_Target
     // 4. 최종 알파 값 계산 (두 알파 값을 곱함)
     finalColor.a = /*cylinderAlpha; //*/timeAlpha;
 
+    // the color above was picked on screen (sRGB) -> linear, since this now blends into the linear HDR RT
+    finalColor.rgb = SRGBToLinear(finalColor.rgb);
+
     return finalColor;
 
 }
