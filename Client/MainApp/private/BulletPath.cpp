@@ -4,6 +4,7 @@
 #include "Terrain.h"
 #include "Tank.h"
 #include "Network_Manager.h"
+#include "FMOD_Manager.h"
 
 CBulletPath::CBulletPath() : CRenderObject()
 {
@@ -83,6 +84,8 @@ void CBulletPath::Tick(float fTimeDelta)
 
 void CBulletPath::LateTick(float fTimeDelta){
 
+	const bool wasCollision = isCollision;
+
 	if (Network_Manager::GetInstance()->isConnected() && (m_GameInstance->GetLayerSize("Tank") > 1))
 	{
 		if (CheckCollisionWithTank()) {
@@ -93,6 +96,20 @@ void CBulletPath::LateTick(float fTimeDelta){
 	if (CheckCollisionWithTerrain())
 	{
 		isCollision = true;
+	}
+
+	// 싱글플레이: 서버가 S_WEAPON_HIT 를 보내 주지 않으므로 처음 땅에 닿은 순간 직접 폭발시킨다
+	// (멀티는 서버가 판정해서 보낸 위치로 ClientPacketHandler 가 폭발을 만든다)
+	// m_Pos2 는 충돌 뒤에도 계속 움직이므로 충돌한 그 프레임에만 처리한다
+	if (!wasCollision && isCollision && !Network_Manager::GetInstance()->isConnected())
+	{
+		const float x = XMVectorGetX(m_Pos2);
+		const float z = XMVectorGetZ(m_Pos2);
+		if (x > -2000.f && x < 2000.f && z > -2000.f && z < 2000.f)	// 맵 밖으로 나간 포탄은 터뜨리지 않는다
+		{
+			// 이번 프레임에 땅 밑으로 조금 파고든 위치라 지면 높이로 올린다
+			Spawn_Explosion(XMVectorSet(x, m_Terrain->Get_Terrain_Heights(x, z), z, 1.f));
+		}
 	}
 
 	if (m_fCollisionDeltatime > 5.f)
@@ -227,6 +244,85 @@ bool CBulletPath::CheckCollisionWithTank()
 
 	return false; // 충돌 없음
 
+}
+
+/*----------------------------------------------------------------------------
+	발사 / 폭발 연출 (싱글플레이와 네트워크 공용)
+	점광원 색은 1 을 넘는다 (HDR). 톤매핑 전 HDR RT 에서 Bloom bright pass 에 걸려 번져 보인다
+	밝기는 CLightMgr 가 Duration 동안 (1 - t)^2 로 줄인다
+----------------------------------------------------------------------------*/
+void CBulletPath::Add_MuzzleFlashLight(_fvector vPos)
+{
+	CLightMgr::POINTLIGHT_DESC desc;
+	XMStoreFloat3(&desc.Position, vPos);
+	desc.Color = XMFLOAT3(6.0f, 3.5f, 1.2f);	// 주황빛 섬광
+	desc.Radius = 20.f;
+	desc.Duration = 10.f;						// 짧게 번쩍
+	CGameInstance::Get_Instance()->Add_PointLight(desc);
+}
+
+void CBulletPath::Add_ExplosionLight(_fvector vPos)
+{
+	CLightMgr::POINTLIGHT_DESC desc;
+	// 지면에 딱 붙이면 바닥 노멀과 거의 평행해 N·L 이 작아진다 → 조금 띄워서 주변 땅을 비추게
+	XMStoreFloat3(&desc.Position, XMVectorAdd(vPos, XMVectorSet(0.f, 3.f, 0.f, 0.f)));
+	desc.Color = XMFLOAT3(10.0f, 5.0f, 1.5f);	// 머즐보다 크고 오래
+	desc.Radius = 40.f;
+	desc.Duration = 10.f;
+	CGameInstance::Get_Instance()->Add_PointLight(desc);
+}
+
+// Handle_S_BULLET_ADD 와 같은 연출 + 머즐 플래시 점광원
+void CBulletPath::Spawn_Shot(uint8 ownerTankIndex, _fvector vPos, _fvector vDir)
+{
+	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
+
+	CBulletPath::BulletPathstr bps;
+	bps.OwnerTankIndex = ownerTankIndex;
+	bps.Dir = vDir;
+	bps.Pos = vPos;
+	pGameInstance->AddObject("BulletPath", "BulletPath", &bps);
+
+	const float PosX = XMVectorGetX(vPos);
+	const float PosY = XMVectorGetY(vPos);
+	const float PosZ = XMVectorGetZ(vPos);
+
+	_matrix mat = XMMatrixTranslation(PosX, PosY + 0.5f, PosZ);
+	pGameInstance->AddObject("SmokeEffect", "Effect", &mat);
+	mat = XMMatrixTranslation(PosX + 0.1f, PosY + 0.6f, PosZ + 0.1f);
+	pGameInstance->AddObject("SmokeEffect", "Effect", &mat);
+	mat = XMMatrixTranslation(PosX - 0.1f, PosY + 0.6f, PosZ - 0.1f);
+	pGameInstance->AddObject("SmokeEffect", "Effect", &mat);
+
+	auto* FM = FMOD_Manager::Get_Instance();
+	AudioVec3 p{ PosX, PosY, PosZ };
+	AudioVec3 v{ 0, 0, 0 };
+	FMOD::Channel* ch = nullptr;
+	if (FM->Play3D_ReturnChannel("Tank_Shot", p, v, &ch, /*volume=*/0.4f, /*paused=*/false) && ch) {
+		float pitch = 0.98f + (rand() / (float)RAND_MAX) * (1.02f - 0.98f);
+		ch->setPitch(pitch);
+	}
+
+	Add_MuzzleFlashLight(vPos);
+}
+
+// Handle_S_WEAPON_HIT 와 같은 연출 + 폭발 점광원
+void CBulletPath::Spawn_Explosion(_fvector vPos)
+{
+	_matrix Hit_Matrix = XMMatrixIdentity();
+	Hit_Matrix.r[3] = XMVectorSetW(vPos, 1.f);
+	CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
+
+	auto* FM = FMOD_Manager::Get_Instance();
+	AudioVec3 p{ XMVectorGetX(vPos), XMVectorGetY(vPos), XMVectorGetZ(vPos) };
+	AudioVec3 v{ 0, 0, 0 };
+	FMOD::Channel* ch = nullptr;
+	if (FM->Play3D_ReturnChannel("Explosion", p, v, &ch, /*volume=*/2.f, /*paused=*/false) && ch) {
+		float pitch = 0.97f + (rand() / (float)RAND_MAX) * (1.03f - 0.97f);
+		ch->setPitch(pitch);
+	}
+
+	Add_ExplosionLight(vPos);
 }
 
 void CBulletPath::Free()

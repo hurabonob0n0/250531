@@ -327,6 +327,7 @@ void ClientPacketHandler::Handle_S_WEAPON_HIT(BYTE* buffer, int32 len)
 		Hit_Matrix.r[3] = hitPos;
 
 		CGameInstance::Get_Instance()->AddObject("Effect", "Effect", &Hit_Matrix);
+		CBulletPath::Add_ExplosionLight(hitPos);	// Deferred 점광원 (폭발)
 
 		auto* FM = FMOD_Manager::Get_Instance();
 		AudioVec3 p{ X, Y, Z };
@@ -365,6 +366,7 @@ void ClientPacketHandler::Handle_S_BULLET_ADD(BYTE* buffer, int32 len)
 		bps.Dir = XMVectorSet(DirX, DirY, DirZ, 0.f);
 		bps.Pos = XMVectorSet(PosX, PosY, PosZ, 1.f);
 		CGameInstance::Get_Instance()->AddObject("BulletPath", "BulletPath", &bps);
+		CBulletPath::Add_MuzzleFlashLight(bps.Pos);	// Deferred 점광원 (머즐 플래시)
 
 
 		_matrix mat = XMMatrixTranslation(PosX, PosY + 0.5f, PosZ);

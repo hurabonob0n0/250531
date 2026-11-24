@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "ObjectMgr.h"
 #include "TextureMgr.h"
+#include "LightMgr.h"
 #include "MaterialMgr.h"
 #include "Random_Manager.h"
 #include "ShadowMap.h"
@@ -118,6 +119,10 @@ public: //For TextureMgr
 	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureGpuHandle(_uint texIndex) const { return m_TextureMgr->Get_TextureGpuHandle(texIndex); }
 	_uint Find_Texture(const string& texname) const { return m_TextureMgr->Find_Texture(texname); }	// 0 (pink) if not found
 
+public: //For LightMgr (dynamic point lights: muzzle flash, explosion ...)
+	void Add_PointLight(const CLightMgr::POINTLIGHT_DESC& desc) { m_LightMgr->Add_PointLight(desc); }
+	UINT Get_PointLightCount() const { return m_LightMgr->Get_Count(); }
+
 public: //For PSOMgr
 	ID3D12PipelineState* GetPSO(const string& PSOName) const { return m_PSOMgr->Get(PSOName); }
 
@@ -188,6 +193,7 @@ public:
 	CRenderTarget*			m_BloomTarget[2] = { nullptr, nullptr };
 	// Deferred G-Buffer: [0] albedo, [1] normal, [2] material, [3] emissive (Engine_Config.h GBUFFER_*)
 	CRenderTarget*			m_GBuffer[GBUFFER_COUNT] = { nullptr, nullptr, nullptr, nullptr };
+	CLightMgr*				m_LightMgr = nullptr;	// dynamic point lights, uploaded every frame by CRenderer (deferred lighting pass)
 };
 
 END

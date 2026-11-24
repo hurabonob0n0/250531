@@ -22,6 +22,13 @@ Texture2D gGBufferMaterial : register(t2, space2);
 Texture2D gGBufferEmissive : register(t3, space2);
 Texture2D gDepthMap        : register(t4, space2);
 
+// 동적 점광원 (CLightMgr: 포 발사, 폭발). Light 구조체는 LightingUtil.hlsl 것 그대로
+StructuredBuffer<Light> gPointLights : register(t5, space2);
+cbuffer cbPointLights : register(b3)
+{
+    uint gPointLightCount;
+};
+
 struct VertexOut
 {
     float4 PosH : SV_POSITION;
@@ -107,6 +114,11 @@ float4 PS(VertexOut pin) : SV_Target
     float4 directLight = ComputeLighting(gLights, mat, posW, normalW, toEyeW, shadowFactor);
 
     float4 litColor = ambient + directLight;
+
+    // 점광원: 지금은 픽셀마다 모든 점광원을 돈다. 반경 밖이면 ComputePointLight 가 바로 0 을 반환
+    // 비용 = 화면 픽셀 수 x 점광원 수. 물체 수와는 상관없다 (Forward 라면 물체를 그릴 때마다 이 루프가 돈다)
+    for (uint i = 0; i < gPointLightCount; ++i)
+        litColor.rgb += ComputePointLight(gPointLights[i], mat, posW, normalW, toEyeW);
 
     if (!noShadow)
     {

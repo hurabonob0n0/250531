@@ -113,6 +113,8 @@ public:
 	void SendPosinData();
 	void SendPosData();
 	void SendShootDataToServer();
+	void Calc_ShotOriginAndDir(_vector& vPos, _vector& vDir);	// muzzle position + barrel direction (shared by online/offline)
+	void Shoot_Offline();										// single player: spawn the shot locally instead of asking the server
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 

@@ -264,6 +264,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_ShadowMap = CShadowMap::Get_Instance();
 	m_ShadowMap->Initialize();
 
+	m_LightMgr = CLightMgr::Create();
+
 	// HDR 씬 렌더타겟 (Bloom 1단계). 백버퍼와 같은 해상도, RTV/SRV 는 엔진 예약 칸에 만든다
 	// 클리어 값 = Clear() 에서 쓰는 색. 메인 패스는 스카이가 먼저 화면 전체를 덮으므로 검정이면 충분
 	{
@@ -331,6 +333,8 @@ void CGameInstance::Update(CTimer* pTimer)
 void CGameInstance::Late_Update(CTimer* pTimer)
 {
 	m_ShadowMap->Late_Update();
+
+	m_LightMgr->Update(pTimer->DeltaTime());	// 수명 끝난 점광원 제거 (오브젝트 LateTick 에서 새로 넣은 건 이번 프레임에 바로 그려진다)
 	
 	m_ObjectMgr->LateUpdate(pTimer->DeltaTime());
 
@@ -367,6 +371,7 @@ void CGameInstance::Release_Engine()
 	// Graphic_Dev::Free()의 ReportLiveDeviceObjects에 정상 텍스처가 누수로 섞여 나오지 않게 하기 위함
 	for (int i = 0; i < GBUFFER_COUNT; ++i)
 		Safe_Release(m_GBuffer[i]);
+	Safe_Release(m_LightMgr);
 	Safe_Release(m_BloomTarget[0]);
 	Safe_Release(m_BloomTarget[1]);
 	Safe_Release(m_HDRTarget);

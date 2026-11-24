@@ -735,6 +735,9 @@ void CTank::Master_Pos_KeyInput()
 					dynamic_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0))->StartShake(0.7f, 0.7f, 40.f);
 					
 				}
+				else {
+					Shoot_Offline();	// 싱글플레이: 서버 없이 바로 발사
+				}
 				_shootTimer = 0.f; // 타이머 초기화
 			}
 
@@ -822,6 +825,9 @@ void CTank::POSU_Pos_KeyInput()
 					SendShootDataToServer();
 					((CUIReloading*)m_GameInstance->GetGameObject("UI", UI_RELOADING))->Set_Reloading();
 					dynamic_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0))->StartShake(0.7f, 0.7f, 40.f);
+				}
+				else {
+					Shoot_Offline();	// 싱글플레이: 서버 없이 바로 발사
 				}
 
 				_shootTimer = 0.f;
@@ -1413,7 +1419,8 @@ void CTank::SendPosData() {
 	Network_Manager::GetInstance()->Send(sendBuffer);
 }
 
-void CTank::SendShootDataToServer()
+// 포구 위치 + 포신 방향. 멀티(서버로 보냄)와 싱글(바로 생성)이 같은 값을 쓰도록 분리
+void CTank::Calc_ShotOriginAndDir(_vector& vPos, _vector& vDir)
 {
 	_vector forward = m_TransformCom->Get_State(CTransform::STATE_LOOK);
 	float yaw = atan2(XMVectorGetX(forward), XMVectorGetZ(forward));
@@ -1435,10 +1442,30 @@ void CTank::SendShootDataToServer()
 
 	// 5. 최종 방향 벡터를 계산합니다.
 	// 방향 벡터에는 이동(Translation) 정보가 포함되면 안 되므로 XMVector3TransformNormal을 사용하는 것이 더 안전합니다.
-	_vector vDir = XMVector3TransformNormal(vBaseLook, matTotalRotation);
+	vDir = XMVector3TransformNormal(vBaseLook, matTotalRotation);
 
-	_vector vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP) * 1.95f
+	vPos = m_TransformCom->Get_State(CTransform::STATE_POSITION) + m_TransformCom->Get_State(CTransform::STATE_UP) * 1.95f
 		+ XMVector3TransformNormal(vBaseLook, matYaw) * 1.15f + vDir * 3.8f;
+}
+
+// 싱글플레이 발사: 서버가 S_BULLET_ADD 로 해 주던 일을 바로 한다 (포탄 궤적, 연기, 소리, 머즐 플래시 점광원)
+// 땅에 닿으면 CBulletPath::LateTick 이 폭발과 폭발 점광원을 만든다
+void CTank::Shoot_Offline()
+{
+	_vector vPos, vDir;
+	Calc_ShotOriginAndDir(vPos, vDir);
+	CBulletPath::Spawn_Shot(static_cast<uint8>(Network_Manager::GetInstance()->GetMyTankIndex()), vPos, vDir);
+
+	if (auto* pReloading = dynamic_cast<CUIReloading*>(m_GameInstance->GetGameObject("UI", UI_RELOADING)))
+		pReloading->Set_Reloading();
+	if (auto* pCamera = dynamic_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0)))
+		pCamera->StartShake(0.7f, 0.7f, 40.f);
+}
+
+void CTank::SendShootDataToServer()
+{
+	_vector vPos, vDir;
+	Calc_ShotOriginAndDir(vPos, vDir);
 
 	// 최종 결과를 _float3로 저장 (기존과 동일)
 	_float3 fPos, fDir;

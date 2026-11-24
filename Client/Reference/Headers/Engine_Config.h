@@ -126,5 +126,9 @@
 #define GBUFFER_FORMAT_EMISSIVE DXGI_FORMAT_R16G16B16A16_FLOAT
 #define DEFERRED_DEFAULT        1
 
+// 동적 점광원 최대 개수 (CLightMgr → FrameResource 의 StructuredBuffer). 넘치면 버린다
+// 지금은 라이팅 패스가 모든 픽셀에서 모든 점광원을 돈다 (다음 단계: 조명이 덮는 영역만 그리기)
+#define MAX_POINT_LIGHTS        256
+
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

@@ -375,6 +375,13 @@ void CRenderer::Render_Scene_Deferred()
     m_CommandList->SetGraphicsRootDescriptorTable(3, m_GameInstance->Get_TextureGpuHandle(skyTexIndex));          // t0 큐브맵
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);                       // t1 그림자맵
     m_CommandList->SetGraphicsRoot32BitConstant(5, DebugMode, 0);                                                   // b2 디버그 보기
+
+    // 동적 점광원 (포 발사, 폭발): CLightMgr 가 살아 있는 조명을 이번 프레임 FrameResource 버퍼에 복사
+    // 프레임 리소스마다 버퍼가 따로라 GPU 가 아직 읽고 있는 이전 프레임 버퍼를 덮어쓰지 않는다
+    CFrameResource* pFrame = m_GameInstance->Get_Current_FrameResource();
+    const UINT pointLightCount = m_GameInstance->m_LightMgr->Upload(pFrame->m_PointLightBuffer, MAX_POINT_LIGHTS);
+    m_CommandList->SetGraphicsRoot32BitConstant(6, pointLightCount, 0);                                             // b3 점광원 개수
+    m_CommandList->SetGraphicsRootShaderResourceView(7, pFrame->m_PointLightBuffer->Resource()->GetGPUVirtualAddress()); // t5 space2
     m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     m_CommandList->DrawInstanced(3, 1, 0, 0);
 

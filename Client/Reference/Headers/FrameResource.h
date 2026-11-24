@@ -35,6 +35,7 @@ public:
     CUploadBuffer<ObjectConstants>* m_ObjectCB = nullptr;
     CUploadBuffer<MaterialData>* m_MaterialCB = nullptr;
     CUploadBuffer<InstanceData>* m_InstanceCB = nullptr;
+    CUploadBuffer<Light>* m_PointLightBuffer = nullptr;    // dynamic point lights for the deferred lighting pass (MAX_POINT_LIGHTS)
 
 public:
     _uint UsedObjectCBIndex = 0;

@@ -40,6 +40,15 @@ public:
 	bool CheckCollisionWithTank();
 
 	uint8 OwnerTankIndex;
+
+public:
+	// Shot / hit effects shared by single player and the network handlers.
+	// Spawn_Shot      : bullet trail + muzzle smoke + shot sound + muzzle flash light (what S_BULLET_ADD does)
+	// Spawn_Explosion : explosion effect + sound + explosion light (what S_WEAPON_HIT does)
+	static void Spawn_Shot(uint8 ownerTankIndex, _fvector vPos, _fvector vDir);
+	static void Spawn_Explosion(_fvector vPos);
+	static void Add_MuzzleFlashLight(_fvector vPos);	// point light only (used by the network handler too)
+	static void Add_ExplosionLight(_fvector vPos);
 private:
 	CVIBuffer_Geos* m_VIBuffer;
 	vector<InstanceData> BulletDatas;

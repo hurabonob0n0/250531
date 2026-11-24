@@ -16,6 +16,8 @@ void CFrameResource::Initialize(ID3D12Device* device)
     m_ObjectCB = CUploadBuffer<ObjectConstants>::Create(device, 4000, true);
     m_MaterialCB = CUploadBuffer<MaterialData>::Create(device, 1000, false);
     m_InstanceCB = CUploadBuffer<InstanceData>::Create(device, 1000, false);
+    // StructuredBuffer (not a constant buffer): no 256-byte alignment, element stride = sizeof(Light) = 48
+    m_PointLightBuffer = CUploadBuffer<Light>::Create(device, MAX_POINT_LIGHTS, false);
 }
 
 void CFrameResource::Set_PassConstants(_uint index)
@@ -54,5 +56,6 @@ void CFrameResource::Free()
     Safe_Release(m_ObjectCB);
     Safe_Release(m_MaterialCB);
     Safe_Release(m_InstanceCB);
+    Safe_Release(m_PointLightBuffer);
 }
 

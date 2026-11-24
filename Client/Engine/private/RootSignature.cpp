@@ -196,6 +196,12 @@ CRootSignature* CRootSignature::CreateDeferredLightingRootSignature()
 	// slot 5: 루트 상수 (b2) 1개 = gDebugMode. 0 조명 결과, 1 노멀, 2 그림자, 3 알베도, 4 광택, 5 발광, 6 깊이
 	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 2, 0, D3D12_SHADER_VISIBILITY_ALL, 1);
 
+	// slot 6: 루트 상수 (b3) 1개 = 이번 프레임 점광원 개수
+	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 3, 0, D3D12_SHADER_VISIBILITY_PIXEL, 1);
+
+	// slot 7: 점광원 StructuredBuffer (t5, space2). 루트 SRV 라 디스크립터 힙 칸이 필요 없다 (FrameResource 업로드 버퍼 주소를 바로 건다)
+	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 5, 2, D3D12_SHADER_VISIBILITY_PIXEL);
+
 	auto staticSamplers = GetStaticSamplers();
 
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
