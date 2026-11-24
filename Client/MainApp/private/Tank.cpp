@@ -11,6 +11,7 @@
 #include "AirDrop.h"
 #include "FMOD_Manager.h"
 #include "Camera_Free.h"
+#include "Terrain.h"
 
 
 
@@ -159,6 +160,7 @@ void CTank::Initialize_For_PosinQuad()
 void CTank::Tick(float fTimeDelta)
 {
 	if (_myPlayer) {
+		Update_TestPointLights();
 		UpdateAirDropCooldown(fTimeDelta);
 		_shootTimer += fTimeDelta;
 
@@ -1460,6 +1462,58 @@ void CTank::Shoot_Offline()
 		pReloading->Set_Reloading();
 	if (auto* pCamera = dynamic_cast<CCamera_Free*>(m_GameInstance->GetGameObject("Camera", 0)))
 		pCamera->StartShake(0.7f, 0.7f, 40.f);
+}
+
+/*----------------------------------------------------------------------------
+	측정용 테스트 점광원 (P 키)
+	누를 때마다 0 → 16 → 64 → 256 → 1024 개. 탱크 주변 300 x 300 범위의 지면 위에 고정으로 뿌린다
+	난수 씨앗이 고정이라 같은 자리에서 누르면 매번 같은 배치 → Forward / Deferred(풀스크린) / Deferred(영역) 를
+	L 키로 바꿔 가며 같은 조건으로 PIX 측정을 할 수 있다
+----------------------------------------------------------------------------*/
+void CTank::Update_TestPointLights()
+{
+	if (!m_GameInstance->Key_Down('P'))
+		return;
+
+	static const int kCounts[] = { 0, 16, 64, 256, 1024 };
+	m_TestLightStep = (m_TestLightStep + 1) % _countof(kCounts);
+	const int count = kCounts[m_TestLightStep];
+
+	const int TEST_LIGHT_GROUP = 1;
+	m_GameInstance->Remove_PointLightGroup(TEST_LIGHT_GROUP);
+
+	CTerrain* pTerrain = dynamic_cast<CTerrain*>(m_GameInstance->GetGameObject("Terrain", 0));
+	_float3 center;
+	XMStoreFloat3(&center, m_TransformCom->Get_State(CTransform::STATE_POSITION));
+
+	static const XMFLOAT3 kPalette[6] = {
+		{ 3.0f, 1.2f, 0.4f }, { 0.4f, 1.0f, 3.0f }, { 0.5f, 3.0f, 0.8f },
+		{ 3.0f, 0.5f, 2.0f }, { 3.0f, 2.6f, 1.0f }, { 1.0f, 2.5f, 3.0f } };
+
+	unsigned int seed = 20261124u;
+	auto rand01 = [&seed]() {
+		seed = seed * 1664525u + 1013904223u;	// LCG (Numerical Recipes)
+		return static_cast<float>(seed >> 8) / 16777216.f;
+	};
+
+	for (int i = 0; i < count; ++i)
+	{
+		const float x = center.x + (rand01() * 2.f - 1.f) * 150.f;
+		const float z = center.z + (rand01() * 2.f - 1.f) * 150.f;
+		const float ground = pTerrain ? pTerrain->Get_Terrain_Heights(x, z) : center.y;
+
+		CLightMgr::POINTLIGHT_DESC desc;
+		desc.Position = XMFLOAT3(x, ground + 4.f, z);
+		desc.Color = kPalette[i % 6];
+		desc.Radius = 15.f + rand01() * 15.f;
+		desc.Duration = 0.f;					// 꺼지지 않음 (다시 P 를 누르면 지움)
+		desc.Group = TEST_LIGHT_GROUP;
+		m_GameInstance->Add_PointLight(desc);
+	}
+
+	wchar_t msg[64];
+	swprintf_s(msg, L"[Light] test point lights = %d\n", count);
+	OutputDebugStringW(msg);
 }
 
 void CTank::SendShootDataToServer()

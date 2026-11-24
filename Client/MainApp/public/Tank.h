@@ -115,6 +115,8 @@ public:
 	void SendShootDataToServer();
 	void Calc_ShotOriginAndDir(_vector& vPos, _vector& vDir);	// muzzle position + barrel direction (shared by online/offline)
 	void Shoot_Offline();										// single player: spawn the shot locally instead of asking the server
+	void Update_TestPointLights();								// P key: 0 / 16 / 64 / 256 / 1024 static test point lights around the tank (deferred measurement)
+	int  m_TestLightStep = 0;
 
 	void Set_OtherPlayerState(_float4x4 mat, float PotapRot, float PosinRot);
 

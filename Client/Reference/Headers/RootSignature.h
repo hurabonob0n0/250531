@@ -28,7 +28,7 @@ public:
 	CRootSignature* CreatePostProcessRootSignature();
 	// deferred lighting pass: slot 0 = G-Buffer+depth table (t0~t4, space2), 1 = PassCB b1, 2 = materials (t0, space1),
 	// 3 = cube map t0, 4 = shadow map t1, 5 = root constant b2 (debug mode), 6 = root constant b3 (point light count),
-	// 7 = root SRV t5 space2 (point lights). Slots 1~4 match DefaultRS so the same binding helpers work
+	// 7 = root SRV t2 space1 (point lights, same register as DefaultRS slot 9). Slots 1~4 match DefaultRS so the same binding helpers work
 	CRootSignature* CreateDeferredLightingRootSignature();
 	 
 	vector<D3D12_ROOT_PARAMETER>	mParams{};

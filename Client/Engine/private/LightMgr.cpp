@@ -20,6 +20,14 @@ void CLightMgr::Update(float fTimeDelta)
 		m_PointLights.end());
 }
 
+void CLightMgr::Remove_Group(int group)
+{
+	m_PointLights.erase(
+		std::remove_if(m_PointLights.begin(), m_PointLights.end(),
+			[group](const ACTIVE_LIGHT& light) { return light.Desc.Group == group; }),
+		m_PointLights.end());
+}
+
 UINT CLightMgr::Upload(CUploadBuffer<Light>* pBuffer, UINT maxCount)
 {
 	UINT count = 0;

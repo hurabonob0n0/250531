@@ -117,18 +117,21 @@
     깊이는 메인 DSV(R24G8_TYPELESS)에 SRV 를 하나 더 붙여 읽는다 → 위치는 깊이 + 역 ViewProj 로 복원
 
     픽셀당 4 + 8 + 4 + 8 + 깊이 4 = 28바이트, 1920x1080 에서 약 58MB
-    DEFERRED_DEFAULT : 1 이면 Deferred 로 시작. 실행 중 L 키로 Forward / Deferred 전환 (비교 측정용)
+    RENDER_PATH_DEFAULT : 시작할 때 렌더 경로. 실행 중 L 키로 순환 (비교 측정용)
+        0 Forward                : 물체를 그리면서 방향광 + 모든 점광원 계산
+        1 Deferred (풀스크린)     : 라이팅 패스 한 번에서 모든 픽셀이 모든 점광원을 돈다
+        2 Deferred (조명 영역)    : 점광원마다 화면에서 덮는 사각형만 그려 가산 블렌딩
 ---------------------------------------------------------------------------*/
 #define GBUFFER_COUNT           4
 #define GBUFFER_FORMAT_ALBEDO   DXGI_FORMAT_R8G8B8A8_UNORM
 #define GBUFFER_FORMAT_NORMAL   DXGI_FORMAT_R16G16B16A16_FLOAT
 #define GBUFFER_FORMAT_MATERIAL DXGI_FORMAT_R8G8B8A8_UNORM
 #define GBUFFER_FORMAT_EMISSIVE DXGI_FORMAT_R16G16B16A16_FLOAT
-#define DEFERRED_DEFAULT        1
+#define RENDER_PATH_DEFAULT     2
 
 // 동적 점광원 최대 개수 (CLightMgr → FrameResource 의 StructuredBuffer). 넘치면 버린다
-// 지금은 라이팅 패스가 모든 픽셀에서 모든 점광원을 돈다 (다음 단계: 조명이 덮는 영역만 그리기)
-#define MAX_POINT_LIGHTS        256
+// P 키 테스트 조명이 최대 1024 개라 포 발사 조명까지 담으려면 여유가 조금 있어야 한다
+#define MAX_POINT_LIGHTS        1100
 
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

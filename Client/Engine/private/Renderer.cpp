@@ -15,8 +15,38 @@ static int   BloomDebugView = 0;
 static float BloomIntensity = BLOOM_INTENSITY_DEFAULT;
 static int   TonemapMode    = TONEMAP_MODE_DEFAULT;
 
-// Forward / Deferred 전환 (L 키). Engine_Config.h DEFERRED_DEFAULT
-static bool  UseDeferred    = (DEFERRED_DEFAULT != 0);
+// 렌더 경로 (L 키 순환). Engine_Config.h RENDER_PATH_DEFAULT
+//   0 Forward, 1 Deferred (점광원 풀스크린 루프), 2 Deferred (점광원 화면 영역만)
+enum RENDER_PATH { RP_FORWARD, RP_DEFERRED_FULLSCREEN, RP_DEFERRED_VOLUME, RP_END };
+static int   RenderPath     = RENDER_PATH_DEFAULT;
+
+static const wchar_t* RenderPathNames[RP_END] = { L"Forward", L"Deferred (fullscreen loop)", L"Deferred (light rect)" };
+
+// 창 제목 표시용 (CMainApp::CalculateFrameStats)
+const wchar_t* CRenderer::Get_RenderPathName()
+{
+    return RenderPathNames[RenderPath];
+}
+
+// 이번 프레임 점광원 개수 (Render() 시작에서 CLightMgr 가 FrameResource 버퍼에 올린 수)
+static UINT  PointLightCount = 0;
+
+// PIX 이벤트 (패스별 GPU 시간 측정용). WinPixEventRuntime 없이 커맨드 리스트의 BeginEvent/EndEvent 를 직접 쓴다
+// metadata 0 = 유니코드 문자열 (PIX 의 옛 방식 형식). PIX 타임라인에 이름 붙은 구간으로 보인다
+static void BeginGpuEvent(ID3D12GraphicsCommandList* pCommandList, const wchar_t* name)
+{
+    pCommandList->BeginEvent(0, name, static_cast<UINT>((wcslen(name) + 1) * sizeof(wchar_t)));
+}
+static void EndGpuEvent(ID3D12GraphicsCommandList* pCommandList)
+{
+    pCommandList->EndEvent();
+}
+struct CScopedGpuEvent
+{
+    ID3D12GraphicsCommandList* m_pCommandList;
+    CScopedGpuEvent(ID3D12GraphicsCommandList* pCommandList, const wchar_t* name) : m_pCommandList(pCommandList) { BeginGpuEvent(pCommandList, name); }
+    ~CScopedGpuEvent() { EndGpuEvent(m_pCommandList); }
+};
 
 CRenderer::CRenderer(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, class CGameInstance* pGameInstance) : CComponent(pDevice, pCommandList)
 {
@@ -99,6 +129,7 @@ void CRenderer::Render()
 {
 #pragma region ShadowPass
     m_GameInstance->Reset_CommandList_and_Allocator(m_GameInstance->GetPSO("ShadowPSO"));
+    BeginGpuEvent(m_CommandList, L"Shadow");
     m_GameInstance->Set_DescriptorHeap();
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("DefaultRS"));
     m_GameInstance->Set_CurrentFramePBMats(1);
@@ -116,6 +147,7 @@ void CRenderer::Render()
     m_GameInstance->Set_ShadowPass(false);
     m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GameInstance->m_ShadowMap->m_Resource,
         D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ));
+    EndGpuEvent(m_CommandList);
 #pragma endregion ShadowPass
 
     --PassNum;
@@ -128,13 +160,19 @@ void CRenderer::Render()
     Handle_DebugKeys();
     m_GameInstance->Set_DescriptorHeap();
 
+    // 0) 점광원을 이번 프레임 FrameResource 버퍼에 올린다 (Forward 는 DefaultRS slot 9, Deferred 는 라이팅 RS slot 7 로 같은 버퍼를 읽는다)
+    //    프레임 리소스마다 버퍼가 따로라 GPU 가 아직 읽고 있는 이전 프레임 버퍼를 덮어쓰지 않는다
+    PointLightCount = m_GameInstance->m_LightMgr->Upload(m_GameInstance->Get_Current_FrameResource()->m_PointLightBuffer, MAX_POINT_LIGHTS);
+
     // 1) 씬을 HDR RT 에 그린다. 끝나면 HDR RT 는 RENDER_TARGET 상태
-    //    L 키로 Forward / Deferred 전환 (같은 화면이 나와야 정상. 조명 수별 비교 측정용)
+    //    L 키로 렌더 경로 순환 (같은 화면이 나와야 정상. 조명 수별 비교 측정용)
     CRenderTarget* pHDR = m_GameInstance->m_HDRTarget;
-    if (UseDeferred)
-        Render_Scene_Deferred();
-    else
+    if (RenderPath == RP_FORWARD)
         Render_Scene_Forward();
+    else
+        Render_Scene_Deferred();
+
+    BeginGpuEvent(m_CommandList, L"PostProcess (Bloom + Tonemap)");
 
     // 2) HDR RT 를 다 그렸으니 셰이더가 읽을 수 있는 상태로 (RENDER_TARGET → PIXEL_SHADER_RESOURCE)
     pHDR->Transition(m_CommandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -210,6 +248,7 @@ void CRenderer::Render()
         m_CommandList->SetGraphicsRootDescriptorTable(0, pBloomA->Get_SRV());
     }
     m_CommandList->DrawInstanced(3, 1, 0, 0);
+    EndGpuEvent(m_CommandList);
 
     // 5) UI 는 톤매핑 영향을 받지 않게 백버퍼에 직접 그린다
     //    루트시그니처를 바꾸면 이전 바인딩이 전부 무효가 되므로 DefaultRS 를 다시 바인딩한다
@@ -233,17 +272,25 @@ void CRenderer::Bind_DefaultRS_for_MainPass()
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);        // slot 4 그림자맵
     m_CommandList->SetGraphicsRootDescriptorTable(5, m_GameInstance->Get_TextureTableGpuHandle());  // slot 5 gTextureMaps[0] = 힙 SRV_ENGINE_RESERVED 칸
     m_CommandList->SetGraphicsRoot32BitConstant(7, DebugMode, 0);                                    // slot 7 디버그 모드
+    // slot 8, 9 점광원 (Forward 의 Default/PosNor PS 만 읽는다). Deferred 경로에서는 0 개로 둬서 G-Buffer 패스가 계산하지 않게
+    const UINT forwardPointLights = (RenderPath == RP_FORWARD) ? PointLightCount : 0;
+    m_CommandList->SetGraphicsRoot32BitConstant(8, forwardPointLights, 0);
+    m_CommandList->SetGraphicsRootShaderResourceView(9, m_GameInstance->Get_Current_FrameResource()->m_PointLightBuffer->Resource()->GetGPUVirtualAddress());
 }
 
 // 디버그/조절 키. 프레임마다 Render() 시작에서 한 번
 void CRenderer::Handle_DebugKeys()
 {
-    // L : Forward ↔ Deferred
+    // L : 렌더 경로 순환 Forward → Deferred(풀스크린) → Deferred(조명 영역)
     if (m_GameInstance->Key_Down('L'))
     {
-        UseDeferred = !UseDeferred;
-        OutputDebugStringW(UseDeferred ? L"[Render] Deferred\n" : L"[Render] Forward\n");
+        RenderPath = (RenderPath + 1) % RP_END;
+        static const wchar_t* names[RP_END] = { L"Forward", L"Deferred (point lights: fullscreen loop)", L"Deferred (point lights: screen rect per light)" };
+        wchar_t msg[96];
+        swprintf_s(msg, L"[Render] %s, point lights = %u\n", names[RenderPath], m_GameInstance->Get_PointLightCount());
+        OutputDebugStringW(msg);
     }
+    const bool UseDeferred = (RenderPath != RP_FORWARD);
 
     // 오른쪽 화살표 : 디버그 보기 순환
     //   Forward  0 조명, 1 노멀, 2 그림자
@@ -295,6 +342,7 @@ void CRenderer::Handle_DebugKeys()
 // [Forward] 물체를 그리면서 조명까지 계산한다 (Default.hlsl PS 가 그림자, 노멀맵, 조명, 반사를 한 번에)
 void CRenderer::Render_Scene_Forward()
 {
+    CScopedGpuEvent gpuEvent(m_CommandList, L"Forward Scene");
     CRenderTarget* pHDR = m_GameInstance->m_HDRTarget;
     pHDR->Transition(m_CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_GameInstance->Set_ViewPort_and_ScissorRect();    // 그림자 패스가 바꿔 둔 뷰포트를 화면 크기로 되돌림
@@ -342,6 +390,7 @@ void CRenderer::Render_Scene_Deferred()
         ppGBuffer[i]->Transition(m_CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
         gbufferRtv[i] = ppGBuffer[i]->Get_RTV();
     }
+    BeginGpuEvent(m_CommandList, L"Deferred G-Buffer");
     m_GameInstance->Set_ViewPort_and_ScissorRect();
     m_CommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     // RTV 4개 = PS 의 SV_Target0~3. 칸이 연속이 아니어도 되게 배열로 넘긴다 (RTsSingleHandleToDescriptorRange = FALSE)
@@ -354,6 +403,7 @@ void CRenderer::Render_Scene_Deferred()
 
     m_CommandList->SetPipelineState(m_GameInstance->GetPSO("GBufferPSO"));
     Render_NonBlend();
+    EndGpuEvent(m_CommandList);
 
     // (2) 라이팅 패스 -----------------------------------------------------------
     // G-Buffer 와 깊이를 셰이더가 읽을 수 있게. 깊이는 DSV 로 묶은 채로 SRV 로 읽을 수 없어서 출력은 HDR RT 하나만 묶는다
@@ -362,6 +412,7 @@ void CRenderer::Render_Scene_Deferred()
     m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(pDepth,
         D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 
+    BeginGpuEvent(m_CommandList, L"Deferred Lighting (directional)");
     pHDR->Transition(m_CommandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
     pHDR->Bind_as_Output(m_CommandList);    // 화면 전체를 덮어쓰므로 Clear 불필요
 
@@ -376,19 +427,32 @@ void CRenderer::Render_Scene_Deferred()
     m_CommandList->SetGraphicsRootDescriptorTable(4, m_GameInstance->m_ShadowMap->mhGpuSrv);                       // t1 그림자맵
     m_CommandList->SetGraphicsRoot32BitConstant(5, DebugMode, 0);                                                   // b2 디버그 보기
 
-    // 동적 점광원 (포 발사, 폭발): CLightMgr 가 살아 있는 조명을 이번 프레임 FrameResource 버퍼에 복사
-    // 프레임 리소스마다 버퍼가 따로라 GPU 가 아직 읽고 있는 이전 프레임 버퍼를 덮어쓰지 않는다
+    // 동적 점광원 (Render() 시작에서 업로드한 버퍼)
+    //   경로 1: 이 풀스크린 패스 안에서 모든 픽셀이 모든 점광원을 돈다 → b3 = 개수
+    //   경로 2: 여기서는 0 개, 아래 영역 패스에서 점광원마다 덮는 사각형만 그린다
     CFrameResource* pFrame = m_GameInstance->Get_Current_FrameResource();
-    const UINT pointLightCount = m_GameInstance->m_LightMgr->Upload(pFrame->m_PointLightBuffer, MAX_POINT_LIGHTS);
-    m_CommandList->SetGraphicsRoot32BitConstant(6, pointLightCount, 0);                                             // b3 점광원 개수
-    m_CommandList->SetGraphicsRootShaderResourceView(7, pFrame->m_PointLightBuffer->Resource()->GetGPUVirtualAddress()); // t5 space2
+    const UINT fullscreenPointLights = (RenderPath == RP_DEFERRED_FULLSCREEN) ? PointLightCount : 0;
+    m_CommandList->SetGraphicsRoot32BitConstant(6, fullscreenPointLights, 0);                                       // b3 점광원 개수
+    m_CommandList->SetGraphicsRootShaderResourceView(7, pFrame->m_PointLightBuffer->Resource()->GetGPUVirtualAddress()); // t2 space1
     m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     m_CommandList->DrawInstanced(3, 1, 0, 0);
+    EndGpuEvent(m_CommandList);
+
+    // (2-1) 점광원 영역 패스: 점광원 하나 = 인스턴스 하나 = 화면 사각형(삼각형 2개)
+    //       VS 가 조명 구(위치, 반경)를 화면에 투영한 사각형을 만들고, PS 는 그 안의 픽셀만 계산해 HDR RT 에 더한다(가산 블렌딩)
+    //       RS 는 그대로라 바인딩도 그대로. PSO 만 바꾼다
+    if (RenderPath == RP_DEFERRED_VOLUME && PointLightCount > 0 && DebugMode == 0)
+    {
+        CScopedGpuEvent gpuEvent(m_CommandList, L"Deferred Point Lights (screen rect)");
+        m_CommandList->SetPipelineState(m_GameInstance->GetPSO("DeferredPointLightPSO"));
+        m_CommandList->DrawInstanced(6, PointLightCount, 0, 0);
+    }
 
     m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(pDepth,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 
     // (3) Forward: 스카이 + 반투명 ----------------------------------------------
+    CScopedGpuEvent gpuEvent(m_CommandList, L"Sky + Transparent (forward)");
     // 기하 패스가 남긴 깊이를 그대로 쓴다 → 스카이(LESS_EQUAL, 깊이 1)는 아무것도 안 그려진 픽셀에만, 반투명은 불투명 물체 뒤에서 가려진다
     D3D12_CPU_DESCRIPTOR_HANDLE hdrRtv = pHDR->Get_RTV();
     m_CommandList->OMSetRenderTargets(1, &hdrRtv, true, &dsv);

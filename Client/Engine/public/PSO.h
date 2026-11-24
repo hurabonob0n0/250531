@@ -36,6 +36,7 @@ public:
     CPSO* set_Cull_None();
     CPSO* SetNoDepthStencil();               // no DSV bound (bloom passes): DSVFormat UNKNOWN, depth off
     CPSO* SetRTVFormats(UINT count, const DXGI_FORMAT* formats);  // MRT (G-Buffer pass)
+    CPSO* set_Blend_Additive();              // dest + src (light accumulation)
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

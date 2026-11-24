@@ -29,6 +29,7 @@ public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* pArg) override;
 	void Render();
+	static const wchar_t* Get_RenderPathName();	// current render path (L key) for the window title
 
 private:
 	vector<CRenderObject*> m_vRenderObjects[RG_END];

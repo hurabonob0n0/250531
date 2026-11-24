@@ -219,6 +219,24 @@ CPSO* CPSO::SetRTVFormats(UINT count, const DXGI_FORMAT* formats)
     return this;
 }
 
+// 가산 블렌딩: 결과 = 이미 있는 색 + 새 색. 점광원마다 따로 그려서 HDR RT 에 빛을 쌓을 때 쓴다
+CPSO* CPSO::set_Blend_Additive()
+{
+    D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
+    blenddesc.BlendEnable = TRUE;
+    blenddesc.LogicOpEnable = FALSE;
+    blenddesc.SrcBlend = D3D12_BLEND_ONE;
+    blenddesc.DestBlend = D3D12_BLEND_ONE;
+    blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+    blenddesc.SrcBlendAlpha = D3D12_BLEND_ZERO;
+    blenddesc.DestBlendAlpha = D3D12_BLEND_ONE;
+    blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+    blenddesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+    blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+    m_PsoDesc.BlendState.RenderTarget[0] = blenddesc;
+    return this;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;

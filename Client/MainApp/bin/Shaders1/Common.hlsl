@@ -171,6 +171,29 @@ struct GBufferOut
 #define GBUFFER_FLAG_UNLIT      1.0f    // emissive only (the blue border line)
 
 //---------------------------------------------------------------------------------------
+// Dynamic point lights (CLightMgr: muzzle flash, explosion, P-key test lights).
+// One buffer, read by every render path:
+//   Forward          : DefaultRS slot 8 (count) / slot 9 (buffer), looped in Default/Default3 PS
+//   Deferred (1)     : DeferredLightingRS slot 6 / 7, looped in the fullscreen lighting pass
+//   Deferred (2)     : same slots, one screen rect per light (DeferredLighting.hlsl POINT_LIGHT_VOLUME)
+// The renderer sets the count to 0 for the paths that should not loop here.
+//---------------------------------------------------------------------------------------
+StructuredBuffer<Light> gPointLights : register(t2, space1);
+
+cbuffer cbPointLights : register(b3)
+{
+    uint gPointLightCount;
+};
+
+float3 AccumulatePointLights(Material mat, float3 pos, float3 normal, float3 toEye)
+{
+    float3 result = 0.0f;
+    for (uint i = 0; i < gPointLightCount; ++i)
+        result += ComputePointLight(gPointLights[i], mat, pos, normal, toEye);
+    return result;
+}
+
+//---------------------------------------------------------------------------------------
 // Transforms a normal map sample to world space.
 //---------------------------------------------------------------------------------------
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)

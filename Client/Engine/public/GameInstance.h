@@ -122,6 +122,8 @@ public: //For TextureMgr
 public: //For LightMgr (dynamic point lights: muzzle flash, explosion ...)
 	void Add_PointLight(const CLightMgr::POINTLIGHT_DESC& desc) { m_LightMgr->Add_PointLight(desc); }
 	UINT Get_PointLightCount() const { return m_LightMgr->Get_Count(); }
+	void Remove_PointLightGroup(int group) { m_LightMgr->Remove_Group(group); }
+	const wchar_t* Get_RenderPathName() const { return CRenderer::Get_RenderPathName(); }
 
 public: //For PSOMgr
 	ID3D12PipelineState* GetPSO(const string& PSOName) const { return m_PSOMgr->Get(PSOName); }

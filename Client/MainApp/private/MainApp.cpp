@@ -780,10 +780,13 @@ void CMainApp::CalculateFrameStats()
 		wstring mpsfStr = to_wstring(mspf);
 		wstring ClientId = to_wstring(g_PlayerID);
 
+		// 렌더 경로(L 키)와 점광원 개수(P 키 테스트 조명 + 발사/폭발)를 같이 띄워 측정할 때 바로 확인
 		wstring windowText = m_MainWndCaption +
 			L"    fps: " + fpsStr +
 			L"   mfps: " + mpsfStr +
-			L"   ClientID: " + ClientId;
+			L"   ClientID: " + ClientId +
+			L"   |   " + m_GameInstance->Get_RenderPathName() +
+			L"   point lights: " + to_wstring(m_GameInstance->Get_PointLightCount());
 
 		SetWindowText(m_hMainWnd, windowText.c_str());
 

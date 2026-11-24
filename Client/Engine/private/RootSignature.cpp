@@ -107,6 +107,12 @@ CRootSignature* CRootSignature::CreateDefaultGraphicsRootSignature()
 	// slot 7: Root Constant (b2)
 	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 2, 0, D3D12_SHADER_VISIBILITY_ALL, 1);
 
+	// slot 8: 점광원 개수 (b3). Forward 경로의 Default/PosNor PS 가 점광원을 돌 때 쓴다
+	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 3, 0, D3D12_SHADER_VISIBILITY_PIXEL, 1);
+
+	// slot 9: 점광원 StructuredBuffer (t2, space1). 루트 SRV (CLightMgr 가 FrameResource 버퍼에 올린 것)
+	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 2, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
 	auto staticSamplers = GetStaticSamplers();
 
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -199,8 +205,10 @@ CRootSignature* CRootSignature::CreateDeferredLightingRootSignature()
 	// slot 6: 루트 상수 (b3) 1개 = 이번 프레임 점광원 개수
 	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 3, 0, D3D12_SHADER_VISIBILITY_PIXEL, 1);
 
-	// slot 7: 점광원 StructuredBuffer (t5, space2). 루트 SRV 라 디스크립터 힙 칸이 필요 없다 (FrameResource 업로드 버퍼 주소를 바로 건다)
-	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 5, 2, D3D12_SHADER_VISIBILITY_PIXEL);
+	// slot 7: 점광원 StructuredBuffer (t2, space1). 루트 SRV 라 디스크립터 힙 칸이 필요 없다 (FrameResource 업로드 버퍼 주소를 바로 건다)
+	//         조명 영역 패스는 VS 에서도 읽는다 (조명 위치/반경으로 화면 사각형 계산) → visibility ALL
+	//         레지스터는 DefaultRS slot 9 와 같다 (Common.hlsl 의 gPointLights 하나를 Forward/Deferred 가 같이 쓴다)
+	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 2, 1, D3D12_SHADER_VISIBILITY_ALL);
 
 	auto staticSamplers = GetStaticSamplers();
 

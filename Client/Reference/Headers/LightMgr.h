@@ -23,6 +23,7 @@ public:
 		XMFLOAT3	Color = { 1.f, 1.f, 1.f };	// 시작 밝기 (HDR, 1 넘어도 됨)
 		float		Radius = 10.f;				// 이 거리에서 0 (선형 감쇠)
 		float		Duration = 0.5f;			// 초. 0 이하면 꺼지지 않는다
+		int			Group = 0;					// 묶음 번호. Remove_Group 으로 한 번에 지운다 (P 키 테스트 조명 = 1)
 	};
 
 private:
@@ -35,6 +36,7 @@ public:
 	UINT Upload(CUploadBuffer<Light>* pBuffer, UINT maxCount);	// 살아 있는 조명을 버퍼에 복사, 복사한 개수 반환
 	UINT Get_Count() const { return static_cast<UINT>(m_PointLights.size()); }
 	void Clear() { m_PointLights.clear(); }
+	void Remove_Group(int group);
 
 private:
 	struct ACTIVE_LIGHT

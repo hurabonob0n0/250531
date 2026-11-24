@@ -82,6 +82,9 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		m_ShaderMgr->AddShader("GBufferPosNorPS", CShader::ST_PS, L"../bin/Shaders1/Default3.hlsl", gbufferDefines);
 		m_ShaderMgr->AddShader("DeferredLightingVS", CShader::ST_VS, L"../bin/Shaders1/DeferredLighting.hlsl", nullptr);
 		m_ShaderMgr->AddShader("DeferredLightingPS", CShader::ST_PS, L"../bin/Shaders1/DeferredLighting.hlsl", nullptr);
+		static const D3D_SHADER_MACRO lightVolumeDefines[] = { { "POINT_LIGHT_VOLUME", "1" }, { nullptr, nullptr } };
+		m_ShaderMgr->AddShader("DeferredPointLightVS", CShader::ST_VS, L"../bin/Shaders1/DeferredLighting.hlsl", lightVolumeDefines);
+		m_ShaderMgr->AddShader("DeferredPointLightPS", CShader::ST_PS, L"../bin/Shaders1/DeferredLighting.hlsl", lightVolumeDefines);
 	}
 
 	//PSOMgr
@@ -242,6 +245,18 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetRTVFormat(HDR_FORMAT)->
 		SetNoDepthStencil()->
 		set_Cull_None()->
+		Create_PSO());
+
+	// Deferred 점광원 영역 패스: 점광원 하나 = 화면 사각형 하나(인스턴스). 결과를 HDR RT 에 더한다
+	m_PSOMgr->AddPSO("DeferredPointLightPSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("DeferredPointLightVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("DeferredPointLightPS"))->
+		SetRS(m_RootSignatureMgr->Get("DeferredLightingRS"))->
+		SetRTVFormat(HDR_FORMAT)->
+		SetNoDepthStencil()->
+		set_Cull_None()->
+		set_Blend_Additive()->
 		Create_PSO());
 
 	//Renderer

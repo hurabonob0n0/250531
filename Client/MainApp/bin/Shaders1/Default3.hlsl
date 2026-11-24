@@ -109,6 +109,9 @@ float4 PS(VertexOut pin) : SV_Target
 
     float4 litColor = ambient + directLight;
 
+    // Forward point lights: every object pixel loops over every point light (count is 0 on the deferred paths)
+    litColor.rgb += AccumulatePointLights(mat, pin.PosW, bumpedNormalW, toEyeW);
+
 	// Add in specular reflections.
     float3 r = reflect(-toEyeW, bumpedNormalW);
     float4 reflectionColor = float4(0, 0, 0, 0);
