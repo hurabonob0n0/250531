@@ -71,6 +71,8 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		m_ShaderMgr->AddShader("BrightPassPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", brightPassDefines);
 		static const D3D_SHADER_MACRO blurDefines[] = { { "BLUR", "1" }, { nullptr, nullptr } };
 		m_ShaderMgr->AddShader("BlurPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", blurDefines);
+		static const D3D_SHADER_MACRO compositeDefines[] = { { "COMPOSITE", "1" }, { nullptr, nullptr } };
+		m_ShaderMgr->AddShader("CompositePS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", compositeDefines);
 	}
 
 	//PSOMgr
@@ -160,6 +162,17 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		SetNoInputLayout()->
 		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
 		SetPS(m_ShaderMgr->GetShaderObj("CopyToBackBufferPS"))->
+		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
+		set_Disable_Depth_Test()->
+		set_Disable_Depth_Write()->
+		set_Cull_None()->
+		Create_PSO());
+
+	// HDR + Bloom 합성 + 톤매핑 → 백버퍼. 복사 PSO 와 같은 설정에 PS 만 다르다 (복사 PSO 는 B 키 디버그 보기에 계속 쓴다)
+	m_PSOMgr->AddPSO("CompositePSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("PostProcessVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("CompositePS"))->
 		SetRS(m_RootSignatureMgr->Get("PostProcessRS"))->
 		set_Disable_Depth_Test()->
 		set_Disable_Depth_Write()->

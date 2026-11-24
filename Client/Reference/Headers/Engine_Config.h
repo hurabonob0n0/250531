@@ -99,5 +99,10 @@
 // 가우시안 블러 반복 횟수 (가로+세로 1회 = 1). 9탭을 반복하면 퍼지는 반경이 √N 배로 커진다
 #define BLOOM_BLUR_ITERATIONS   3
 
+// 합성/톤매핑 기본값 (실행 중 PageUp/PageDown = Bloom 강도, N = 톤매핑 모드 순환)
+#define BLOOM_INTENSITY_DEFAULT 0.6f
+#define TONEMAP_EXPOSURE        1.0f
+#define TONEMAP_MODE_DEFAULT    2       // 0 없음(saturate), 1 Reinhard, 2 ACES
+
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

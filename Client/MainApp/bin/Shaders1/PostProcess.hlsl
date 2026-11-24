@@ -10,13 +10,16 @@
 //   (없음)        : HDR → 백버퍼 복사   (CopyToBackBufferPS)
 //   BRIGHT_PASS   : Bloom bright pass   (BrightPassPS)
 //   BLUR          : 분리형 가우시안 1방향 (BlurPS)
+//   COMPOSITE     : HDR + Bloom 합성 + 톤매핑 → 백버퍼 (CompositePS)
 //=============================================================================
 
-Texture2D gInput : register(t0);
+Texture2D gInput  : register(t0);   // slot 0
+Texture2D gInput2 : register(t1);   // slot 2 (합성 패스의 Bloom)
 
 // 루트 상수 (PostProcessRS slot 1, 32비트 4개)
 //   bright pass : x = 휘도 임계값
 //   blur        : xy = 한 텍셀만큼의 uv 이동 방향 (가로 = (1/width, 0), 세로 = (0, 1/height))
+//   composite   : x = Bloom 강도, y = 노출, z = 톤매핑 모드 (0 없음/saturate, 1 Reinhard, 2 ACES)
 cbuffer cbPostProcess : register(b0)
 {
     float4 gPostParams;
@@ -92,6 +95,50 @@ float4 PS(VertexOut pin) : SV_Target
         color += gInput.Sample(gsamLinearClamp, pin.TexC - offset).rgb * kWeights[i];
     }
     return float4(color, 1.0f);
+}
+
+#elif defined(COMPOSITE)
+
+// Reinhard: x / (1 + x). 어떤 큰 값도 1 미만으로 눌러 준다. 단순하지만 전체가 물빠진 듯 어두워지기 쉽다
+float3 TonemapReinhard(float3 x)
+{
+    return x / (1.0f + x);
+}
+
+// ACES Filmic 근사 (Krzysztof Narkowicz 2015). 어두운 쪽은 살짝 누르고 중간은 대비를 올리고 밝은 쪽은 부드럽게 1로
+// 영화용 ACES RRT+ODT 곡선을 다항식 비율로 맞춘 것. 입력에 0.6 정도를 곱해 쓰는 경우가 많지만 여기서는 노출로 조절
+float3 TonemapACES(float3 x)
+{
+    const float a = 2.51f;
+    const float b = 0.03f;
+    const float c = 2.43f;
+    const float d = 0.59f;
+    const float e = 0.14f;
+    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+}
+
+// 합성: 씬 HDR 에 Bloom(절반 해상도를 선형 샘플로 늘림)을 더한 뒤 노출 → 톤매핑 → 백버퍼(0~1)
+// 톤매핑 전까지는 1.0 을 넘는 값을 그대로 유지해야 한다 (그래서 HDR RT, Bloom RT 모두 FLOAT 포맷)
+float4 PS(VertexOut pin) : SV_Target
+{
+    float bloomIntensity = gPostParams.x;
+    float exposure       = gPostParams.y;
+    int   tonemapMode    = (int)gPostParams.z;
+
+    float3 scene = gInput.Sample(gsamLinearClamp, pin.TexC).rgb;
+    float3 bloom = gInput2.Sample(gsamLinearClamp, pin.TexC).rgb;
+
+    float3 hdr = (scene + bloom * bloomIntensity) * exposure;
+
+    float3 ldr;
+    if (tonemapMode == 1)
+        ldr = TonemapReinhard(hdr);
+    else if (tonemapMode == 2)
+        ldr = TonemapACES(hdr);
+    else
+        ldr = saturate(hdr);    // 톤매핑 없음: 1 넘는 값은 잘려서 하얗게 뭉친다
+
+    return float4(ldr, 1.0f);
 }
 
 #else

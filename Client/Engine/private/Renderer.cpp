@@ -8,8 +8,12 @@ static int DebugMode = 0;
 // Bloom 디버그/조절 (Engine_Config.h BLOOM_THRESHOLD_DEFAULT)
 //   위/아래 화살표 : bright pass 임계값 ±0.05
 //   B             : 화면 보기 순환 0 = 최종 씬, 1 = bright pass 결과(블러 안 함), 2 = 블러까지 끝난 Bloom
+//   PageUp/PageDown : Bloom 강도 ±0.1 (0 이면 Bloom 끔 → on/off 비교 스크린샷용)
+//   N             : 톤매핑 모드 순환 0 없음(saturate), 1 Reinhard, 2 ACES
 static float BloomThreshold = BLOOM_THRESHOLD_DEFAULT;
 static int   BloomDebugView = 0;
+static float BloomIntensity = BLOOM_INTENSITY_DEFAULT;
+static int   TonemapMode    = TONEMAP_MODE_DEFAULT;
 
 CRenderer::CRenderer(ID3D12Device* pDevice, ID3D12GraphicsCommandList* pCommandList, class CGameInstance* pGameInstance) : CComponent(pDevice, pCommandList)
 {
@@ -148,6 +152,23 @@ void CRenderer::Render()
         swprintf_s(msg, L"[Bloom] threshold = %.2f\n", BloomThreshold);
         OutputDebugStringW(msg);
     }
+    if (m_GameInstance->Key_Down(VK_PRIOR) || m_GameInstance->Key_Down(VK_NEXT))
+    {
+        BloomIntensity += m_GameInstance->Key_Down(VK_PRIOR) ? 0.1f : -0.1f;
+        if (BloomIntensity < 0.0f)
+            BloomIntensity = 0.0f;
+        wchar_t msg[64];
+        swprintf_s(msg, L"[Bloom] intensity = %.1f\n", BloomIntensity);
+        OutputDebugStringW(msg);
+    }
+    if (m_GameInstance->Key_Down('N'))
+    {
+        TonemapMode = (TonemapMode + 1) % 3;
+        static const wchar_t* names[3] = { L"none (saturate)", L"Reinhard", L"ACES" };
+        wchar_t msg[64];
+        swprintf_s(msg, L"[Tonemap] %s\n", names[TonemapMode]);
+        OutputDebugStringW(msg);
+    }
 
     Bind_DefaultRS_for_MainPass();
 
@@ -220,13 +241,26 @@ void CRenderer::Render()
     //    복사 패스가 화면 전체를 덮으므로 백버퍼 클리어는 사실상 필요 없지만 기존 함수를 그대로 쓴다
     m_GameInstance->Set_BackBuffer_and_DSV();
 
-    // 4) HDR → 백버퍼 풀스크린 복사 (임시. 다음 단계에서 Bloom 합성 + 톤매핑으로 바뀐다)
-    //    HDR(R16G16B16A16_FLOAT)과 백버퍼(R8G8B8A8_UNORM)는 포맷이 달라 CopyResource 를 못 쓴다 → 셰이더로 그린다
-    m_CommandList->SetPipelineState(m_GameInstance->GetPSO("CopyToBackBufferPSO"));
+    // 4) 최종 합성: HDR + Bloom → 노출 → 톤매핑 → 백버퍼 (R8G8B8A8_UNORM, 0~1)
+    //    HDR(R16G16B16A16_FLOAT)과 백버퍼는 포맷이 달라 CopyResource 를 못 쓴다 → 셰이더로 그린다
+    //    Set_BackBuffer_and_DSV 가 뷰포트를 화면 크기로 되돌려 둔 상태
     m_CommandList->SetGraphicsRootSignature(m_GameInstance->GetRootSignature("PostProcessRS"));
-    // B 키 디버그 보기: HDR 대신 Bloom A 를 화면 크기로 늘려 그린다 (Set_BackBuffer_and_DSV 가 뷰포트를 화면 크기로 되돌려 둠)
-    m_CommandList->SetGraphicsRootDescriptorTable(0, BloomDebugView != 0 ? pBloomA->Get_SRV() : pHDR->Get_SRV());
+    m_CommandList->SetGraphicsRootDescriptorTable(0, pHDR->Get_SRV());       // t0 씬
+    m_CommandList->SetGraphicsRootDescriptorTable(2, pBloomA->Get_SRV());    // t1 Bloom (절반 해상도, 선형 샘플로 늘림)
     m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    if (BloomDebugView == 0)
+    {
+        m_CommandList->SetPipelineState(m_GameInstance->GetPSO("CompositePSO"));
+        const float compositeParams[4] = { BloomIntensity, TONEMAP_EXPOSURE, static_cast<float>(TonemapMode), 0.f };
+        m_CommandList->SetGraphicsRoot32BitConstants(1, 4, compositeParams, 0);
+    }
+    else
+    {
+        // B 키 디버그 보기: Bloom A 를 톤매핑 없이 그대로 화면 크기로 늘려 그린다
+        m_CommandList->SetPipelineState(m_GameInstance->GetPSO("CopyToBackBufferPSO"));
+        m_CommandList->SetGraphicsRootDescriptorTable(0, pBloomA->Get_SRV());
+    }
     m_CommandList->DrawInstanced(3, 1, 0, 0);
 
     // 5) UI 는 톤매핑 영향을 받지 않게 백버퍼에 직접 그린다

@@ -138,8 +138,13 @@ CRootSignature* CRootSignature::CreatePostProcessRootSignature()
 	// slot 0: 입력 텍스처 (t0). HDR RT, Bloom 핑퐁 RT 의 SRV 를 패스마다 바꿔 끼운다
 	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
 
-	// slot 1: 루트 상수 (b0) 4개. 임계값, 블러 방향, 노출 같은 패스별 값 (아직 안 씀)
+	// slot 1: 루트 상수 (b0) 4개. 임계값, 블러 방향, Bloom 강도/노출/톤매핑 모드 같은 패스별 값
 	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 0, 0, D3D12_SHADER_VISIBILITY_PIXEL, 4);
+
+	// slot 2: 두 번째 입력 텍스처 (t1). 합성 패스에서 Bloom 결과를 읽는다
+	// slot 0 테이블을 2칸으로 늘리는 대신 따로 둔 이유: 입력이 하나뿐인 패스(Bloom B 를 읽는 세로 블러 등)에서
+	// 테이블 두 번째 칸이 아직 아무 뷰도 안 만든 힙 칸(엔진 4번)을 가리키게 되는 상황을 피하려고
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	// 정적 샘플러는 DefaultRS 와 같은 s0~s6 (Common.hlsl 과 레지스터 번호 일치)
 	auto staticSamplers = GetStaticSamplers();
