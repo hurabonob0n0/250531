@@ -55,8 +55,16 @@ void CRawInput::Update_InputDev(LPARAM lParam)
 	{
 		RAWMOUSE& mouse = raw->data.mouse;
 
-		m_MouseDelta[0] = static_cast<SHORT>(mouse.lLastX);
-		m_MouseDelta[1] = static_cast<SHORT>(mouse.lLastY);
+		// [수정 전] m_MouseDelta = lLastX (덮어쓰기)
+		// WM_INPUT 은 마우스가 움직일 때마다(보통 초당 125~1000번) 하나씩 온다. 한 프레임 사이에 여러 개가 오면
+		// 마지막 하나만 남고 나머지 이동량은 버려졌다 → fps 가 낮을수록(프레임이 길수록) 버리는 양이 많아 감도가 낮아졌다
+		// 프레임 동안 받은 이동량을 전부 더하고, ResetPerFrame() 에서 0 으로 되돌린다 → fps 와 상관없이 같은 손 움직임 = 같은 회전
+		// (MOUSE_MOVE_ABSOLUTE 는 원격 데스크톱/태블릿이 보내는 절대 좌표라 이동량이 아니다 → 더하지 않는다)
+		if (!(mouse.usFlags & MOUSE_MOVE_ABSOLUTE))
+		{
+			m_MouseDelta[0] += static_cast<SHORT>(mouse.lLastX);
+			m_MouseDelta[1] += static_cast<SHORT>(mouse.lLastY);
+		}
 
 		if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
 			m_bMouseCurrState[0] = true;
@@ -83,10 +91,9 @@ void CRawInput::Update_InputDev(LPARAM lParam)
 		if (mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)
 			m_bMouseCurrState[4] = false;
 
+		// 휠도 같은 문제: 예전에는 휠 메시지 뒤에 이동 메시지가 하나만 와도 0 으로 지워졌다. 누적하고 프레임마다 초기화
 		if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
-			m_MouseDelta[2] = static_cast<SHORT>(mouse.usButtonData);
-		else
-			m_MouseDelta[2] = 0;
+			m_MouseDelta[2] += static_cast<SHORT>(mouse.usButtonData);
 	}
 }
 
