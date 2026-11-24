@@ -208,6 +208,17 @@ CPSO* CPSO::SetNoDepthStencil()
     return this;
 }
 
+// 여러 렌더타겟에 동시에 쓰는 PSO (MRT). Deferred G-Buffer 패스가 4장에 한 번에 쓴다
+// PS 의 SV_Target0~N 순서 = 여기 formats 순서 = OMSetRenderTargets 에 넘기는 RTV 순서
+CPSO* CPSO::SetRTVFormats(UINT count, const DXGI_FORMAT* formats)
+{
+    assert(count <= D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT);
+    m_PsoDesc.NumRenderTargets = count;
+    for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        m_PsoDesc.RTVFormats[i] = (i < count) ? formats[i] : DXGI_FORMAT_UNKNOWN;
+    return this;
+}
+
 CPSO* CPSO::Create()
 {
     CPSO* pInstance = new CPSO;

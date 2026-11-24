@@ -82,15 +82,18 @@
 // 엔진 전용 SRV 칸 번호 (0 ~ SRV_ENGINE_RESERVED-1)
 #define SRV_SLOT_SHADOWMAP      0
 #define SRV_SLOT_HDR            1
-#define SRV_SLOT_BLOOM_A        2       // HDR 바로 뒤에 붙여 둔다 → 합성 패스에서 HDR+Bloom 을 2칸 테이블 하나로 바인딩
+#define SRV_SLOT_BLOOM_A        2
 #define SRV_SLOT_BLOOM_B        3
+#define SRV_SLOT_GBUFFER0       4       // G-Buffer 4장 = 4,5,6,7 + 깊이 8. 라이팅 패스가 5칸 테이블 하나로 바인딩 (t0~t4, space2)
+#define SRV_SLOT_DEPTH          8
 
-#define RTV_ENGINE_RESERVED     4
+#define RTV_ENGINE_RESERVED     8
 
 // 엔진 전용 RTV 칸 번호 (0 ~ RTV_ENGINE_RESERVED-1, 백버퍼 뒤 위치)
 #define RTV_SLOT_HDR            0
 #define RTV_SLOT_BLOOM_A        1
 #define RTV_SLOT_BLOOM_B        2
+#define RTV_SLOT_GBUFFER0       3       // G-Buffer 4장 = 3,4,5,6
 
 // Bloom bright pass 휘도 임계값 기본값. 지금 씬 조명은 거의 0~1 범위라 1.0 이면 남는 게 거의 없다
 // 실행 중 위/아래 화살표로 조절, B 키로 bright pass 결과 보기 (CRenderer)
@@ -103,6 +106,25 @@
 #define BLOOM_INTENSITY_DEFAULT 0.6f
 #define TONEMAP_EXPOSURE        1.0f
 #define TONEMAP_MODE_DEFAULT    2       // 0 없음(saturate), 1 Reinhard, 2 ACES
+
+/*---------------------------------------------------------------------------
+    Deferred 렌더링 G-Buffer (2주차 후반)
+
+    [0] 알베도  RGBA8_UNORM   : rgb = diffuseAlbedo(머티리얼 x 텍스처), a = shininess
+    [1] 노멀    RGBA16_FLOAT  : xyz = 월드 노멀 (노멀맵 적용 후). 8비트면 면이 계단지게 보여서 16비트
+    [2] 재질    RGBA8_UNORM   : rgb = FresnelR0, a = 조명 방식 플래그 (0 기본 / 0.5 그림자·반사 없음(PosNor) / 1 조명 없음)
+    [3] 발광    RGBA16_FLOAT  : rgb = 조명 뒤에 더하는 색 (팀 색, 경계선 등. 음수도 있어서 FLOAT)
+    깊이는 메인 DSV(R24G8_TYPELESS)에 SRV 를 하나 더 붙여 읽는다 → 위치는 깊이 + 역 ViewProj 로 복원
+
+    픽셀당 4 + 8 + 4 + 8 + 깊이 4 = 28바이트, 1920x1080 에서 약 58MB
+    DEFERRED_DEFAULT : 1 이면 Deferred 로 시작. 실행 중 L 키로 Forward / Deferred 전환 (비교 측정용)
+---------------------------------------------------------------------------*/
+#define GBUFFER_COUNT           4
+#define GBUFFER_FORMAT_ALBEDO   DXGI_FORMAT_R8G8B8A8_UNORM
+#define GBUFFER_FORMAT_NORMAL   DXGI_FORMAT_R16G16B16A16_FLOAT
+#define GBUFFER_FORMAT_MATERIAL DXGI_FORMAT_R8G8B8A8_UNORM
+#define GBUFFER_FORMAT_EMISSIVE DXGI_FORMAT_R16G16B16A16_FLOAT
+#define DEFERRED_DEFAULT        1
 
 // HDR 씬 렌더타겟 포맷. 1.0을 넘는 밝기를 그대로 담아 Bloom bright pass가 골라낼 수 있게 한다
 #define HDR_FORMAT              DXGI_FORMAT_R16G16B16A16_FLOAT

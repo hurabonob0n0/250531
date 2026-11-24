@@ -26,6 +26,9 @@ public:
 	CRootSignature* CreateDefaultGraphicsRootSignature();
 	// post process (fullscreen pass): slot 0 = SRV table t0 (input), slot 1 = root constants b0 (4 x 32bit), slot 2 = SRV table t1 (second input), static samplers s0~s6
 	CRootSignature* CreatePostProcessRootSignature();
+	// deferred lighting pass: slot 0 = G-Buffer+depth table (t0~t4, space2), 1 = PassCB b1, 2 = materials (t0, space1),
+	// 3 = cube map t0, 4 = shadow map t1, 5 = root constant b2 (debug mode). Slots 1~4 match DefaultRS so the same binding helpers work
+	CRootSignature* CreateDeferredLightingRootSignature();
 	 
 	vector<D3D12_ROOT_PARAMETER>	mParams{};
 	vector<D3D12_DESCRIPTOR_RANGE>	mRanges{};

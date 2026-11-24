@@ -149,6 +149,28 @@ cbuffer cbDebug : register(b2)
 { uint gDebugMode; }
 
 //---------------------------------------------------------------------------------------
+// Deferred G-Buffer (Engine_Config.h GBUFFER_*). Written by Default.hlsl / Default3.hlsl
+// with GBUFFER defined, read by DeferredLighting.hlsl.
+//   SV_Target0 albedo   RGBA8   : rgb = diffuse albedo, a = shininess
+//   SV_Target1 normal   RGBA16F : xyz = world normal (after normal mapping, not renormalized,
+//                                 same value the forward path feeds into ComputeLighting)
+//   SV_Target2 material RGBA8   : rgb = FresnelR0, a = lighting flag below
+//   SV_Target3 emissive RGBA16F : rgb = color added after lighting (team tint, border line)
+//---------------------------------------------------------------------------------------
+struct GBufferOut
+{
+    float4 Albedo   : SV_Target0;
+    float4 Normal   : SV_Target1;
+    float4 Material : SV_Target2;
+    float4 Emissive : SV_Target3;
+};
+
+// Lighting flag in material.a. RGBA8 stores 0.5 as 128/255, so the reader compares with 0.25 / 0.75.
+#define GBUFFER_FLAG_LIT        0.0f    // shadow + lights + cube map reflection (Default.hlsl)
+#define GBUFFER_FLAG_NO_SHADOW  0.5f    // lights only, no shadow, no reflection (Default3.hlsl = PosNor)
+#define GBUFFER_FLAG_UNLIT      1.0f    // emissive only (the blue border line)
+
+//---------------------------------------------------------------------------------------
 // Transforms a normal map sample to world space.
 //---------------------------------------------------------------------------------------
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)

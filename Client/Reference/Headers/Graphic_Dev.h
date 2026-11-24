@@ -45,6 +45,8 @@ public: // For SwapChain
 	ID3D12Resource* CurrentBackBuffer() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
+	// 메인 깊이 버퍼 리소스 (R24G8_TYPELESS). Deferred 라이팅 패스가 SRV 로 읽는다. 평소 상태는 DEPTH_WRITE
+	ID3D12Resource* Get_DepthStencilBuffer() const { return m_DepthStencilBuffer; }
 	// 엔진 오프스크린 RT용 RTV 칸 (0 ~ RTV_ENGINE_RESERVED-1). 백버퍼 RTV 바로 뒤에 있다
 	D3D12_CPU_DESCRIPTOR_HANDLE EngineRtv(UINT slot) const;
 	// 렌더 해상도 (= 백버퍼 크기). 창 크기와는 다르다 (MainApp WM_SIZE 주석 참고)

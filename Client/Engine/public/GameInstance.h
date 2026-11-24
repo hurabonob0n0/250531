@@ -40,6 +40,7 @@ public:		//For_GraphicDev
 	void Present() { m_Graphic_Dev->Present(); }
 	void OnResize() { m_Graphic_Dev->OnResize(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const { return m_Graphic_Dev->DepthStencilView(); }
+	ID3D12Resource* Get_DepthStencilBuffer() const { return m_Graphic_Dev->Get_DepthStencilBuffer(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE Get_EngineRtv(UINT slot) const { return m_Graphic_Dev->EngineRtv(slot); }
 	UINT Get_ClientWidth() const { return m_Graphic_Dev->Get_ClientWidth(); }
 	UINT Get_ClientHeight() const { return m_Graphic_Dev->Get_ClientHeight(); }
@@ -115,6 +116,7 @@ public: //For TextureMgr
 	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_EngineSrvGpuHandle(_uint slot) const { return m_TextureMgr->Get_EngineSrvGpuHandle(slot); }
 	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureTableGpuHandle() const { return m_TextureMgr->Get_TextureTableGpuHandle(); }
 	CD3DX12_GPU_DESCRIPTOR_HANDLE Get_TextureGpuHandle(_uint texIndex) const { return m_TextureMgr->Get_TextureGpuHandle(texIndex); }
+	_uint Find_Texture(const string& texname) const { return m_TextureMgr->Find_Texture(texname); }	// 0 (pink) if not found
 
 public: //For PSOMgr
 	ID3D12PipelineState* GetPSO(const string& PSOName) const { return m_PSOMgr->Get(PSOName); }
@@ -184,6 +186,8 @@ public:
 	CRenderTarget*			m_HDRTarget = nullptr;	// HDR scene RT (HDR_FORMAT, RTV_SLOT_HDR / SRV_SLOT_HDR). Bloom step 1
 	// Bloom ping-pong RTs at half resolution. [0] = A (bright pass output, final blurred bloom), [1] = B (blur temp)
 	CRenderTarget*			m_BloomTarget[2] = { nullptr, nullptr };
+	// Deferred G-Buffer: [0] albedo, [1] normal, [2] material, [3] emissive (Engine_Config.h GBUFFER_*)
+	CRenderTarget*			m_GBuffer[GBUFFER_COUNT] = { nullptr, nullptr, nullptr, nullptr };
 };
 
 END

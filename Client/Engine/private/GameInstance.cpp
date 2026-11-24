@@ -39,6 +39,7 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 	m_RootSignatureMgr = CRootSignatureMgr::Get_Instance();
 	m_RootSignatureMgr->Register("DefaultRS", CRootSignature::Create()->CreateDefaultGraphicsRootSignature());
 	m_RootSignatureMgr->Register("PostProcessRS", CRootSignature::Create()->CreatePostProcessRootSignature());
+	m_RootSignatureMgr->Register("DeferredLightingRS", CRootSignature::Create()->CreateDeferredLightingRootSignature());
 
 	//ShaderMgr
 	m_ShaderMgr = CShader_Mgr::Get_Instance();
@@ -73,6 +74,14 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		m_ShaderMgr->AddShader("BlurPS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", blurDefines);
 		static const D3D_SHADER_MACRO compositeDefines[] = { { "COMPOSITE", "1" }, { nullptr, nullptr } };
 		m_ShaderMgr->AddShader("CompositePS", CShader::ST_PS, L"../bin/Shaders1/PostProcess.hlsl", compositeDefines);
+	}
+	// Deferred: G-Buffer 기록 PS 는 기존 셰이더 파일에 GBUFFER 를 정의해서 컴파일 (VS 는 기존 DefaultVS / PosNorVS 그대로)
+	{
+		static const D3D_SHADER_MACRO gbufferDefines[] = { { "GBUFFER", "1" }, { nullptr, nullptr } };
+		m_ShaderMgr->AddShader("GBufferPS", CShader::ST_PS, L"../bin/Shaders1/Default.hlsl", gbufferDefines);
+		m_ShaderMgr->AddShader("GBufferPosNorPS", CShader::ST_PS, L"../bin/Shaders1/Default3.hlsl", gbufferDefines);
+		m_ShaderMgr->AddShader("DeferredLightingVS", CShader::ST_VS, L"../bin/Shaders1/DeferredLighting.hlsl", nullptr);
+		m_ShaderMgr->AddShader("DeferredLightingPS", CShader::ST_PS, L"../bin/Shaders1/DeferredLighting.hlsl", nullptr);
 	}
 
 	//PSOMgr
@@ -201,6 +210,40 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 		set_Cull_None()->
 		Create_PSO());
 
+	// Deferred G-Buffer 패스: 같은 정점 셰이더, PS 만 G-Buffer 4장(MRT)에 쓰는 버전. 깊이는 평소처럼 쓴다
+	{
+		const DXGI_FORMAT gbufferFormats[GBUFFER_COUNT] = {
+			GBUFFER_FORMAT_ALBEDO, GBUFFER_FORMAT_NORMAL, GBUFFER_FORMAT_MATERIAL, GBUFFER_FORMAT_EMISSIVE };
+
+		m_PSOMgr->AddPSO("GBufferPSO", CPSO::Create()->
+			SetInputLayout(CPSO::IT_MESH)->
+			SetVS(m_ShaderMgr->GetShaderObj("DefaultVS"))->
+			SetPS(m_ShaderMgr->GetShaderObj("GBufferPS"))->
+			SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+			SetRTVFormats(GBUFFER_COUNT, gbufferFormats)->
+			Create_PSO());
+
+		m_PSOMgr->AddPSO("GBufferPosNorPSO", CPSO::Create()->
+			SetInputLayout(CPSO::IT_MESH)->
+			SetVS(m_ShaderMgr->GetShaderObj("PosNorVS"))->
+			SetPS(m_ShaderMgr->GetShaderObj("GBufferPosNorPS"))->
+			SetRS(m_RootSignatureMgr->Get("DefaultRS"))->
+			SetRTVFormats(GBUFFER_COUNT, gbufferFormats)->
+			Create_PSO());
+	}
+
+	// Deferred 라이팅 패스: G-Buffer + 깊이를 읽어 HDR RT 에 조명 결과를 쓴다. 풀스크린 삼각형, 깊이 버퍼 안 묶음
+	// (깊이를 SRV 로 읽는 중이라 DSV 로 동시에 묶을 수 없다)
+	m_PSOMgr->AddPSO("DeferredLightingPSO", CPSO::Create()->
+		SetNoInputLayout()->
+		SetVS(m_ShaderMgr->GetShaderObj("DeferredLightingVS"))->
+		SetPS(m_ShaderMgr->GetShaderObj("DeferredLightingPS"))->
+		SetRS(m_RootSignatureMgr->Get("DeferredLightingRS"))->
+		SetRTVFormat(HDR_FORMAT)->
+		SetNoDepthStencil()->
+		set_Cull_None()->
+		Create_PSO());
+
 	//Renderer
 	m_MainRenderer = CRenderer::Create(Get_Device(),Get_CommandList(),this);
 	m_ComponentMgr->AddPrototype("RendererCom", m_MainRenderer);
@@ -243,6 +286,31 @@ void CGameInstance::Initialize(WindowInfo& windowInfo, CRawInput* pRawInput)
 				Get_EngineSrvCpuHandle(bloomSrv[i]),
 				Get_EngineSrvGpuHandle(bloomSrv[i]));
 		}
+	}
+
+	// Deferred G-Buffer 4장 (전체 해상도). RTV 엔진 3~6, SRV 엔진 4~7
+	// 라이팅 패스가 깊이 1(하늘)인 픽셀은 안 읽고, 나머지는 기하 패스가 매 프레임 덮어쓰므로 Clear 는 안 한다
+	{
+		const DXGI_FORMAT gbufferFormats[GBUFFER_COUNT] = {
+			GBUFFER_FORMAT_ALBEDO, GBUFFER_FORMAT_NORMAL, GBUFFER_FORMAT_MATERIAL, GBUFFER_FORMAT_EMISSIVE };
+		const FLOAT zeroColor[4] = { 0.f, 0.f, 0.f, 0.f };
+		for (int i = 0; i < GBUFFER_COUNT; ++i)
+		{
+			m_GBuffer[i] = CRenderTarget::Create(Get_ClientWidth(), Get_ClientHeight(), gbufferFormats[i], zeroColor,
+				Get_EngineRtv(RTV_SLOT_GBUFFER0 + i),
+				Get_EngineSrvCpuHandle(SRV_SLOT_GBUFFER0 + i),
+				Get_EngineSrvGpuHandle(SRV_SLOT_GBUFFER0 + i));
+		}
+
+		// 메인 깊이 버퍼에 SRV 추가 (그림자맵과 같은 방식: 리소스는 TYPELESS, DSV 는 D24_UNORM_S8_UINT, SRV 는 R24_UNORM_X8_TYPELESS)
+		// 깊이 24비트만 읽고 스텐실 8비트는 버린다. 그래픽 장치가 OnResize 로 깊이 버퍼를 다시 만들면 이 SRV 도 다시 만들어야 한다
+		D3D12_SHADER_RESOURCE_VIEW_DESC depthSrv{};
+		depthSrv.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		depthSrv.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		depthSrv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		depthSrv.Texture2D.MostDetailedMip = 0;
+		depthSrv.Texture2D.MipLevels = 1;
+		Get_Device()->CreateShaderResourceView(Get_DepthStencilBuffer(), &depthSrv, Get_EngineSrvCpuHandle(SRV_SLOT_DEPTH));
 	}
 
 	m_Graphic_Dev->Execute_CommandList();
@@ -297,6 +365,8 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_FrameResourceMgr);
 	// D3D 리소스를 가진 매니저는 Graphic_Dev(Device)보다 먼저 해제한다.
 	// Graphic_Dev::Free()의 ReportLiveDeviceObjects에 정상 텍스처가 누수로 섞여 나오지 않게 하기 위함
+	for (int i = 0; i < GBUFFER_COUNT; ++i)
+		Safe_Release(m_GBuffer[i]);
 	Safe_Release(m_BloomTarget[0]);
 	Safe_Release(m_BloomTarget[1]);
 	Safe_Release(m_HDRTarget);

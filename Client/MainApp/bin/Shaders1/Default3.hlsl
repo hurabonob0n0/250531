@@ -53,6 +53,25 @@ VertexOut VS(VertexIn vin)
     return vout;
 }
 
+#ifdef GBUFFER
+// Deferred geometry pass for PosNor objects. The forward PS below uses no shadow, no normal map,
+// shininess 1 and no reflection, so the flag tells the lighting pass to skip shadow and reflection.
+GBufferOut PS(VertexOut pin)
+{
+    MaterialData matData = gMaterialData[gMaterialIndex];
+    float4 diffuseAlbedo = matData.DiffuseAlbedo;
+    diffuseAlbedo *= gTextureMaps[matData.DiffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+
+    GBufferOut gout;
+    gout.Albedo   = float4(diffuseAlbedo.rgb, 1.0f);           // shininess 1
+    gout.Normal   = float4(normalize(pin.NormalW), 0.0f);
+    gout.Material = float4(matData.FresnelR0, GBUFFER_FLAG_NO_SHADOW);
+    gout.Emissive = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    return gout;
+}
+
+#else
+
 float4 PS(VertexOut pin) : SV_Target
 {
 	// Fetch the material data.
@@ -102,3 +121,5 @@ float4 PS(VertexOut pin) : SV_Target
     
     return litColor;
 }
+
+#endif // GBUFFER

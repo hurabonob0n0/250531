@@ -173,6 +173,54 @@ CRootSignature* CRootSignature::CreatePostProcessRootSignature()
 	return this;
 }
 
+// Deferred 라이팅 패스용 (풀스크린 삼각형). 셰이더가 Common.hlsl 을 그대로 include 하도록 레지스터를 DefaultRS 와 맞췄다
+// slot 1, 2 번호도 DefaultRS 와 같게 둬서 Set_CurrentFramePBMats(0) (PassCB = slot 1, 머티리얼 = slot 2) 를 그대로 쓴다
+CRootSignature* CRootSignature::CreateDeferredLightingRootSignature()
+{
+	// slot 0: G-Buffer 4장 + 깊이 (t0~t4, space2). 힙 엔진 칸 4~8 이 붙어 있어서 테이블 하나로 끝난다
+	//         space2 로 둔 이유: space0 의 t0(큐브맵), t1(그림자맵), t2~(gTextureMaps) 와 겹치지 않게
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2, GBUFFER_COUNT + 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// slot 1: PassCB (b1). 조명, 카메라 위치, 역 ViewProj, 그림자 행렬
+	Push(D3D12_ROOT_PARAMETER_TYPE_CBV, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+
+	// slot 2: 머티리얼 버퍼 (t0, space1). 라이팅 셰이더는 안 쓰지만 Set_CurrentFramePBMats 가 slot 2 에 SRV 를 걸기 때문에 자리를 맞춘다
+	Push(D3D12_ROOT_PARAMETER_TYPE_SRV, 0, 1, D3D12_SHADER_VISIBILITY_ALL);
+
+	// slot 3: 큐브맵 (t0). 반사
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// slot 4: 그림자맵 (t1)
+	PushTable(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// slot 5: 루트 상수 (b2) 1개 = gDebugMode. 0 조명 결과, 1 노멀, 2 그림자, 3 알베도, 4 광택, 5 발광, 6 깊이
+	Push(D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS, 2, 0, D3D12_SHADER_VISIBILITY_ALL, 1);
+
+	auto staticSamplers = GetStaticSamplers();
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.NumParameters		= static_cast<UINT>(mParams.size());
+	rootSignatureDesc.pParameters		= mParams.data();
+	rootSignatureDesc.NumStaticSamplers = static_cast<UINT>(staticSamplers.size());
+	rootSignatureDesc.pStaticSamplers	= staticSamplers.data();
+	rootSignatureDesc.Flags				= D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errBlob);
+	if (errBlob)
+		OutputDebugStringA(static_cast<const char*>(errBlob->GetBufferPointer()));
+	if (SUCCEEDED(hr))
+		GETDEVICE->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+	else
+		MSG_BOX("Failed to Serialize : DeferredLighting RootSignature");
+
+	Safe_Release(signatureBlob);
+	Safe_Release(errBlob);
+
+	return this;
+}
+
 CRootSignature* CRootSignature::Create()
 {
 	CRootSignature* pInstance = new CRootSignature;

@@ -35,6 +35,7 @@ public:
     CPSO* SetNoInputLayout();                // fullscreen triangle made from SV_VertexID, no vertex buffer
     CPSO* set_Cull_None();
     CPSO* SetNoDepthStencil();               // no DSV bound (bloom passes): DSVFormat UNKNOWN, depth off
+    CPSO* SetRTVFormats(UINT count, const DXGI_FORMAT* formats);  // MRT (G-Buffer pass)
 
 private:
     ID3D12PipelineState* m_PSO = nullptr;

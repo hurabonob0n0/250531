@@ -69,6 +69,63 @@ VertexOut VS(VertexIn vin)
     return vout;
 }
 
+#ifdef GBUFFER
+//---------------------------------------------------------------------------------------
+// Deferred geometry pass: same inputs as the forward PS below, but instead of lighting
+// the pixel it stores what the lighting needs into the G-Buffer (see Common.hlsl).
+// Lighting happens later, once per visible pixel, in DeferredLighting.hlsl.
+//---------------------------------------------------------------------------------------
+GBufferOut PS(VertexOut pin)
+{
+	MaterialData matData = gMaterialData[gMaterialIndex];
+	float4 diffuseAlbedo = matData.DiffuseAlbedo;
+	diffuseAlbedo *= gTextureMaps[matData.DiffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+
+#ifdef ALPHA_TEST
+    clip(diffuseAlbedo.a - 0.1f);
+#endif
+
+    pin.NormalW = normalize(pin.NormalW);
+	float4 normalMapSample = gTextureMaps[matData.NormalMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
+
+    const float shininess = (1.0f - matData.Roughness) * normalMapSample.a;
+
+    // The forward PS edits the lit color at the end (border line, team tint).
+    // Those don't depend on light, so they go to the emissive target and get added after lighting.
+    float  flag = GBUFFER_FLAG_LIT;
+    float3 emissive = float3(0.0f, 0.0f, 0.0f);
+    if (gObjPad0 == 1)
+    {
+        float dist = length(pin.PosW.xz);
+        float radius = 300.f;
+
+        if (dist >= radius - 5.f && dist <= radius)
+        {
+            flag = GBUFFER_FLAG_UNLIT;              // forward: litColor.rgb = blue (replaces lighting)
+            emissive = float3(0.f, 0.f, 1.f);
+        }
+        if (dist < radius - 5.f)
+            emissive += float3(0.f, 0.f, 0.05f);
+    }
+
+    if (gObjPad1 == 1)
+        emissive.r += 0.1f;
+    else if (gObjPad1 == 2)
+        emissive.b += 0.1f;
+    else if (gObjPad1 == 3)
+        emissive -= 0.1f;
+
+    GBufferOut gout;
+    gout.Albedo   = float4(diffuseAlbedo.rgb, shininess);
+    gout.Normal   = float4(bumpedNormalW, 0.0f);
+    gout.Material = float4(matData.FresnelR0, flag);
+    gout.Emissive = float4(emissive, 0.0f);
+    return gout;
+}
+
+#else
+
 float4 PS(VertexOut pin) : SV_Target
 {
 	// Fetch the material data.
@@ -163,5 +220,7 @@ float4 PS(VertexOut pin) : SV_Target
     return litColor;
 
 }
+
+#endif // GBUFFER
 
 
